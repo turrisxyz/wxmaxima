@@ -93,7 +93,15 @@ public:
   { if (m_image)m_image->ClearCache(); }
 
   virtual wxString GetToolTip(const wxPoint &point);
-  
+
+  //! Is this an svg image?
+  bool IsSVG(){
+    if(m_image)
+      return m_image->IsSVG();
+    else
+      return false;
+  }
+
   //! Sets the bitmap that is shown
   void SetBitmap(const wxBitmap &bitmap);
 

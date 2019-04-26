@@ -117,7 +117,8 @@ public:
     is known) this function returns wxEmptyString.
    */
   wxString GnuplotData();
-
+  //! Is this an svg image?
+  bool IsSVG(){return m_isSVG;}
   //! Returns the gnuplot source of this image
   wxMemoryBuffer GetGnuplotSource();
   //! Returns the gnuplot data of this image

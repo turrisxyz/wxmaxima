@@ -7480,16 +7480,41 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
       break;
     case Worksheet::popid_image:
     {
-      wxString file = wxFileSelector(_("Save selection to file"), m_lastPath,
-                                     wxT("image.png"), wxT("png"),
-                                     _("PNG image (*.png)|*.png|"
-                                               "JPEG image (*.jpg)|*.jpg|"
-                                               "Windows bitmap (*.bmp)|*.bmp|"
-                                               "Portable animap (*.pnm)|*.pnm|"
-                                               "Tagged image file format (*.tif)|*.tif|"
-                                               "X pixmap (*.xpm)|*.xpm"
+      bool supportsSVG = false;
+      
+      Cell *cell = m_worksheet->m_cellPointers.m_selectionStart;
+      
+      if((cell->GetType() == MC_TYPE_IMAGE) &&
+         (dynamic_cast<ImgCell *>(cell))->IsSVG())
+        supportsSVG = true;
+      if((cell->GetType() == MC_TYPE_SLIDE) &&
+         (dynamic_cast<SlideShow *>(cell))->IsSVG())
+        supportsSVG = true;
+      
+      wxString file;
+      if(supportsSVG)
+        file = wxFileSelector(_("Save selection to file"), m_lastPath,
+                              wxT("image.svg"), wxT("svg"),
+                              _("Scalable Vector Graphics (*.svg)|*.svg|"
+                                "PNG image (*.png)|*.png|"
+                                "JPEG image (*.jpg)|*.jpg|"
+                                "Windows bitmap (*.bmp)|*.bmp|"
+                                "Portable animap (*.pnm)|*.pnm|"
+                                "Tagged image file format (*.tif)|*.tif|"
+                                "X pixmap (*.xpm)|*.xpm"
                                      ),
-                                     wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+                              wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+      else
+        file = wxFileSelector(_("Save selection to file"), m_lastPath,
+                              wxT("image.png"), wxT("png"),
+                              _("PNG image (*.png)|*.png|"
+                                "JPEG image (*.jpg)|*.jpg|"
+                                "Windows bitmap (*.bmp)|*.bmp|"
+                                "Portable animap (*.pnm)|*.pnm|"
+                                "Tagged image file format (*.tif)|*.tif|"
+                                "X pixmap (*.xpm)|*.xpm"
+                                     ),
+                              wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
       if (file.Length())
       {
         m_worksheet->CopyToFile(file);

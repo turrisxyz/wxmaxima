@@ -79,7 +79,15 @@ public:
   };
 
   bool IsOk(){return (m_size>0) && (m_images[m_displayed]->IsOk());}
-  
+
+  //! Is this an svg image?
+  bool IsSVG(){
+    if(m_images[m_displayed]->IsOk())
+      return m_images[m_displayed]->IsSVG();
+    else
+      return false;
+  }
+
   virtual wxString GetToolTip(const wxPoint &point);
 
   std::list<Cell *> GetInnerCells();
