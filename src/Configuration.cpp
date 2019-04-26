@@ -42,7 +42,7 @@ Configuration::Configuration(wxDC *dc) : m_dc(dc)
   m_zoomFactor = 1.0; // affects returned fontsizes
   m_top = -1;
   m_bottom = -1;
-  m_useSVG = true;
+  m_useSVG = false;
   m_changeAsterisk = true;
   m_workSheet = NULL;
   m_printScale = 1.0;
