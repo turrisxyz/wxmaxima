@@ -35,6 +35,10 @@
 #include <wx/filesys.h>
 #include <wx/fs_arc.h>
 #include <wx/buffer.h>
+#include <wx/buffer.h>
+#include <wxSVG/svg.h>
+#include <wxSVG/svgctrl.h>
+#include <wxSVG/SVGCanvas.h>
 
 /*! Manages an auto-scaling image
 
@@ -203,6 +207,11 @@ protected:
   //! The gnuplot data file for this image, if any.
   wxString m_gnuplotData;
 private:
+
+  //! A svg renderer. Needed in case the image is svg.
+  wxSVGDocument m_svgImage;
+  bool m_isSVG;
+  //! A pointer to the pointer that points to the current configuration
   Configuration **m_configuration;
   //! The upper width limit for displaying this image
   double m_maxWidth;

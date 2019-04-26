@@ -52,15 +52,26 @@ wxMemoryBuffer Image::ReadCompressedImage(wxInputStream *data)
 wxBitmap Image::GetUnscaledBitmap()
 {
   wxMemoryInputStream istream(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
-  wxImage img(istream, wxBITMAP_TYPE_ANY);
   wxBitmap bmp;
-  if (img.Ok())
-    bmp = wxBitmap(img);
-  return bmp;
+  if(!m_isSVG)
+  {
+    wxImage img(istream, wxBITMAP_TYPE_ANY);
+    if (img.Ok())
+      bmp = wxBitmap(img);
+    return bmp;
+  }
+  else
+  {
+    wxImage img = m_svgImage.Render(); 
+    if (img.Ok())
+      bmp = wxBitmap(img);
+    return bmp;
+  }
 }
 
 Image::Image(Configuration **config)
 {
+  m_isSVG = false;
   m_configuration = config;
   m_width = 1;
   m_height = 1;
@@ -74,6 +85,7 @@ Image::Image(Configuration **config)
 
 Image::Image(Configuration **config, wxMemoryBuffer image, wxString type)
 {
+  m_isSVG = false;
   m_configuration = config;
   m_scaledBitmap.Create(1, 1);
   m_compressedImage = image;
@@ -98,6 +110,7 @@ Image::Image(Configuration **config, wxMemoryBuffer image, wxString type)
 
 Image::Image(Configuration **config, const wxBitmap &bitmap)
 {
+  m_isSVG = false;
   m_configuration = config;
   m_width = 1;
   m_height = 1;
@@ -109,6 +122,7 @@ Image::Image(Configuration **config, const wxBitmap &bitmap)
 // constructor which loads an image
 Image::Image(Configuration **config, wxString image, bool remove, wxFileSystem *filesystem)
 {
+  m_isSVG = false;
   m_configuration = config;
   m_scaledBitmap.Create(1, 1);
   m_width = 1;
@@ -485,57 +499,64 @@ wxBitmap Image::GetBitmap(double scale)
 {
   Recalculate(scale);
 
+  // Make sure we stay within sane defaults
+  if (m_width < 1)
+    m_width = 1;
+  if (m_height < 1)
+    m_height = 1;
+
   // Let's see if we have cached the scaled bitmap with the right size
   if (m_scaledBitmap.GetWidth() == m_width)
     return m_scaledBitmap;
 
-
-  // Seems like we need to create a new scaled bitmap.
-  if (m_scaledBitmap.GetWidth() != m_width)
+  if(m_isSVG)
+    m_scaledBitmap = m_svgImage.Render(m_width, m_height); 
+  else
   {
-    wxImage img;
-    if (m_compressedImage.GetDataLen() > 0)
+    // Seems like we need to create a new scaled bitmap.
+    if (m_scaledBitmap.GetWidth() != m_width)
     {
-      wxMemoryInputStream istream(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
+      wxImage img;
+      if (m_compressedImage.GetDataLen() > 0)
+      {
+        wxMemoryInputStream istream(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
+        
+        img = wxImage(istream, wxBITMAP_TYPE_ANY);
+      }
+      m_isOk = true;
+      
+      if (img.Ok())
+        m_scaledBitmap = wxBitmap(img);
+      else
+      {
+        m_isOk = false;
+        // Create a "image not loaded" bitmap.
+        m_scaledBitmap.Create(400, 250);
 
-      img = wxImage(istream, wxBITMAP_TYPE_ANY);
+        wxString error(_("Error"));
+
+        wxMemoryDC dc;
+        dc.SelectObject(m_scaledBitmap);
+
+        int width = 0, height = 0;
+        dc.GetTextExtent(error, &width, &height);
+
+        dc.DrawRectangle(0, 0, 400, 250);
+        dc.DrawLine(0, 0, 400, 250);
+        dc.DrawLine(0, 250, 400, 0);
+        dc.DrawText(error, 200 - width / 2, 125 - height / 2);
+
+        dc.GetTextExtent(error, &width, &height);
+        dc.DrawText(error, 200 - width / 2, 150 - height / 2);
+      }
     }
-    m_isOk = true;
-
-    if (img.Ok())
-      m_scaledBitmap = wxBitmap(img);
-    else
-    {
-      m_isOk = false;
-      // Create a "image not loaded" bitmap.
-      m_scaledBitmap.Create(400, 250);
-
-      wxString error(_("Error"));
-
-      wxMemoryDC dc;
-      dc.SelectObject(m_scaledBitmap);
-
-      int width = 0, height = 0;
-      dc.GetTextExtent(error, &width, &height);
-
-      dc.DrawRectangle(0, 0, 400, 250);
-      dc.DrawLine(0, 0, 400, 250);
-      dc.DrawLine(0, 250, 400, 0);
-      dc.DrawText(error, 200 - width / 2, 125 - height / 2);
-
-      dc.GetTextExtent(error, &width, &height);
-      dc.DrawText(error, 200 - width / 2, 150 - height / 2);
-    }
+    
+    // Create a scaled bitmap.
+    wxImage img = m_scaledBitmap.ConvertToImage();
+    img.Rescale(m_width, m_height, wxIMAGE_QUALITY_BICUBIC);
+    m_scaledBitmap = wxBitmap(img, 24);
   }
 
-  // Make sure we stay within sane defaults
-  if (m_width < 1)m_width = 1;
-  if (m_height < 1)m_height = 1;
-
-  // Create a scaled bitmap and return it.
-  wxImage img = m_scaledBitmap.ConvertToImage();
-  img.Rescale(m_width, m_height, wxIMAGE_QUALITY_BICUBIC);
-  m_scaledBitmap = wxBitmap(img, 24);
   return m_scaledBitmap;
 }
 
@@ -602,30 +623,41 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
   }
 
   m_isOk = false;
-  
+  m_isSVG = false;
   wxImage Image;
   if (m_compressedImage.GetDataLen() > 0)
   {
     wxMemoryInputStream istream(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
-    Image.LoadFile(istream);
+    if(!Image.LoadFile(istream))
+    {
+      wxMemoryInputStream istream2(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
+      m_svgImage.Load(istream2);
+      m_isSVG = true;
+    }
   }
-
+  
   m_extension = wxFileName(image).GetExt();
 
   m_originalWidth = 400;
   m_originalHeight = 250;
 
-  if (Image.Ok())
+  if (Image.Ok() && (!m_isSVG))
   {
     m_originalWidth = Image.GetWidth();
     m_originalHeight = Image.GetHeight();
     m_isOk = true;
   }
   else
-    m_isOk = false;
-
+  {
+    wxImage image = m_svgImage.Render();
+    m_originalWidth = image.GetWidth();
+    m_originalHeight = image.GetHeight();
+    if((m_originalWidth > 0) && (m_originalHeight > 0))
+      m_isOk = true;
+    else
+      m_isOk = false;
+  }
   Recalculate();
-
 }
 
 void Image::Recalculate(double scale)
