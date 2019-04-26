@@ -263,7 +263,7 @@ protected:
   wxCheckBox *m_restartOnReEvaluation;
   wxCheckBox *m_wrapLatexMath;
   wxCheckBox *m_savePanes;
-  wxCheckBox *m_usepngCairo;
+  wxCheckBox *m_usesvg;
   wxCheckBox *m_antialiasLines;
   wxSpinCtrl *m_defaultFramerate;
   wxSpinCtrl *m_defaultPlotWidth;
@@ -364,7 +364,7 @@ protected:
   void MaximaLocationChanged(wxCommandEvent &unused);
 
   //! Is called when the path to the maxima binary was changed.
-  void UsepngcairoChanged(wxCommandEvent &event);
+  void UsesvgChanged(wxCommandEvent &event);
 
   //! Is called when the configuration dialog is closed.
   void OnClose(wxCloseEvent &event);

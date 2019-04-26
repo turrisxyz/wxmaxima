@@ -650,10 +650,15 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
   else
   {
     wxImage image = m_svgImage.Render();
-    m_originalWidth = image.GetWidth();
-    m_originalHeight = image.GetHeight();
-    if((m_originalWidth > 0) && (m_originalHeight > 0))
-      m_isOk = true;
+    if(image.IsOk())
+    {
+      m_originalWidth = image.GetWidth();
+      m_originalHeight = image.GetHeight();
+      if((m_originalWidth > 0) && (m_originalHeight > 0))
+        m_isOk = true;
+      else
+        m_isOk = false;
+    }
     else
       m_isOk = false;
   }

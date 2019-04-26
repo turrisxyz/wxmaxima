@@ -641,6 +641,12 @@ public:
     {
       wxConfig::Get()->Write(wxT("copyMathMLHTML"), m_copyMathMLHTML = copyMathMLHTML );
     }
+
+  bool UseSVG(){return m_useSVG;}
+  void UseSVG(bool useSVG)
+    {
+      wxConfig::Get()->Write(wxT("useSVG"), m_useSVG = useSVG );
+    }
   bool CopyRTF(){return m_copyRTF;}
   void CopyRTF(bool copyRTF)
     {
@@ -825,6 +831,7 @@ private:
   bool m_showCodeCells;
   bool m_copyBitmap;
   bool m_copyMathML;
+  bool m_useSVG;
   bool m_copyMathMLHTML;
   int m_showLength;
   bool m_copyRTF;

@@ -276,7 +276,7 @@ ConfigDialogue::~ConfigDialogue()
 }
 
 
-void ConfigDialogue::UsepngcairoChanged(
+void ConfigDialogue::UsesvgChanged(
   #ifdef __WXOSX__
   wxCommandEvent &event
   #else
@@ -287,12 +287,12 @@ void ConfigDialogue::UsepngcairoChanged(
   #ifdef __WXOSX__
   if(event.IsChecked())
   {
-    m_usepngCairo->SetForegroundColour(*wxRED);
+    m_usesvg->SetForegroundColour(*wxRED);
   }
   else
   {
     wxSystemSettings systemSettings;
-    m_usepngCairo->SetForegroundColour(systemSettings.GetColour(wxSYS_COLOUR_WINDOWTEXT));
+    m_usesvg->SetForegroundColour(systemSettings.GetColour(wxSYS_COLOUR_WINDOWTEXT));
   }
   #endif
 }
@@ -359,8 +359,8 @@ void ConfigDialogue::SetProperties()
   m_exportWithMathJAX->SetToolTip(
           _("MathJAX creates scalable High-Quality representations of 2D Maths that can be used for Drag-And-Drop and provides accessability options. The disadvantage of MathJAX is that it needs JavaScript and a little bit of time in order to typeset equations.\nMathML is much faster than MathJaX, if it is supported by the browser. But many MathML implementations tend to lack necessary features.\nBitmaps tend to need more band width than the other two options. They lack support for advanced features like drag-and-drop or accessibility. Also they have problems aligning and scaling with the rest of the text and might use fonts that don't match the rest of the document."));
   m_savePanes->SetToolTip(_("Save panes layout between sessions."));
-  m_usepngCairo->SetToolTip(
-          _("The pngCairo terminal offers much better graphics quality (antialiassing and additional line styles). But it will only produce plots if the gnuplot installed on the current system actually supports it. Requesting cairo on a system thhat doesn't support it might result in empty plots."));
+  m_usesvg->SetToolTip(
+          _("PNG images can be read by old wxMaxima versions - but aren't really scalable."));
   m_antialiasLines->SetToolTip(
           _("Try to antialias lines (which allows to move them by a fraction of a pixel, but reduces their sharpness)."));
   m_matchParens->SetToolTip(
@@ -413,21 +413,12 @@ void ConfigDialogue::SetProperties()
   wxString documentclass = wxT("article");
   wxString symbolPaneAdditionalChars = wxT("üØ");
   m_symbolPaneAdditionalChars->SetValue(symbolPaneAdditionalChars);
-
-#if defined (__WXOSX__)
-  bool usepngCairo = false;
-#else
-  bool usepngCairo=true;
-#endif
-
-
   int rs = 0;
   int panelSize = 1;
 
   config->Read(wxT("maxima"), &mp);
   config->Read(wxT("parameters"), &mc);
   config->Read(wxT("AUI/savePanes"), &savePanes);
-  config->Read(wxT("usepngCairo"), &usepngCairo);
   config->Read(wxT("DefaultFramerate"), &defaultFramerate);
   int defaultPlotWidth = 600;
 
@@ -484,10 +475,7 @@ void ConfigDialogue::SetProperties()
   else
     m_saveSize->SetValue(false);
   m_savePanes->SetValue(savePanes);
-  m_usepngCairo->SetValue(usepngCairo);
-  #ifdef __WXOSX__
-  m_usepngCairo->SetForegroundColour(*wxRED);
-  #endif
+  m_usesvg->SetValue(configuration->UseSVG());
   m_antialiasLines->SetValue(configuration->AntiAliasLines());
 
   m_AnimateLaTeX->SetValue(AnimateLaTeX);
@@ -888,12 +876,12 @@ wxPanel *ConfigDialogue::CreateOptionsPanel()
   m_savePanes = new wxCheckBox(panel, -1, _("Save panes layout"));
   vsizer->Add(m_savePanes, 0, wxALL, 5);
 
-  m_usepngCairo = new wxCheckBox(panel, -1, _("Use cairo to improve plot quality."));
-  m_usepngCairo->Connect(wxEVT_CHECKBOX,
-                         wxCommandEventHandler(ConfigDialogue::UsepngcairoChanged),
+  m_usesvg = new wxCheckBox(panel, -1, _("Create scalable plots."));
+  m_usesvg->Connect(wxEVT_CHECKBOX,
+                         wxCommandEventHandler(ConfigDialogue::UsesvgChanged),
                          NULL, this);
 
-  vsizer->Add(m_usepngCairo, 0, wxALL, 5);
+  vsizer->Add(m_usesvg, 0, wxALL, 5);
 
   m_antialiasLines = new wxCheckBox(panel, -1, _("Antialias lines."));
   vsizer->Add(m_antialiasLines, 0, wxALL, 5);
@@ -1215,7 +1203,7 @@ void ConfigDialogue::WriteSettings()
   configuration->SetLabelChoice(m_showUserDefinedLabels->GetSelection());
   config->Write(wxT("defaultPort"), m_defaultPort->GetValue());
   config->Write(wxT("AUI/savePanes"), m_savePanes->GetValue());
-  config->Write(wxT("usepngCairo"), m_usepngCairo->GetValue());
+  configuration->UseSVG(m_usesvg->GetValue());
   configuration->AntiAliasLines(m_antialiasLines->GetValue());
   config->Write(wxT("DefaultFramerate"), m_defaultFramerate->GetValue());
   config->Write(wxT("defaultPlotWidth"), m_defaultPlotWidth->GetValue());
