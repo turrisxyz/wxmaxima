@@ -586,6 +586,7 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
 
   if (filesystem)
   {
+    // Load the image from a virtual file (that lies inside a .zip file or similar)
     wxFSFile *fsfile = filesystem->OpenFile(image);
     if (fsfile)
     { // open successful
@@ -602,6 +603,8 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
   }
   else
   {
+    // Load the image from a file.
+    
     wxFile file;
     // Support relative and absolute paths.
     if(wxFileExists((*m_configuration)->GetWorkingDirectory() + wxT("/") + image))
@@ -609,6 +612,8 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
     else
       file.Open(image);
 
+    // Read the file into memory: We need a copy of the file there in order to
+    // be able to save it along with the worksheet.
     if (file.IsOpened())
     {
       wxFileInputStream strm(file);
@@ -622,17 +627,22 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
     }
   }
 
+  // Now load the image from memory.
   m_isOk = false;
-  m_isSVG = false;
   wxImage Image;
   if (m_compressedImage.GetDataLen() > 0)
   {
     wxMemoryInputStream istream(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
-    if(!Image.LoadFile(istream))
+    if(image.Lower().EndsWith(".svg") ||
+       image.Lower().EndsWith(".svgz"))
     {
-      wxMemoryInputStream istream2(m_compressedImage.GetData(), m_compressedImage.GetDataLen());
-      m_svgImage.Load(istream2);
+      m_isOk = m_svgImage.Load(istream);
       m_isSVG = true;
+    }
+    else
+    {
+      m_isOk = Image.LoadFile(istream);
+      m_isSVG = false;
     }
   }
   
@@ -641,23 +651,23 @@ void Image::LoadImage(wxString image, bool remove, wxFileSystem *filesystem)
   m_originalWidth = 400;
   m_originalHeight = 250;
 
+  // Determine the image size
   if (Image.Ok() && (!m_isSVG))
   {
+    // For bitmaps this step is trivial
     m_originalWidth = Image.GetWidth();
     m_originalHeight = Image.GetHeight();
     m_isOk = true;
   }
   else
   {
-    wxImage image = m_svgImage.Render();
-    if(image.IsOk())
+    // svg images need to be rendered in order to determine their dimensions.
+    wxImage renderedImage = m_svgImage.Render();
+    if(renderedImage.IsOk())
     {
-      m_originalWidth = image.GetWidth();
-      m_originalHeight = image.GetHeight();
-      if((m_originalWidth > 0) && (m_originalHeight > 0))
-        m_isOk = true;
-      else
-        m_isOk = false;
+      m_width = m_originalWidth = renderedImage.GetWidth();
+      m_height = m_originalHeight = renderedImage.GetHeight();
+      m_scaledBitmap = wxBitmap(renderedImage);
     }
     else
       m_isOk = false;
