@@ -3,6 +3,7 @@ set(VERSION 19.04.3-DevelopmentSnapshot)
 set(PACKAGE_VERSION ${VERSION})
 set(GITVERSION ${VERSION})
 set(PACKAGE wxMaxima)
+include(FindPkgConfig)
 
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
@@ -30,6 +31,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
+pkg_search_module(WXSVG REQUIRED libwxsvg wxsvg)
 
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(WARNING "In-source builds are strongly discouraged. Please make an out-of-source-build instead (which means: run cmake and build the program from a different directory than the one the source package is in).")

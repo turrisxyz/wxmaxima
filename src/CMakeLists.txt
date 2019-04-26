@@ -99,7 +99,7 @@ else()
     add_executable(wxmaxima ${SOURCE_FILES})
 endif()
 
-target_link_libraries(wxmaxima ${wxWidgets_LIBRARIES})
+target_link_libraries(wxmaxima ${wxWidgets_LIBRARIES} ${WXSVG_LIBRARIES})
 
 include(CheckIncludeFiles)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Version.h.cin ${CMAKE_CURRENT_BINARY_DIR}/Version.h)
