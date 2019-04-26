@@ -1,3 +1,7 @@
+Current:
+ * wxMaxima now uses wxsvg in order to render svg files and per default uses
+   svg for plotting.
+
 19.04.3:
  * wxMaxima now informs maxima which front-end is in use.
 
