@@ -1,0 +1,12 @@
+[submodule "libs/wxsvg"]
+	path = libs/wxsvg
+	url = https://git.code.sf.net/p/wxsvg/git
+[submodule "libs/libpng"]
+	path = libs/libpng
+	url = git://git.code.sf.net/p/libpng/code
+[submodule "libs/zlib"]
+	path = libs/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "libs/cairo"]
+	path = libs/cairo
+	url = git://anongit.freedesktop.org/git/cairo
