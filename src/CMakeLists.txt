@@ -2,6 +2,12 @@ find_package(wxWidgets 3 REQUIRED std xml html adv aui core net base richtext)
 
 include(${wxWidgets_USE_FILE})
 
+include(FindPkgConfig)
+pkg_search_module(WXSVG libwxsvg wxsvg)
+pkg_search_module(ZLIB libzlib zlib)
+pkg_search_module(LIBPNG libpng png)
+pkg_search_module(LIBCAIRO libcairo cairo)
+
 file(GLOB SOURCE_FILES *.cpp *.h)
 
 # We provide our own manifest. MSVC seems not to autodetect that.
