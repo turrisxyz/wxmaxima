@@ -30,8 +30,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "MinSizeRel" "RelWithDebInfo")
 endif()
 
-pkg_search_module(WXSVG REQUIRED libwxsvg wxsvg)
-
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(WARNING "In-source builds are strongly discouraged. Please make an out-of-source-build instead (which means: run cmake and build the program from a different directory than the one the source package is in).")
 endif()
@@ -59,6 +57,18 @@ if(Git_FOUND)
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
         message(STATUS "Building from git development tree, revision: ${WXMAXIMA_GIT_VERSION}")
         add_definitions("-DWXMAXIMA_GIT_VERSION=\"${WXMAXIMA_GIT_VERSION}\"")
+    endif()
+    if(EXISTS libs/cairo/INSTALL)
+    else()
+      include(FindPkgConfig)
+      pkg_search_module(WXSVG libwxsvg wxsvg)
+      if (WXSVG_FOUND)
+      else()
+	message(STATUS "Downloading the necessary git submodules.")
+	# Download all the git submodules, if needed.
+	execute_process(COMMAND ${GIT_EXECUTABLE} submodules init
+          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+      endif()
     endif()
 endif()
 
