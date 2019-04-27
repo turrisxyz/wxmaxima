@@ -5,6 +5,11 @@ set(GITVERSION ${VERSION})
 set(PACKAGE wxMaxima)
 include(FindPkgConfig)
 
+pkg_search_module(WXSVG libwxsvg wxsvg)
+pkg_search_module(ZLIB libzlib zlib)
+pkg_search_module(LIBPNG libpng png)
+pkg_search_module(LIBCAIRO libcairo cairo)
+
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
 #SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg")
