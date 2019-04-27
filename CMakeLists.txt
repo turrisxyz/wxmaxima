@@ -58,15 +58,14 @@ if(Git_FOUND)
         message(STATUS "Building from git development tree, revision: ${WXMAXIMA_GIT_VERSION}")
         add_definitions("-DWXMAXIMA_GIT_VERSION=\"${WXMAXIMA_GIT_VERSION}\"")
     endif()
-    if(EXISTS libs/cairo/INSTALL)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/libs/cairo/INSTALL)
     else()
       include(FindPkgConfig)
       pkg_search_module(WXSVG libwxsvg wxsvg)
       if (WXSVG_FOUND)
       else()
-	message(STATUS "Downloading the necessary git submodules.")
-	# Download all the git submodules, if needed.
-	execute_process(COMMAND ${GIT_EXECUTABLE} submodules init
+	message(STATUS "Downloading the necessary git submodules into the source tree.")
+	execute_process(COMMAND ${GIT_EXECUTABLE} submodule init
           WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
       endif()
     endif()

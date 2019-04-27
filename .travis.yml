@@ -36,6 +36,7 @@ notification:
 git:
   depth: 15
 script:
+- git submodule init
 - export COV_BUILD_OPTIONS="--parse-error-threshold 5"
 - export COVERITY_SCAN_PROJECT_NAME="wxMaxima-developers/wxmaxima"
 - export COVERITY_SCAN_NOTIFICATION_EMAIL="gunter@peterpall.de"
