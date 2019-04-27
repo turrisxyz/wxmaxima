@@ -790,7 +790,9 @@ bool GroupCell::NeedsRecalculation()
                  (m_currentPoint.x < 0) || (m_currentPoint.y < 0) ||
                  ((*m_configuration)->RecalculationForce() ||
                   ((GetInput() != NULL) &&
-                   ((GetInput()->GetWidth() <= 0) || (GetInput()->GetHeight() <= 0))
+                   ((GetInput()->GetWidth() <= 0) || (GetInput()->GetHeight() <= 0) ||
+                    (GetInput()->GetCurrentPoint().x <= 0) || (GetInput()->GetCurrentPoint().y <= 0)
+                     )
                     )));
   return result;
 }
@@ -947,6 +949,13 @@ int GroupCell::GetInputIndent()
 
 void GroupCell::Draw(wxPoint point)
 {
+  if ((m_width < 1 || m_height < 1) ||
+      ((GetEditable() != NULL) &&
+     (
+       ((GetEditable()->GetHeight() < 1) ||
+        (GetEditable()->GetWidth() < 1)
+         ))))
+    Recalculate();
   Cell::Draw(point);
 
   Configuration *configuration = (*m_configuration);
@@ -956,7 +965,7 @@ void GroupCell::Draw(wxPoint point)
 
   if (DrawThisCell(point))
   {
-    if (m_width == -1 || m_height == -1)
+    if (m_width < 0|| m_height < 0)
       return;
     
     wxDC *dc = configuration->GetDC();
