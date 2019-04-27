@@ -8,6 +8,17 @@ pkg_search_module(ZLIB libzlib zlib)
 pkg_search_module(LIBPNG libpng png)
 pkg_search_module(LIBCAIRO libcairo cairo)
 
+
+if (WXSVG_FOUND)
+  message(STATUS "Building with system wxsvg includes")
+  add_library(WXSVG INTERFACE)
+  target_include_directories(WXSVG INTERFACE ${WXSVG_INCLUDE_DIR})
+  target_link_libraries(WXSVG INTERFACE ${WXSVG_LIBRARIES})
+else ()
+  add_subdirectory("../libs/wxsvg")
+  file(GLOB WXSVG_FILES "../libs/wxsvg/*.cpp" "../libs/wxsvg/*/*.cpp")
+endif ()
+
 file(GLOB SOURCE_FILES *.cpp *.h)
 
 # We provide our own manifest. MSVC seems not to autodetect that.
