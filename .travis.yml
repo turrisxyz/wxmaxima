@@ -25,7 +25,8 @@ before_install:
   ; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install gettext texinfo
   ; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wxwidgets cairo libexif
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install wxwidgets
+# cairo and libexif are provided by wxMaxima.
   ; fi
 notification:
   email:
