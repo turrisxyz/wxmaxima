@@ -10,3 +10,6 @@
 [submodule "libs/cairo"]
 	path = libs/cairo
 	url = git://anongit.freedesktop.org/git/cairo
+[submodule "libs/libexif"]
+	path = libs/libexif
+	url = https://github.com/libexif/libexif.git
