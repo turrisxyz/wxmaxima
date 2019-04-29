@@ -14,7 +14,75 @@ if (WXSVG_FOUND)
   target_link_libraries(WXSVG INTERFACE ${WXSVG_LIBRARIES})
 else ()
   message(STATUS "Will compile our own wxsvg")
-  file(GLOB WXSVG_FILES ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/*.cpp ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/svgxml/*.cpp)
+  set(WXSVG_FILES
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/CSSStyleDeclaration.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/CSSValue.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/Elements_CopyConstructors.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/Elements_GetAttribute.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/Elements_GetAttributes.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/Elements_HasAttribute.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/Elements_SetAttribute.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/GetSVGDocument.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/NodeList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGAngle.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGAnimateTransformElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGAnimateMotionElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGAnimatedType.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGAnimationElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGCanvas.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGCanvasItem.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGCircleElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGColor.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGDocument.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGElementInstanceList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGEllipseElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGFEGaussianBlurElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGFilterElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGFitToViewBox.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGImageElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGLength.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGLengthList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGLineElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGLocatable.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGMarkerElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGMatrix.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGNumberList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPaint.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPathElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPathSegList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPoint.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPointList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPolygonElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPolylineElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGPreserveAspectRatio.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGRadialGradientElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGRect.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGRectElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGSVGElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGStringList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGStylable.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTests.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTextContentElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTextElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTransform.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTransformList.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGTransformable.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGUseElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/SVGVideoElement.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/imagsvg.cpp
+    #   ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/mediadec_ffmpeg.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/svgctrl.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasCairo.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasCairo.h
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasImageCairo.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasImageCairo.h
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasPathCairo.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasPathCairo.h
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasTextCairo.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo/SVGCanvasTextCairo.h
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/svgxml/svgxml.cpp
+    ${CMAKE_SOURCE_DIR}/libs/wxsvg/src/svgxml/svgxmlhelpr.cpp
+    )
   set(SOURCE_FILES ${WXSVG_FILES} ${SOURCE_FILES})
   include_directories(${CMAKE_SOURCE_DIR}/libs/wxsvg/src)
   include_directories(${CMAKE_SOURCE_DIR}/libs/wxsvg/src/cairo)
