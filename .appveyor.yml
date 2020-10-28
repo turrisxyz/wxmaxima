@@ -16,7 +16,7 @@ configuration:
  - debug
  
 environment:
-  PATH: ;$(PATH)
+  PATH: c:\maxima-5.44.0\bin\;$(PATH)
   # The wxWidgets version as referred to in the source package
   WXVERSION: 3.1.3
   # The wxWidgets version as referred to in the build folder
@@ -67,8 +67,7 @@ install:
       choco install -y --no-progress pandoc
       choco install -y --no-progress maxima
       choco install -y --no-progress netcat
-      dir c:\
-      c:\maxima-5.44.0\bin\maxima --version
+      maxima --version
 before_build:
   - ps: |
       iex $env:TOOLKIT_INIT
