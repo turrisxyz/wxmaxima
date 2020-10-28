@@ -65,6 +65,7 @@ install:
       echo '- Installing pandoc...'
       choco install -y --no-progress pandoc
       choco install -y --no-progress maxima
+      type C:\ProgramData\chocolatey\logs\chocolatey.log
       choco install -y --no-progress netcat
       maxima --version
 before_build:
