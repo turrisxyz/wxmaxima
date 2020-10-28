@@ -64,7 +64,9 @@ install:
       echo ''
       echo '- Installing pandoc...'
       choco install -y --no-progress pandoc
-
+      choco install -y --no-progress maxima
+      choco install -y --no-progress netcat
+      maxima --version
 before_build:
   - ps: |
       iex $env:TOOLKIT_INIT
