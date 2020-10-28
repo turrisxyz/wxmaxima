@@ -146,6 +146,7 @@ build_script:
       iex $env:TOOLKIT_INIT
       pushd build
       cmake --build . --config Release
+      ctest
       if (! $?) { throw "CMake failed with exit code $LastExitCode" }
       popd
 
