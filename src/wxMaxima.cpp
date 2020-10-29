@@ -1163,6 +1163,7 @@ wxMaxima::wxMaxima(wxWindow *parent, int id, wxLocale *locale, const wxString ti
           wxCommandEventHandler(wxMaxima::ReplaceSuggestion), NULL, this);
   m_worksheet->SetFocus();
   StartAutoSaveTimer();
+  Close();
 }
 
 void wxMaxima::StartAutoSaveTimer()
