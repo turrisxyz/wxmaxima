@@ -327,11 +327,19 @@ wxMaxima::wxMaxima(wxWindow *parent, int id, wxLocale *locale, const wxString ti
     m_port++;
     if ((m_port > m_worksheet->m_configuration->DefaultPort() + 15000) || (m_port > 65535))
     {
-      LoggingMessageBox(_("wxMaxima could not start the server.\n\n"
-                          "Please check you have network support\n"
-                          "enabled and try again!"),
-                        _("Fatal error"),
-                        wxOK | wxICON_ERROR);
+      wxString message = _("wxMaxima could not start the server.\n\n"
+                           "Please check you have network support\n"
+                           "enabled and try again!");
+      if(m_exitAfterEval)
+      {
+        std::cerr<<message;
+        Retval(-1);
+        Close();
+      }
+      else
+        LoggingMessageBox(message,
+                          _("Fatal error"),
+                          wxOK | wxICON_ERROR);
       break;
     }
   }
@@ -1848,8 +1856,16 @@ bool wxMaxima::StartMaxima(bool force)
       m_maximaStdout = NULL;
       m_maximaStderr = NULL;
       m_statusBar->NetworkStatus(StatusBar::offline);
-      LoggingMessageBox(_("Can not start maxima. The most probable cause is that maxima isn't installed (it can be downloaded from http://maxima.sourceforge.net) or in wxMaxima's config dialogue the setting for maxima's location is wrong."), _("Error"),
-                        wxOK | wxICON_ERROR);
+      wxString message = _("Can not start maxima. The most probable cause is that maxima isn't installed (it can be downloaded from http://maxima.sourceforge.net) or in wxMaxima's config dialogue the setting for maxima's location is wrong.");
+      if(m_exitAfterEval)
+      {
+        std::cerr<<message;
+        Retval(-1);
+        Close();
+      }
+      else
+        LoggingMessageBox(message, _("Error"),
+                          wxOK | wxICON_ERROR);
       return false;
     }
     m_maximaStdout = m_process->GetInputStream();
@@ -10480,3 +10496,5 @@ wxString wxMaxima::m_firstPrompt(wxT("(%i1) "));
 //wxString wxMaxima::m_outputPromptSuffix(wxT("</lbl"));
 wxMaxima::ParseFunctionHash wxMaxima::m_knownXMLTags;
 wxMaxima::VarReadFunctionHash wxMaxima::m_variableReadActions;
+
+int wxMaxima::m_retval = 0;

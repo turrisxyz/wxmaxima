@@ -75,7 +75,7 @@ int CommonMain()
     wxLogDebug("Cell:    %zu live instances leaked", Observed::GetLiveInstanceCount());
   if(Observed::GetLiveControlBlockInstanceCount() != 0)
     wxLogDebug("ControlBlock: %zu live instances leaked", Observed::GetLiveControlBlockInstanceCount());
-  return 0;
+  return wxMaxima::Retval();
 }
 
 #ifndef __WXMSW__

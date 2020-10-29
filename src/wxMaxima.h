@@ -695,7 +695,11 @@ protected:
   static wxString m_mathSuffix2;
   //! The marker for the start of a input prompt
   static wxString m_promptPrefix;
+  //! The RetVal of wxMaxima
+  static int m_retval;
 public:
+  static void Retval(int retval){m_retval = retval;}
+  static int Retval(){return m_retval;}
   //! The marker for the end of a input prompt
   const static wxString m_promptSuffix;
 protected:
