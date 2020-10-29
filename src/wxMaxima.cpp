@@ -336,10 +336,9 @@ wxMaxima::wxMaxima(wxWindow *parent, int id, wxLocale *locale, const wxString ti
         Retval(-1);
         Close();
       }
-      else
-        LoggingMessageBox(message,
-                          _("Fatal error"),
-                          wxOK | wxICON_ERROR);
+      LoggingMessageBox(message,
+                        _("Fatal error"),
+                        wxOK | wxICON_ERROR);
       break;
     }
   }
@@ -1163,7 +1162,6 @@ wxMaxima::wxMaxima(wxWindow *parent, int id, wxLocale *locale, const wxString ti
           wxCommandEventHandler(wxMaxima::ReplaceSuggestion), NULL, this);
   m_worksheet->SetFocus();
   StartAutoSaveTimer();
-  Close();
 }
 
 void wxMaxima::StartAutoSaveTimer()
@@ -1857,16 +1855,8 @@ bool wxMaxima::StartMaxima(bool force)
       m_maximaStdout = NULL;
       m_maximaStderr = NULL;
       m_statusBar->NetworkStatus(StatusBar::offline);
-      wxString message = _("Can not start maxima. The most probable cause is that maxima isn't installed (it can be downloaded from http://maxima.sourceforge.net) or in wxMaxima's config dialogue the setting for maxima's location is wrong.");
-      if(m_exitAfterEval)
-      {
-        std::cerr<<message;
-        Retval(-1);
-        Close();
-      }
-      else
-        LoggingMessageBox(message, _("Error"),
-                          wxOK | wxICON_ERROR);
+      LoggingMessageBox(_("Can not start maxima. The most probable cause is that maxima isn't installed (it can be downloaded from http://maxima.sourceforge.net) or in wxMaxima's config dialogue the setting for maxima's location is wrong."), _("Error"),
+                        wxOK | wxICON_ERROR);
       return false;
     }
     m_maximaStdout = m_process->GetInputStream();

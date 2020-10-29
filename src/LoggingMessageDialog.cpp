@@ -9,5 +9,6 @@ int LoggingMessageBox( 	const wxString &  	message,
 				)
 {
   wxLogMessage(message);
+  return wxOK;
   return wxMessageBox(message, caption, style, parent, x, y);
 }

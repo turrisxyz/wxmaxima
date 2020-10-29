@@ -41,6 +41,7 @@ class LoggingMessageDialog : public wxMessageDialog
   wxMessageDialog (parent, message, caption, style, pos)
     {
       wxLogMessage(message);
+      Close();
     }
 };
 
