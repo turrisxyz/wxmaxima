@@ -152,7 +152,7 @@ build_script:
 test_script:
   - ps: |
       pushd build
-      set PATH=%PATH%;c:\maxima-5.44.0\bin\
+      set PATH="%PATH%;c:\maxima-5.44.0\bin\"
       ctest -C Release
       if (! $?) { throw "CTest failed with exit code $LastExitCode" }
       popd
