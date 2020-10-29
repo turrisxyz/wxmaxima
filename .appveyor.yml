@@ -146,14 +146,14 @@ build_script:
       iex $env:TOOLKIT_INIT
       pushd build
       cmake --build . --config Release
-      ctest
       if (! $?) { throw "CMake failed with exit code $LastExitCode" }
       popd
 
 test_script:
   - ps: |
       pushd build
-      #ctest -C Release
+      set PATH=%PATH%;c:\maxima-5.44.0\bin\
+      ctest -C Release
       if (! $?) { throw "CTest failed with exit code $LastExitCode" }
       popd
 
