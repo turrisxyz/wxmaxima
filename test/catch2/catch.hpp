@@ -12,6 +12,9 @@
 #define TWOBLUECUBES_SINGLE_INCLUDE_CATCH_HPP_INCLUDED
 // start catch.hpp
 
+//-V::501
+//-V::521
+//-V::760
 
 #define CATCH_VERSION_MAJOR 2
 #define CATCH_VERSION_MINOR 12
