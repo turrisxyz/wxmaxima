@@ -2284,17 +2284,16 @@ void wxMaxima::ReadFirstPrompt(wxString &data)
     if (m_evalOnStartup)
     {
       wxLogMessage(_("Starting evaluation of the document"));
-      m_evalOnStartup = false;
       m_worksheet->AddDocumentToEvaluationQueue();
       EvaluationQueueLength(m_worksheet->m_evaluationQueue.Size(), m_worksheet->m_evaluationQueue.CommandsLeftInCell());
       TriggerEvaluation();
     }
     else
     {
-      m_evalOnStartup = false;
       if ((m_worksheet->m_configuration->GetOpenHCaret()) && (m_worksheet->GetActiveCell() == NULL))
         m_worksheet->OpenNextOrCreateCell();
     }
+    m_evalOnStartup = false;
     if (m_exitAfterEval && m_worksheet->m_evaluationQueue.Empty())
       Close();
   }
