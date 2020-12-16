@@ -45,7 +45,7 @@
 class MaximaTokenizer
 {
 public:
-  MaximaTokenizer(wxString commands, Configuration *configuration);
+  MaximaTokenizer(const wxString &commands, Configuration *configuration);
 
   class Token
   {
@@ -77,7 +77,7 @@ public:
   TokenList PopTokens() && { return std::move(m_tokens); }
 
   //! A constructor that adds additional words to the token list
-  MaximaTokenizer(wxString commands, Configuration *configuration,
+  MaximaTokenizer(const wxString &commands, Configuration *configuration,
                   const TokenList &initialTokens);
 
 protected:

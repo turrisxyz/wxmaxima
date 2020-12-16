@@ -3409,7 +3409,7 @@ bool wxMaxima::OpenWXMFile(const wxString &file, Worksheet *document, bool clear
   return true;
 }
 
-wxString wxMaxima::ReadPotentiallyUnclosedTag(wxStringTokenizer &lines, wxString firstLine)
+wxString wxMaxima::ReadPotentiallyUnclosedTag(wxStringTokenizer &lines, const wxString &firstLine)
 {
   wxString result = firstLine + wxT("\n");
   wxString closingTag = firstLine;
@@ -4128,7 +4128,7 @@ wxString wxMaxima::SearchwxMaximaHelp()
   return helpfile;
 }
 
-void wxMaxima::LaunchHelpBrowser(wxString uri)
+void wxMaxima::LaunchHelpBrowser(const wxString &uri)
 {
   if(m_worksheet->m_configuration->AutodetectHelpBrowser())
   {
@@ -5337,6 +5337,11 @@ bool wxMaxima::SaveFile(bool forceSave)
   StartAutoSaveTimer();
 
   return true;
+}
+
+void wxMaxima::LoadImage(const wxString &file)
+{
+  m_worksheet->OpenHCaret(file, GC_TYPE_IMAGE);
 }
 
 void wxMaxima::ReadStdErr()

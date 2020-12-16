@@ -45,7 +45,7 @@ RegexCtrl::RegexInputState RegexCtrl::GetNewRegexInputState() const
   return RegexInputState::invalid;
 }
 
-bool RegexCtrl::Matches(wxString text)
+bool RegexCtrl::Matches(const wxString &text) const
 {
   if(GetValue().IsEmpty())
     return true;

@@ -74,7 +74,7 @@ public:
   explicit Image(Configuration **config);
 
   //! A constructor that loads the compressed file from a wxMemoryBuffer
-  Image(Configuration **config, wxMemoryBuffer image, wxString type);
+  Image(Configuration **config, wxMemoryBuffer image, const wxString &type);
 
   /*! A constructor that loads a bitmap
 
@@ -90,7 +90,7 @@ public:
     \param filesystem The filesystem to load it from
     \param remove true = Delete the file after loading it
    */
-  Image(Configuration **config, wxString image, std::shared_ptr<wxFileSystem> filesystem, bool remove = true);
+  Image(Configuration **config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove = true);
 
   ~Image();
 
@@ -106,7 +106,7 @@ public:
   void GnuplotSource(wxString gnuplotFilename, wxString dataFilename, std::shared_ptr<wxFileSystem> filesystem);
 
   //! Load the gnuplot source file from the system's filesystem
-  void GnuplotSource(wxString gnuplotFilename, wxString dataFilename)
+  void GnuplotSource(const wxString &gnuplotFilename, const wxString &dataFilename)
     {
       GnuplotSource(gnuplotFilename, dataFilename, {} /* system fs */);
     }
@@ -148,7 +148,7 @@ public:
     }
   
   //! Returns the file name extension of the current image
-  wxString GetExtension();
+  wxString GetExtension() const;
   //! The maximum width this image shall be displayed with
   double GetMaxWidth() const {return m_maxWidth;}
   //! The maximum height this image shall be displayed with
@@ -162,7 +162,7 @@ public:
   void LoadImage(const wxBitmap &bitmap);
 
   //! Saves the image in its original form, or as .png if it originates in a bitmap
-  wxSize ToImageFile(wxString filename);
+  wxSize ToImageFile(const wxString &filename);
 
   //! Returns the bitmap being displayed with custom scale
   wxBitmap GetBitmap(double scale = 1.0);

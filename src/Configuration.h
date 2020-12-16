@@ -130,7 +130,7 @@ public:
   void DisplayMode(mathDisplayMode mode ){m_displayMode = mode;}
 
   //! Set maxima's working directory
-  void SetWorkingDirectory(wxString dir)
+  void SetWorkingDirectory(const wxString &dir)
   { m_workingdir = dir; }
 
   wxString GetWorkingDirectory() const
@@ -546,7 +546,7 @@ public:
   
   wxString SymbolPaneAdditionalChars() const
     {return m_symbolPaneAdditionalChars;}
-  void SymbolPaneAdditionalChars(wxString symbols) {m_symbolPaneAdditionalChars = symbols;}
+  void SymbolPaneAdditionalChars(const wxString &symbols) {m_symbolPaneAdditionalChars = symbols;}
   
   //! Notify the user if maxima is idle?
   bool NotifyIfIdle() const
@@ -649,7 +649,7 @@ public:
   //! Parameters to the maxima binary
   wxString MaximaParameters() const {return m_maximaParameters;}
   //! The parameters we pass to the maxima binary
-  void MaximaParameters(wxString parameters){m_maximaParameters = parameters;}
+  void MaximaParameters(const wxString &parameters){m_maximaParameters = parameters;}
 
   //! The auto-detected maxima location
   static wxString MaximaDefaultLocation();
@@ -663,7 +663,7 @@ public:
   void OnMpBrowse(wxCommandEvent& event);
   
   //! Sets the location of the maxima binary.
-  void MaximaUserLocation(wxString maxima) { m_maximaUserLocation = maxima; }
+  void MaximaUserLocation(const wxString &maxima) { m_maximaUserLocation = maxima; }
 
   //! Autodetect maxima's location? (If false the user-specified location is used)
   bool AutodetectHelpBrowser() const {return m_autodetectHelpBrowser;}
@@ -674,7 +674,7 @@ public:
   wxString HelpBrowserUserLocation() const {return m_helpBrowserUserLocation;}
 
   //! Sets the location of the maxima binary.
-  void HelpBrowserUserLocation(wxString helpBrowser) { m_helpBrowserUserLocation = helpBrowser;}
+  void HelpBrowserUserLocation(const wxString &helpBrowser) { m_helpBrowserUserLocation = helpBrowser;}
 
   /*! Could a maxima binary be found in the path we expect it to be in?
 
@@ -682,7 +682,7 @@ public:
     If location == wxEmptyString the default location from the configuration 
     is taken.
   */
-  static bool MaximaFound(wxString location = wxEmptyString);
+  static bool MaximaFound(const wxString &location = {});
 
   //! Renumber out-of-order cell labels on saving.
   bool FixReorderedIndices() const
@@ -700,7 +700,7 @@ public:
   void EnterEvaluates(bool enterEvaluates) {m_enterEvaluates = enterEvaluates;}
   static wxString MathJaXURL_Auto() { return wxT("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js");}
   //! Returns the URL MathJaX can be found at.
-  void MathJaXURL(wxString url){m_mathJaxURL = url;}
+  void MathJaXURL(const wxString &url){m_mathJaxURL = url;}
   bool AntiAliasLines() const {return m_antiAliasLines;}
   void AntiAliasLines(bool antiAlias){ m_antiAliasLines = antiAlias; }
 
@@ -711,8 +711,8 @@ public:
   void CopyMathML(bool copyMathML){ m_copyMathML = copyMathML;}
   bool CopyMathMLHTML() const {return m_copyMathMLHTML;}
   void CopyMathMLHTML(bool copyMathMLHTML){ m_copyMathMLHTML = copyMathMLHTML; }
-  bool HideMarkerForThisMessage(wxString message);
-  void HideMarkerForThisMessage(wxString message, bool hide)
+  bool HideMarkerForThisMessage(const wxString &message);
+  void HideMarkerForThisMessage(const wxString &message, bool hide)
     {m_hideMarkerForThisMessage[message] = hide;}
   bool CopyRTF() const {return m_copyRTF;}
   void CopyRTF(bool copyRTF) { m_copyRTF = copyRTF; }
@@ -724,7 +724,7 @@ public:
   void UseSVG(bool useSVG) { m_useSVG = useSVG ;}
   void ShowLength(long length) { m_showLength = length; }
   long ShowLength() const {return m_showLength;}
-  void LispType(wxString type) { m_lispType = type; }
+  void LispType(const wxString &type) { m_lispType = type; }
   wxString LispType() const {return m_lispType;}
   
   //! Which way do we want to draw parenthesis?
@@ -774,9 +774,9 @@ public:
     {m_offerKnownAnswers = offerKnownAnswers;}
   
   wxString Documentclass() const {return m_documentclass;}
-  void Documentclass(wxString clss){m_documentclass = clss;}
+  void Documentclass(const wxString &clss){m_documentclass = clss;}
 wxString DocumentclassOptions() const {return m_documentclassOptions;}
-  void DocumentclassOptions(wxString classOptions){m_documentclassOptions = classOptions;}
+  void DocumentclassOptions(const wxString &classOptions){m_documentclassOptions = classOptions;}
 
   
   htmlExportFormat HTMLequationFormat() const {return m_htmlEquationFormat;}
@@ -808,7 +808,7 @@ wxString DocumentclassOptions() const {return m_documentclassOptions;}
   void SetWorksheetPosition(wxPoint worksheetPosition){m_worksheetPosition = worksheetPosition;}
   wxPoint GetWorksheetPosition() const {return m_worksheetPosition;}
   wxString MaximaShareDir() const {return m_maximaShareDir;}
-  void MaximaShareDir(wxString dir){m_maximaShareDir = dir;}
+  void MaximaShareDir(const wxString &dir){m_maximaShareDir = dir;}
   void InLispMode(bool lisp){m_inLispMode = lisp;}
   bool InLispMode() const {return m_inLispMode;}
   void BitmapScale(int factor){m_bitmapScale = factor;}
@@ -838,7 +838,7 @@ wxString DocumentclassOptions() const {return m_documentclassOptions;}
   void ExportContainsWXMX(bool exportContainsWXMX){m_exportContainsWXMX = exportContainsWXMX;}
   bool ExportContainsWXMX() const {return m_exportContainsWXMX;}
   wxString TexPreamble() const {return m_texPreamble;}
-  void TexPreamble(wxString texPreamble) {m_texPreamble = texPreamble;}
+  void TexPreamble(const wxString &texPreamble) {m_texPreamble = texPreamble;}
 
   Style m_styles[NUMBEROFSTYLES];
   //! Initialize the text styles on construction.

@@ -37,7 +37,7 @@
 class WrappingStaticText : public wxPanel
 {
 public:
-  WrappingStaticText(wxWindow* parent, int id, wxString text);
+  WrappingStaticText(wxWindow* parent, int id, const wxString &text);
 protected:
   void OnSize(wxSizeEvent &event);
 private:

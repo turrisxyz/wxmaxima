@@ -26,7 +26,7 @@
 #include "WrappingStaticText.h"
 #include <wx/wupdlock.h>
 
-WrappingStaticText::WrappingStaticText(wxWindow* parent, int id, wxString text):
+WrappingStaticText::WrappingStaticText(wxWindow* parent, int id, const wxString &text):
   wxPanel(parent, -1),
   m_text(text)
 {

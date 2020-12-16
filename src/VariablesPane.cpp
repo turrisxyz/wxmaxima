@@ -323,7 +323,7 @@ wxArrayString Variablespane::GetVarnames()
   return retVal;
 }
 
-wxString Variablespane::InvertCase(wxString var)
+wxString Variablespane::InvertCase(const wxString &var)
 {
   wxString retval;
   for (wxString::const_iterator it = var.begin(); it != var.end(); ++it)
@@ -342,7 +342,7 @@ wxString Variablespane::InvertCase(wxString var)
   return retval;
 }
 
-void Variablespane::AddWatchCode(wxString code)
+void Variablespane::AddWatchCode(const wxString &code)
 {
   m_updateSizeNeeded = true;
   wxString unescapedCode;
@@ -360,7 +360,7 @@ void Variablespane::AddWatchCode(wxString code)
   AddWatch(unescapedCode);
 }
 
-void Variablespane::AddWatch(wxString watch)
+void Variablespane::AddWatch(const wxString &watch)
 {
   m_updateSizeNeeded = true;
   m_grid->BeginBatch();
@@ -415,7 +415,7 @@ wxString Variablespane::EscapeVarname(wxString var)
   return var;
 }
 
-bool Variablespane::IsValidVariable(wxString var)
+bool Variablespane::IsValidVariable(const wxString &var)
 {
   for (wxString::const_iterator it = var.begin(); it != var.end(); ++it)
   {

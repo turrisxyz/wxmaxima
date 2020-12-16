@@ -157,7 +157,7 @@ private:
   class wxmDataObject : public wxCustomDataObject
   {
   public:
-    explicit wxmDataObject(wxString data);
+    explicit wxmDataObject(const wxString &data);
 
     wxmDataObject();
 

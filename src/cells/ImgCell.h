@@ -47,7 +47,7 @@ public:
   ImgCell &operator=(const ImgCell&) = delete;
 
   //! Tell the image which gnuplot files it was made from
-  void GnuplotSource(wxString sourcefile, wxString datafile, std::shared_ptr<wxFileSystem> filesystem)
+  void GnuplotSource(const wxString &sourcefile, const wxString &datafile, std::shared_ptr<wxFileSystem> filesystem)
   { if (m_image) m_image->GnuplotSource(sourcefile,datafile, filesystem); }
 
   //! The name of the file with gnuplot commands that created this file
@@ -69,7 +69,7 @@ public:
 
     See also GetExtension().
    */
-  wxSize ToImageFile(wxString filename);
+  wxSize ToImageFile(const wxString &filename);
 
   /*! Removes the cached scaled image from memory
 

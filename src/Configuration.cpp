@@ -424,7 +424,7 @@ void Configuration::SetBackgroundBrush(wxBrush brush)
   m_tooltipBrush.SetColour(wxColour(255, 255, 192, 128));
 }
 
-bool Configuration::MaximaFound(wxString location)
+bool Configuration::MaximaFound(const wxString &location)
 {
   if(location == wxEmptyString)
     return false;
@@ -680,7 +680,7 @@ void Configuration::ReadConfig()
   ReadStyles();
 }
 
-bool Configuration::HideMarkerForThisMessage(wxString message)
+bool Configuration::HideMarkerForThisMessage(const wxString &message)
 {
   auto it = m_hideMarkerForThisMessage.find(message);
   if (it == m_hideMarkerForThisMessage.end())

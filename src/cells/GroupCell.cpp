@@ -298,7 +298,6 @@ GroupCell *GroupCell::GetLastWorkingGroup() const
 
 wxString GroupCell::TexEscapeOutputCell(wxString Input)
 {
-  wxString retval(Input);
   Input.Replace(wxT("#"), wxT("\\#"));
   return (Input);
 }
@@ -1097,7 +1096,7 @@ wxString GroupCell::ToRTF() const
   return retval;
 }
 
-wxString GroupCell::ToTeX(wxString imgDir, wxString filename, int *imgCounter) const
+wxString GroupCell::ToTeX(wxString imgDir, const wxString &filename, int *imgCounter) const
 {
   wxASSERT_MSG((imgCounter != NULL), _(wxT("Bug: No image counter to write to!")));
   if (imgCounter == NULL) return wxEmptyString;
@@ -1186,7 +1185,7 @@ wxString GroupCell::ToTeX(wxString imgDir, wxString filename, int *imgCounter) c
   return str;
 }
 
-wxString GroupCell::ToTeXCodeCell(wxString imgDir, wxString filename, int *imgCounter) const
+wxString GroupCell::ToTeXCodeCell(const wxString &imgDir, const wxString &filename, int *imgCounter) const
 {
   wxString str;
   Configuration *configuration = (*m_configuration);
@@ -1281,7 +1280,7 @@ wxString GroupCell::ToTeXCodeCell(wxString imgDir, wxString filename, int *imgCo
   return str;
 }
 
-wxString GroupCell::ToTeXImage(Cell *tmp, wxString imgDir, wxString filename, int *imgCounter)
+wxString GroupCell::ToTeXImage(Cell *tmp, const wxString &imgDir, const wxString &filename, int *imgCounter)
 {
   wxASSERT_MSG((imgCounter != NULL), _("Bug: No image counter to write to!"));
   if (imgCounter == NULL) return wxEmptyString;

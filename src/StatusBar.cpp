@@ -238,7 +238,7 @@ void StatusBar::OnSize(wxSizeEvent &event)
 
 #define ABS(val) ((val) >= 0 ? (val) : -(val))
 
-wxBitmap StatusBar::GetImage(wxString name,
+wxBitmap StatusBar::GetImage(const wxString &name,
                           unsigned char *data, size_t len)
 {
   wxSize ppi;

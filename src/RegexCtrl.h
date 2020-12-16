@@ -43,7 +43,7 @@ class RegexCtrl : public wxTextCtrl
 public:
   RegexCtrl(wxWindow *parent,
             wxWindowID id);
-  bool Matches(wxString text);
+  bool Matches(const wxString &text) const;
 
 protected:
   void OnTextChange(wxCommandEvent &ev);

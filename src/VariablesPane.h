@@ -74,11 +74,11 @@ public:
   //! Called if a printable char was entered
   void OnChar(wxKeyEvent &event);
   //! Add a variable whose name contains all the escapes maxima needs to the variables list
-  void AddWatchCode(wxString code);
+  void AddWatchCode(const wxString &code);
   //! Add a variable without escapes to the list.
-  void AddWatch(wxString watch);
+  void AddWatch(const wxString &watch);
   //! Is this string a valid variable name?
-  bool IsValidVariable(wxString var);
+  bool IsValidVariable(const wxString &var);
   //! Returns a list of all variable names in a format maxima understands
   wxArrayString GetEscapedVarnames();
   //! Returns the variable list in a human-readable format
@@ -102,7 +102,7 @@ private:
   // The spreadsheet with the variable names
   wxGrid *m_grid;
   bool m_updateSizeNeeded = false;
-  wxString InvertCase(wxString var);
+  static wxString InvertCase(const wxString &var);
   WX_DECLARE_STRING_HASH_MAP(int, IntHash);
   //! A list of all symbols that can be entered using Esc-Codes
   IntHash m_vars;
