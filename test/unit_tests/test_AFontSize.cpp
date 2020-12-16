@@ -118,7 +118,7 @@ SCENARIO("AFontSize represents its value") {
   } while (0)
 
 SCENARIO("AFontSize compares") {
-  CHECK_COMPARE(size1_4, size1_4, !!,  !,  ! );
+  CHECK_COMPARE(size1_4, size1_4, !!,  !,  ! ); //-V652
   CHECK_COMPARE(size1_4, size3_4,  !, !!,  ! );
   CHECK_COMPARE(size3_4, size1_4,  !,  !, !! );
 }
@@ -126,13 +126,13 @@ SCENARIO("AFontSize compares") {
 SCENARIO("AFontSize is assignable and copy-constructible") {
   AFontSize sizeA;
   sizeA = size1_4;
-  CHECK_COMPARE(sizeA, size1_4, !!,  !,  ! );
+  CHECK_COMPARE(sizeA, size1_4, !!,  !,  ! ); //-V652
   CHECK_COMPARE(sizeA, size3_4,  !, !!,  ! );
   CHECK_COMPARE(size3_4, sizeA,  !,  !, !! );
   CHECK_REPRESENTS(sizeA, val1_4);
 
   AFontSize sizeC(size1_4);
-  CHECK_COMPARE(sizeC, size1_4, !!,  !,  ! );
+  CHECK_COMPARE(sizeC, size1_4, !!,  !,  ! ); //-V652
   CHECK_COMPARE(sizeC, size3_4,  !, !!,  ! );
   CHECK_COMPARE(size3_4, sizeC,  !,  !, !! );
   CHECK_REPRESENTS(sizeC, val1_4);
