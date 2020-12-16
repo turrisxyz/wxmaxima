@@ -1960,17 +1960,15 @@ void wxMaxima::Interrupt(wxCommandEvent& WXUNUSED(event))
           |FORMAT_MESSAGE_ALLOCATE_BUFFER
           |FORMAT_MESSAGE_IGNORE_INSERTS,
           NULL,GetLastError(),MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-          errorText,0,NULL);
+          (LPTSTR)&errorText,0,NULL);
 
         wxString errorMessage;
         if (!errorText)
           errorMessage = _("Could not send an interrupt signal to maxima.");
         else
-        {
           errorMessage = wxString::Format(_("Interrupting maxima: %s"),
                                           errorText);
-          LocalFree(errorText);
-        }
+        LocalFree(errorText);
 
         LeftStatusText(errorMessage);
         wxLogMessage(errorMessage);
