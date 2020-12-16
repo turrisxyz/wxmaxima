@@ -24,7 +24,6 @@
 
 void CellListBuilderBase::base_Append(std::unique_ptr<Cell> &&cells)
 {
-  m_lastAppended = cells.get();
   if (!cells)
     return;
 

@@ -38,7 +38,6 @@ class CellListBuilderBase
 protected:
   std::unique_ptr<Cell> m_head;
   Cell *m_tail = {};
-  Cell *m_lastAppended = {};
 
   //! Appends one or more cells
   void base_Append(std::unique_ptr<Cell> &&cells);
@@ -48,9 +47,6 @@ protected:
   //! appended.
   Cell *base_DynamicAppend(std::unique_ptr<Cell> &&cells,
                            Cell *(*caster)(Cell *));
-
-  //! Clears the pointer to the last appended cell. Useful when tree building.
-  void ClearLastAppended() { m_lastAppended = {}; }
 };
 
 //! Manages building a list of cells, keeping the head and tail of the list.
@@ -59,8 +55,6 @@ template <typename T = Cell> class CellListBuilder : CellListBuilderBase
   static Cell *DynamicCast(Cell *cell) { return dynamic_cast<T *>(cell); }
 
 public:
-  using CellListBuilderBase::ClearLastAppended;
-
   //! Returns true if the tree is non-empty
   explicit operator bool() const { return bool(m_head); }
 
@@ -80,11 +74,10 @@ public:
     if (ptr) {
       m_head.release();
       m_tail = {};
-      m_lastAppended = {};
     } else
       m_head.reset();
 
-    wxASSERT(!m_head && !m_tail && !m_lastAppended); //-V614
+    wxASSERT(!m_head && !m_tail);
     return ptr;
   }
 
@@ -92,18 +85,14 @@ public:
   std::unique_ptr<T> TakeHead()
   {
     m_tail = {};
-    m_lastAppended = {};
     auto retval = dynamic_unique_ptr_cast<T>(std::move(m_head));
 
-    wxASSERT(!m_head && !m_tail && !m_lastAppended);
+    wxASSERT(!m_head && !m_tail);
     return retval;
   }
 
   //! Provides the last cell in the list (if any).
   T *GetTail() const { return dynamic_cast<T*>(m_tail); }
-
-  //! Provides the most cell passed to the most recent `Append` call.
-  T *GetLastAppended() const { return dynamic_cast<T*>(m_lastAppended); }
 
   //! Appends one or more cells
   // cppcheck-suppress deallocret

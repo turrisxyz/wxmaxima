@@ -1095,8 +1095,8 @@ std::unique_ptr<Cell> MathParser::ParseTag(wxXmlNode *node, bool all)
   node = SkipWhitespaceNode(node);
   for (; node; node = GetNextTag(node))
   {
+    Cell *appended = nullptr;
     auto &tagName = node->GetName();
-    tree.ClearLastAppended();
     if (node->GetType() == wxXML_ELEMENT_NODE)
     {
       // Parse XML tags. The only other type of element we recognize are text
@@ -1104,35 +1104,35 @@ std::unique_ptr<Cell> MathParser::ParseTag(wxXmlNode *node, bool all)
 
       auto function = m_innerTags[tagName];
       if (function)
-        tree.Append(CALL_MEMBER_FN(*this, function)(node));
+        appended = tree.Append(CALL_MEMBER_FN(*this, function)(node));
 
       if (false)
-        if (!tree.GetLastAppended() && node->GetChildren())
-          tree.Append(ParseTag(node->GetChildren()));
+        if (!appended && node->GetChildren())
+          appended = tree.Append(ParseTag(node->GetChildren()));
 
-      if (!tree.GetLastAppended() && (node->GetAttribute(wxT("listdelim")) != wxT("true")))
+      if (!appended && (node->GetAttribute(wxT("listdelim")) != wxT("true")))
       {
         auto tmp = std::make_unique<VisiblyInvalidCell>(
             m_group, m_configuration,
             wxString::Format(m_unknownXMLTagToolTip, tagName));
-        tree.Append(std::move(tmp));
+        appended = tree.Append(std::move(tmp));
         gotInvalid = true;
       }
 
-      if (tree.GetLastAppended())
-        ParseCommonAttrs(node, tree.GetLastAppended());
+      if (appended)
+        ParseCommonAttrs(node, appended);
     }
     else
     {
       // We didn't get a tag but got a text cell => Parse the text.
-      tree.Append(ParseText(node));
+      appended = tree.Append(ParseText(node));
     }
 
     if (gotInvalid && !all)
     {
       // Tell the user we ran into problems.
       wxString msg;
-      msg = tree.GetLastAppended()->ToString();
+      msg = appended->ToString();
       if (!msg.empty())
       {
         LoggingMessageBox(msg, _("Warning"), wxOK | wxICON_WARNING);
