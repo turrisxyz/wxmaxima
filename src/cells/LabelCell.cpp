@@ -32,7 +32,7 @@
 #include "StringUtils.h"
 
 LabelCell::LabelCell(GroupCell *parent,
-                     Configuration **config, wxString automaticLabel, TextStyle style)
+                     Configuration **config, const wxString &automaticLabel, TextStyle style)
   : TextCell(parent, config, automaticLabel, style),
     m_labelChoice_Last((*config)->GetLabelChoice())
 {

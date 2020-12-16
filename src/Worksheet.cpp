@@ -8183,7 +8183,7 @@ Worksheet::wxmDataObject::wxmDataObject() : wxCustomDataObject(m_wxmFormat)
 {
 }
 
-Worksheet::wxmDataObject::wxmDataObject(wxString data) : wxCustomDataObject(m_wxmFormat)
+Worksheet::wxmDataObject::wxmDataObject(const wxString &data) : wxCustomDataObject(m_wxmFormat)
 {
   m_databuf = data.utf8_str();
   SetData(m_databuf.length(), m_databuf.data());

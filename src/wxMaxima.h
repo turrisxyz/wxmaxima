@@ -139,7 +139,7 @@ public:
   void StripLispComments(wxString &s);
 
   //! Launches the help browser on the uri passed as an argument.
-  void LaunchHelpBrowser(wxString uri);
+  void LaunchHelpBrowser(const wxString &uri);
   
   void SendMaxima(wxString s, bool addToHistory = false);
 
@@ -151,8 +151,7 @@ public:
   { return m_fileSaved; }
 
   //! Load an image from a file into the worksheet.
-  void LoadImage(wxString file)
-  { m_worksheet->OpenHCaret(file, GC_TYPE_IMAGE); }
+  void LoadImage(const wxString &file);
 
   //! Query the value of a new maxima variable
   bool QueryVariableValue();
@@ -243,7 +242,7 @@ private:
 
 protected:
   //! Reads a potentially unclosed XML tag and closes it
-  wxString ReadPotentiallyUnclosedTag(wxStringTokenizer &lines, wxString firstLine);
+  wxString ReadPotentiallyUnclosedTag(wxStringTokenizer &lines, const wxString &firstLine);
 
   //! Finds the name of an opening tag
   static wxRegEx m_xmlOpeningTagName;

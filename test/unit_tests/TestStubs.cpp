@@ -22,7 +22,7 @@ long Configuration::Scale_Px(double) const { return 1; }
 AFontSize Configuration::Scale_Px(AFontSize) const { return AFontSize(10.0); }
 wxFontStyle Configuration::IsItalic(long) const { return {}; }
 wxColour Configuration::GetColor(TextStyle) { return {}; }
-bool Configuration::HideMarkerForThisMessage(wxString) { return false; }
+bool Configuration::HideMarkerForThisMessage(const wxString &) { return false; }
 void Configuration::NotifyOfCellRedraw(const Cell *) {}
 Style Configuration::GetStyle(TextStyle, AFontSize) const
 {

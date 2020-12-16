@@ -40,7 +40,7 @@
 class Printout : public wxPrintout
 {
 public:
-  Printout(wxString title, Configuration **configuration, double scaleFactor);
+  Printout(const wxString &title, Configuration **configuration, double scaleFactor);
 
   ~Printout();
 

@@ -221,7 +221,7 @@ wxString ImgCell::ToTeX() const
   return _(" (Graphics) ");
 }
 
-wxSize ImgCell::ToImageFile(wxString filename)
+wxSize ImgCell::ToImageFile(const wxString &filename)
 {
   return m_image->ToImageFile(filename);
 }

@@ -54,7 +54,7 @@ Image::Image(Configuration **config)
   m_maxHeight = -1;
 }
 
-Image::Image(Configuration **config, wxMemoryBuffer image, wxString type)
+Image::Image(Configuration **config, wxMemoryBuffer image, const wxString &type)
 {
   #ifdef HAVE_OMP_HEADER
   omp_init_lock(&m_gnuplotLock);
@@ -107,7 +107,7 @@ Image::Image(Configuration **config, const wxBitmap &bitmap)
 // filesystem cannot be passed by const reference as we want to keep the
 // pointer to the file system alive in a background task
 // cppcheck-suppress performance symbolName=filesystem
-Image::Image(Configuration **config, wxString image, std::shared_ptr<wxFileSystem> filesystem, bool remove):
+Image::Image(Configuration **config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove):
     m_fs_keepalive_imagedata(filesystem)
 {
   #ifdef HAVE_OMP_HEADER
@@ -665,7 +665,7 @@ wxString Image::GnuplotSource()
   return m_gnuplotSource;
 }
  
-wxSize Image::ToImageFile(wxString filename)
+wxSize Image::ToImageFile(const wxString &filename)
 {
   #ifdef HAVE_OMP_HEADER
   WaitForLoad waitforload(&m_imageLoadLock);
@@ -859,7 +859,7 @@ void Image::LoadImage(const wxBitmap &bitmap)
   m_height = 1;
 }
 
-wxString Image::GetExtension()
+wxString Image::GetExtension() const
 {
   return m_extension;
 }

@@ -100,7 +100,7 @@ private:
   //! Does the icon show that we currently transmit data?
   bool m_icon_shows_transmit;
 
-  wxBitmap GetImage(wxString name,
+  wxBitmap GetImage(const wxString &name,
                     unsigned char *data_128, size_t len_128
     );
   

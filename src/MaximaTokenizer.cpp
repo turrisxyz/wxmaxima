@@ -32,7 +32,7 @@
 #include <vector>
 
 
-MaximaTokenizer::MaximaTokenizer(wxString commands, Configuration *configuration)
+MaximaTokenizer::MaximaTokenizer(const wxString &commands, Configuration *configuration)
 {
   if(m_hardcodedFunctions.empty())
   {
@@ -402,7 +402,7 @@ MaximaTokenizer::MaximaTokenizer(wxString commands, Configuration *configuration
   }
 }
 
-MaximaTokenizer::MaximaTokenizer(wxString commands,
+MaximaTokenizer::MaximaTokenizer(const wxString &commands,
                                  Configuration *configuration,
                                  const TokenList &initialTokens)
   : MaximaTokenizer(commands, configuration)

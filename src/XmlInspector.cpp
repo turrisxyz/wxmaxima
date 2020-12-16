@@ -168,7 +168,7 @@ wxString XmlInspector::IndentString(int level)
   return result;
 }
 
-void XmlInspector::Add_ToMaxima(wxString text)
+void XmlInspector::Add_ToMaxima(const wxString &text)
 {
   if(m_toMaxima != wxEmptyString)
   {
@@ -180,7 +180,7 @@ void XmlInspector::Add_ToMaxima(wxString text)
   m_updateNeeded = true;
 }
 
-void XmlInspector::Add_FromMaxima(wxString text)
+void XmlInspector::Add_FromMaxima(const wxString &text)
 {
   m_fromMaxima += text;
   m_updateNeeded = true;

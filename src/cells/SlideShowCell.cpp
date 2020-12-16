@@ -168,7 +168,7 @@ void SlideShow::LoadImages(wxMemoryBuffer imageData)
   }
 }
 
-void SlideShow::LoadImages(wxString imageFile)
+void SlideShow::LoadImages(const wxString &imageFile)
 {
   wxImage images;
   size_t count = wxImage::GetImageCount(imageFile);
@@ -183,7 +183,7 @@ void SlideShow::LoadImages(wxString imageFile)
   }
 }
 
-void SlideShow::LoadImages(wxArrayString images, bool deleteRead)
+void SlideShow::LoadImages(const wxArrayString &images, bool deleteRead)
 {
   wxString gnuplotFilename;
   wxString dataFilename;

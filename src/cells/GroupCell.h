@@ -142,13 +142,13 @@ public:
   //! GroupCells warn if they contain both greek and latin lookalike chars.
   void UpdateConfusableCharWarnings();
   
-  wxString ToTeX(wxString imgDir, wxString filename, int *imgCounter) const;
+  wxString ToTeX(wxString imgDir, const wxString &filename, int *imgCounter) const;
 
   wxString ToRTF() const override;
 
-  wxString ToTeXCodeCell(wxString imgDir, wxString filename, int *imgCounter) const;
+  wxString ToTeXCodeCell(const wxString &imgDir, const wxString &filename, int *imgCounter) const;
 
-  static wxString ToTeXImage(Cell *tmp, wxString imgDir, wxString filename, int *imgCounter);
+  static wxString ToTeXImage(Cell *tmp, const wxString &imgDir, const wxString &filename, int *imgCounter);
 
   wxString ToTeX() const override;
 

@@ -46,7 +46,7 @@
 
 #define ABS(val) ((val) >= 0 ? (val) : -(val))
 
-wxBitmap ToolBar::GetBitmap(wxString name, unsigned char *data, size_t len, wxSize siz)
+wxBitmap ToolBar::GetBitmap(const wxString &name, unsigned char *data, size_t len, wxSize siz)
 {
   if(siz.x <= 0)
   {

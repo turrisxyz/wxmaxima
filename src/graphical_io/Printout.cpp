@@ -37,7 +37,7 @@
 #define PRINT_MARGIN_HORIZONTAL 50
 #define PRINT_MARGIN_VERTICAL 50
 
-Printout::Printout(wxString title, Configuration **configuration, double scaleFactor) : wxPrintout(title)
+Printout::Printout(const wxString &title, Configuration **configuration, double scaleFactor) : wxPrintout(title)
 {
   m_scaleFactor = scaleFactor;
   m_configuration = configuration;

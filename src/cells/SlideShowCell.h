@@ -66,7 +66,7 @@ public:
   const CellTypeInfo &GetInfo() override;
   ~SlideShow();
   void LoadImages(wxMemoryBuffer imageData);
-  void LoadImages(wxString imageFile);
+  void LoadImages(const wxString &imageFile);
 
   //! A class that publishes wxm data to the clipboard
   static wxDataFormat m_gifFormat;
@@ -97,7 +97,7 @@ public:
    */
   void ClearCache() override;
 
-  void LoadImages(wxArrayString images, bool deleteRead);
+  void LoadImages(const wxArrayString &images, bool deleteRead);
 
   int GetDisplayedIndex() const { return m_displayed; }
 

@@ -61,7 +61,7 @@ public:
     selectAll
   };
 
-  wxBitmap GetBitmap(wxString name,
+  wxBitmap GetBitmap(const wxString &name,
                      unsigned char *data, size_t len, wxSize siz = wxSize(-1,-1));
 
   virtual ~ToolBar();
