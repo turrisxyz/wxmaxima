@@ -51,6 +51,7 @@ jobs:
     - name: Configure wxMaxima
       run: |
           new-item build -itemtype directory
+          new-item build\Release -itemtype directory
           cd build
           cmake -G "Ninja" --config Release
             -DwxBUILD_SHARED=NO
