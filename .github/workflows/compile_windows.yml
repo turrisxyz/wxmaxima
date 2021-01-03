@@ -18,8 +18,6 @@ jobs:
       with:
         path: wxWidgets-${{env.WXVERSION}}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-2
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-2
 
     - name: Install Ninja
       run: |
@@ -27,14 +25,15 @@ jobs:
 
     - name: Download wxWidgets
       run: |
-          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip }
+          dir
+          if (-not (Test-Path wxWidgets-${{env.WXVERSION}})) { Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip }
     - name: Extract wxWidgets
-      run: if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { Expand-Archive -LiteralPath wxWidgets-${{env.WXVERSION}}.zip -DestinationPath wxWidgets-${{env.WXVERSION}} }
+      run: if (-not (Test-Path wxWidgets-${{env.WXVERSION}})) { Expand-Archive -LiteralPath wxWidgets-${{env.WXVERSION}}.zip -DestinationPath wxWidgets-${{env.WXVERSION}} }
 
 # multi-job compilation is broken in wxWidgets, see https://trac.wxwidgets.org/ticket/19029
     - name: Compile wxWidgets
       run: |
-          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) {
+          if (-not (Test-Path wxWidgets-${{env.WXVERSION}})) {
              cd wxWidgets-${{env.WXVERSION}}
              cd build
              cd msw
