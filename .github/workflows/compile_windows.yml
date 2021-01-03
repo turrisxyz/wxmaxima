@@ -53,9 +53,4 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-          cmake -G "Ninja" --config Release
-            -DwxBUILD_SHARED=NO
-            -DwxUSE_STC=NO
-            -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}}
-            -DwxUSE_RIBBON=NO
-            ..
+          cmake -G Ninja --config Release -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}} ..
