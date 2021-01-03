@@ -56,4 +56,6 @@ jobs:
           dir
           dir ..
           dir ../..
-          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib/mswu  -G Ninja ..
+          dir ../../wxWidgets-${{env.WXVERSION}}
+          dir ../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
+#          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib/mswu  -G Ninja ..
