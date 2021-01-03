@@ -43,19 +43,11 @@ jobs:
              cd ..
           }
 
-    - name: Install Ninja
-      run: |
-          cinst ninja
-
     - name: Configure wxMaxima
       run: |
           cd wxMaxima
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-          dir
-          dir ..
-          dir ../..
-          dir ../../wxWidgets-${{env.WXVERSION}}
           dir ../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
-          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -DCMAKE_BUILD_TYPE=release -G Ninja ..
+          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -DCMAKE_BUILD_TYPE=release -G "MinGW Makefiles" ..
