@@ -50,4 +50,4 @@ jobs:
           new-item build\Release -itemtype directory
           cd build
           dir ../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
-          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -DCMAKE_BUILD_TYPE=release -G "MinGW Makefiles" ..
+          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -DCMAKE_BUILD_TYPE=release -G "MinGW Makefiles" -DwxWidgets_USE_DEBUG=false -DwxWidgets_USE_UNICODE=true -DwxWidgets_USE_STATIC=true ..
