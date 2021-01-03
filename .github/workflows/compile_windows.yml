@@ -57,5 +57,5 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-	  dir ../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
+          dir ../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
           cmake -DwxWidgets_ROOT_DIR=../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib/mswu  -G Ninja ..
