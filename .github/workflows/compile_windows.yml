@@ -55,8 +55,8 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-	  dir
-	  dir ..
+          dir
+          dir ..
           dir ../wxWidgets-${{env.WXVERSION}}/
           dir ../wxWidgets-${{env.WXVERSION}}/lib/
           dir ../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
