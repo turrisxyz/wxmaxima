@@ -53,4 +53,4 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-          cmake -G Ninja --config Release -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}} ..
+          cmake -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}} -G Ninja ..
