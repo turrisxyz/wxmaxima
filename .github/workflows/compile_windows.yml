@@ -32,14 +32,15 @@ jobs:
 # multi-job compilation is broken in wxWidgets, see https://trac.wxwidgets.org/ticket/19029
     - name: Compile wxWidgets
       run: |
-          cd wxWidgets-${{env.WXVERSION}}
-          cd build
-          cd msw
-          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { mingw32-make -f makefile.gcc SHELL=cmd.exe}
-          cd ..
-          cd ..
-          cd..
-
+          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) {
+             cd wxWidgets-${{env.WXVERSION}}
+             cd build
+             cd msw
+	     mingw32-make -f makefile.gcc SHELL=cmd.exe
+             cd ..
+             cd ..
+             cd ..
+          }
     - name: Checkout wxMaxima
       uses: actions/checkout@v2
       with:
