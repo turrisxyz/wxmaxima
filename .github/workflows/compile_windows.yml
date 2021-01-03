@@ -23,6 +23,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
+    - name: Install Ninja
+      run: |
+          cinst ninja
+
     - name: Download wxWidgets
       run: |
           if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip }
