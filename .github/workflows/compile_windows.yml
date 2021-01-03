@@ -7,7 +7,7 @@ env:
   WXVERSION: 3.1.3
 
 jobs:
-  compile_wxWidgets:
+  compile_windows:
     runs-on: windows-latest
 
     steps:
@@ -48,3 +48,13 @@ jobs:
         # a pull request then we can checkout the head.
         fetch-depth: 15
 
+    - name: Configure wxMaxima
+      run: |
+          new-item build -itemtype directory
+	  cd build
+          cmake -G "Ninja" --config Release
+            -DwxBUILD_SHARED=NO
+            -DwxUSE_STC=NO
+	    -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}}
+            -DwxUSE_RIBBON=NO
+	    ..
