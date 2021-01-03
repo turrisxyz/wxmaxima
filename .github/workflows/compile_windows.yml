@@ -58,4 +58,4 @@ jobs:
           dir ../..
           dir ../../wxWidgets-${{env.WXVERSION}}
           dir ../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
-          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -G Ninja ..
+          cmake -DwxWidgets_ROOT_DIR=../../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib -DCMAKE_BUILD_TYPE=release -G Ninja ..
