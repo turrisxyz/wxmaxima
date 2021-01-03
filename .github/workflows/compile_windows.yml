@@ -17,7 +17,7 @@ jobs:
         cache-name: cache-wxWidgets
       with:
         path: wxWidgets-${{env.WXVERSION}}
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-1
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-2
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
@@ -40,7 +40,7 @@ jobs:
              cd wxWidgets-${{env.WXVERSION}}
              cd build
              cd msw
-             mingw32-make -f makefile.gcc SHELL=cmd.exe
+             mingw32-make -f makefile.gcc SHELL=cmd.exe SHARED=0 BUILD=release
              cd ..
              cd ..
              cd ..
@@ -57,5 +57,7 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
+          dir ../wxWidgets-${{env.WXVERSION}}/
+          dir ../wxWidgets-${{env.WXVERSION}}/lib/
           dir ../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib
           cmake -DwxWidgets_ROOT_DIR=../wxWidgets-${{env.WXVERSION}} -DwxWidgets_LIB_DIR=../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib/mswu  -G Ninja ..
