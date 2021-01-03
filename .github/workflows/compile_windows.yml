@@ -51,10 +51,10 @@ jobs:
     - name: Configure wxMaxima
       run: |
           new-item build -itemtype directory
-	  cd build
+          cd build
           cmake -G "Ninja" --config Release
             -DwxBUILD_SHARED=NO
             -DwxUSE_STC=NO
-	    -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}}
+            -DWX_ROOT_DIR=../wxWidgets-${{env.WXVERSION}}
             -DwxUSE_RIBBON=NO
-	    ..
+            ..
