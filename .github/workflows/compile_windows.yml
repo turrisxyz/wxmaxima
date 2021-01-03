@@ -1,0 +1,49 @@
+name: build
+
+on: [push]
+
+env:
+  BUILD_TYPE: Release
+  WXVERSION: 3.1.3
+
+jobs:
+  compile_wxWidgets:
+    runs-on: windows-latest
+
+    steps:
+    - name: Cache wxWidgets
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-wxWidgets
+      with:
+        path: wxWidgets-${{env.WXVERSION}}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-1
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    - name: Download wxWidgets
+      run: |
+          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { Invoke-WebRequest -Uri https://github.com/wxWidgets/wxWidgets/releases/download/v${{env.WXVERSION}}/wxWidgets-${{env.WXVERSION}}.zip -OutFile wxWidgets-${{env.WXVERSION}}.zip }
+    - name: Extract wxWidgets
+      run: if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { Expand-Archive -LiteralPath wxWidgets-${{env.WXVERSION}}.zip -DestinationPath wxWidgets-${{env.WXVERSION}} }
+
+# multi-job compilation is broken in wxWidgets, see https://trac.wxwidgets.org/ticket/19029
+    - name: Compile wxWidgets
+      run: |
+          cd wxWidgets-${{env.WXVERSION}}
+          cd build
+          cd msw
+          if (!(Test-Path wxWidgets-${{env.WXVERSION}})) { mingw32-make -f makefile.gcc SHELL=cmd.exe}
+          cd ..
+          cd ..
+          cd..
+
+    - name: Checkout wxMaxima
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 15
+

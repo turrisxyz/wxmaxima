@@ -1,4 +1,4 @@
-name: compile_mac
+name: compile_windows
 
 on: [push]
 
