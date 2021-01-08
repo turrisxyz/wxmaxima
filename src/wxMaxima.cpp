@@ -3037,6 +3037,7 @@ void wxMaxima::VariableActionAltDisplay2D(const wxString &value)
 void wxMaxima::VariableActionOperators(const wxString &value)
 {
   wxXmlDocument xmldoc;
+  wxString newOperators;
   wxStringInputStream xmlStream(value);
   xmldoc.Load(xmlStream, wxT("UTF-8"));
   wxXmlNode *node = xmldoc.GetRoot();
@@ -3046,12 +3047,27 @@ void wxMaxima::VariableActionOperators(const wxString &value)
     while(contents)
     {
       if(contents->GetName() == wxT("operator"))
-      {
+      {        
         wxXmlNode *node = contents->GetChildren();
         if(node)
-          m_worksheet->m_configuration->m_maximaOperators[node->GetContent()] = 1;
+        {
+          if(m_worksheet->m_configuration->m_maximaOperators.find(node->GetContent()) ==
+             m_worksheet->m_configuration->m_maximaOperators.end()
+            )
+          {
+            m_worksheet->m_configuration->m_maximaOperators[node->GetContent()] = 1;
+            if(!newOperators.IsEmpty())
+              newOperators += wxT(", ");
+            newOperators += node->GetContent();
+          }
+        }
       }
       contents = contents->GetNext();
+    }
+    if(!newOperators.IsEmpty())
+    {
+      wxLogMessage(wxString::Format(_("New maxima Operators detected: %s"), newOperators.utf8_str()));
+      m_worksheet->Recalculate();
     }
   }
 }

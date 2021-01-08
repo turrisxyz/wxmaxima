@@ -44,6 +44,38 @@
 Configuration::Configuration(wxDC *dc, InitOpt options) :
   m_dc(dc)
 {
+  m_maximaOperators["("] = 1;
+  m_maximaOperators["/"] = 1;
+  m_maximaOperators["{"] = 1;
+  m_maximaOperators["-"] = 1;
+  m_maximaOperators["^"] = 1;
+  m_maximaOperators["#"] = 1;
+  m_maximaOperators["="] = 1;
+  m_maximaOperators[":"] = 1;
+  m_maximaOperators["["] = 1;
+  m_maximaOperators["'"] = 1;
+  m_maximaOperators["!"] = 1;
+  m_maximaOperators["+"] = 1;
+  m_maximaOperators["*"] = 1;
+  m_maximaOperators["or"] = 1;
+  m_maximaOperators["and"] = 1;
+  m_maximaOperators["do_in"] = 1;
+  m_maximaOperators[">"] = 1;
+  m_maximaOperators["$SUBVAR"] = 1;
+  m_maximaOperators["<"] = 1;
+  m_maximaOperators["if"] = 1;
+  m_maximaOperators["::="] = 1;
+  m_maximaOperators["::"] = 1;
+  m_maximaOperators["@"] = 1;
+  m_maximaOperators["."] = 1;
+  m_maximaOperators["-->"] = 1;
+  m_maximaOperators["^^"] = 1;
+  m_maximaOperators["not"] = 1;
+  m_maximaOperators["<="] = 1;
+  m_maximaOperators[":="] = 1;
+  m_maximaOperators[">="] = 1;
+  m_maximaOperators["$BFLOAT"] = 1;
+  m_maximaOperators["do"] = 1;
   m_printing = false;
   m_clipToDrawRegion = true;
   m_inLispMode = false;
