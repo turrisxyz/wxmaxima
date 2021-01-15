@@ -39,3 +39,8 @@ jobs:
            cd build
            cmake --build .
            cd ..
+    - name: install
+      run: |
+           cd build
+           cmake --install .
+           cd ..
