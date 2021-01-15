@@ -241,10 +241,6 @@ elseif(APPLE)
         COMPONENT Runtime)
 else()
     add_executable(wxmaxima ${SOURCE_FILES})
-    # These don't seem to be used, and they were disabled, but perhaps they really
-    # belong on Unix platforms other than Apple
-    ##set_target_properties(wxmaxima PROPERTIES
-    ##    RESOURCE "${RESOURCE_FILES}"
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
@@ -283,7 +279,8 @@ if(APPLE)
     install(TARGETS wxmaxima
 	     BUNDLE  DESTINATION .
 	     RUNTIME DESTINATION bin
-	     COMPONENT Runtime)
+	     COMPONENT Runtime
+	     RESOURCE DESTINATION resource)
 else()
     install(TARGETS wxmaxima RUNTIME DESTINATION bin)
 endif()
