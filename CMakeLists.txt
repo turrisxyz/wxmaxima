@@ -244,3 +244,5 @@ if(WIN32 AND APPVEYOR_BUILD)
         DESTINATION programs
         COMPONENT applications)
 endif()
+
+install(RESOURCE DESTINATION resource)
