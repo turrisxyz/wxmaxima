@@ -203,6 +203,7 @@ public:
    */
   void Recalculate(AFontSize WXUNUSED(fontsize)) override {Recalculate();}
   void Recalculate();
+  wxPoint CalculateInputPosition();
 
   //! Recalculate the height of the input part of the cell
   void RecalculateInput();
@@ -352,6 +353,8 @@ public:
   //! Recalculate the cell's y position using the position and height of the last one.
   void UpdateYPosition();
 
+  void UpdateOutputPositions();
+
   void UpdateYPositionList();
 
   bool GetSuppressTooltipMarker() const { return m_suppressTooltipMarker; }
@@ -415,6 +418,7 @@ protected:
     m_lastInEvaluationQueue = false;
     m_updateConfusableCharWarnings = true;
     m_suppressTooltipMarker = false;
+    m_cellsAppended = false;
   }
 
   //! Does this GroupCell automatically fill in the answer to questions?
@@ -424,6 +428,7 @@ protected:
   bool m_updateConfusableCharWarnings : 1 /* InitBitFields */;
   //! Suppress the yellow ToolTip marker?
   bool m_suppressTooltipMarker : 1 /* InitBitFields */;
+  bool m_cellsAppended : 1; /* InitBitFields */
 
   static wxString m_lookalikeChars;
 };

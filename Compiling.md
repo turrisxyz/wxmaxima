@@ -19,26 +19,22 @@ Assume you start inside wxmaxima source tree root folder. Then:
         mkdir -p ../build-wxm
         cmake -G Ninja -S . -B ../build-wxm
         cmake --build ../build-wxm
-        sudo cmake --build ../build-wxm -- install
+        sudo cmake --install ../build-wxm
         
 - Using cmake 3.7-3.12
 
         mkdir -p ../build-wxm
         cd ../build-wxm
-        cmake -G Ninja ../wxmaxima
+        cmake ../wxmaxima
         cd ../wxmaxima
         cmake --build ../build-wxm
-        sudo cmake --build ../build-wxm -- install
+        sudo cmake --install ../build-wxm
 
 If you want to install into a special prefix (not `/usr/local`), add
 `-DCMAKE_INSTALL_PREFIX:PATH=/your/installation/prefix` to the first
 cmake invocation. E.g.
 
     cmake -DCMAKE_INSTALL_PREFIX=/your/installation/prefix -G Ninja -S . -B ../build-wxm
-
-By default, wxMaxima tries to use OpenMP for parallelization, if the
-compiler supports that. You can remove OpenMP support with the option
-`-DWXM_USE_OPENMP=NO` added to the first cmake invocation.
 
 If installed, wxMaxima can use cppcheck to check the source for potential
 bugs that may escape detection during normal compilation. You can enable
@@ -57,13 +53,16 @@ https://cmake.org/download/ and use that.
 
 #### Mac Os: Creating a portable .apk and .dmg installer
 
-Add the `-DMACOSX_BUNDLE=YES` to the initial cmake invocation. E.g.
+This requires wxWidgets to be installed, e.G. using macports
 
-    cmake -DMACOSX_BUNDLE=YES -G Ninja -S . -B ../build-wxm
+    mkdir ../build-wxm
+    cmake -S . -B ../build-wxm -DCMAKE_INSTALL_PREFIX=.
+    cmake --build ../build-wxm
+    cmake --build ../build-wxm --install
     
 #### Ubuntu or Debian build prerequisites
 
-    sudo apt-get install build-essential libomp-dev libwxbase3.0-dev libwxgtk3.0-dev ibus-gtk ibus-gtk3 checkinstall gettext cmake ninja-build pandoc po4a
+    sudo apt-get install build-essential libwxbase3.0-dev libwxgtk3.0-dev ibus-gtk ibus-gtk3 checkinstall gettext cmake ninja-build pandoc po4a
 
 beforehand or (if apt-get is configured to load the source package
 repositories and not only the binary packages) by the simpler
@@ -82,8 +81,7 @@ the newer version of CMake in the commands above).
 On Mac OS X you most probably need the command-line compiler one can tell 
 Xcode to install. Additionally wxWidgets needs to be installed, which can
 be done using homebrew, fink or macports and should be named wxWidgets or
-wxMac there. If libomp is installed, as well, wxMaxima is able to speed
-up some more tasks using multithreading.
+wxMac there.
 
 Additional information about building on MacOS:
 
@@ -95,8 +93,7 @@ Additional information about building on MacOS:
 You can install MinGW (https://sourceforge.net/projects/mingw/). In
 the installation process make sure you select `g++`, `MSYS Basic
 System` and `MinGW Developer ToolKit` in the `Select components` page
-of the installer. Also select po4a, cmake, ninja, openmp (if openmp is 
-available) and install pandoc.
+of the installer. Also select po4a, cmake, ninja and install pandoc.
 Then run the MinGW Shell and follow the instructions for compiling
 wxWidgets and wxMaxima with cmake.
 

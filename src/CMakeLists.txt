@@ -1,5 +1,23 @@
 # -*- mode: CMake; cmake-tab-width: 4; -*-
 
+# Prepends a prefix to all elements in a list. Needed only in
+# cmake < 3.12, but we claim to support 3.7, so this is needed.
+# Usage: list_transform_prepend(FILES_TO_TRANSLATE "prefix/")
+# See https://stackoverflow.com/a/59155344/1329652
+#
+# According to #1388 cmake 3.19.2 requires this to be definied
+# in each source file separately
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+
+function(list_transform_prepend var prefix)
+    set(temp "")
+    foreach(f ${${var}})
+        list(APPEND temp "${prefix}${f}")
+    endforeach()
+    set(${var} "${temp}" PARENT_SCOPE)
+endfunction()
+
 set(CELL_SOURCE_FILES
     AbsCell.cpp
     AtCell.cpp
@@ -137,11 +155,19 @@ include_directories(
   "${CMAKE_SOURCE_DIR}/src/wizards"
   # Version.h is generated in the binary dir
   "${CMAKE_CURRENT_BINARY_DIR}"
+  "${CMAKE_BINARY_DIR}/examples"
+  "${CMAKE_BINARY_DIR}/art"
+  "${CMAKE_BINARY_DIR}/data"
 )
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.9.4")
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT lposupported)
+
+# link time optimization seems to need that
+if(POLICY CMP0069)
+    cmake_policy(SET CMP0069 NEW)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.9.4")
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT lposupported)
+    endif()
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.10.0" AND WXM_USE_CPPCHECK)
@@ -188,15 +214,19 @@ if(APPLE)
 endif()
 
 if(WIN32)
-    add_executable(wxmaxima WIN32 ${SOURCE_FILES})
+  add_executable(wxmaxima WIN32 ${SOURCE_FILES})
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
+    set_target_properties(wxmaxima PROPERTIES VS_DPI_AWARE "PerMonitor")
+  endif()
 elseif(APPLE)
     set(MACOSX_BUNDLE_NAME wxmaxima)
     set(MACOSX_BUNDLE_ICON_FILE wxmac.icns)
+    set(MACOSX_BUNDLE TRUE)
     list(APPEND SOURCE_FILES ${RESOURCE_FILES})
     add_executable(wxmaxima ${SOURCE_FILES})
     set_target_properties(wxmaxima PROPERTIES
         MACOSX_BUNDLE TRUE
-	MACOSX_BUNDLE_INFO_PLIST ${CMAKE_BINARY_DIR}/data/Info.plist
+	MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
         RESOURCE "${RESOURCE_FILES}"
     )
 
@@ -214,19 +244,14 @@ elseif(APPLE)
         COMPONENT Runtime)
 else()
     add_executable(wxmaxima ${SOURCE_FILES})
-    # These don't seem to be used, and they were disabled, but perhaps they really
-    # belong on Unix platforms other than Apple
-    ##set_target_properties(wxmaxima PROPERTIES
-    ##    RESOURCE "${RESOURCE_FILES}"
 endif()
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
-    set_target_properties(wxmaxima PROPERTIES VS_DPI_AWARE "PerMonitor")
-    if(WXM_ENABLE_PRECOMPILED_HEADERS)
-	target_precompile_headers(wxmaxima PUBLIC "precomp.h")
-    else()
-	set(USE_PRECOMP_HEADER "0")
-    endif()
+  if(WXM_ENABLE_PRECOMPILED_HEADERS)
+    target_precompile_headers(wxmaxima PUBLIC "precomp.h")
+  else()
+    set(USE_PRECOMP_HEADER "0")
+  endif()
 endif()
 
 file(RELATIVE_PATH TRANSLATIONS_DIR ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../locales/wxMaxima/)
@@ -241,11 +266,7 @@ else()
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/wxmaxima-local.in" ../wxmaxima-local)
 endif()
 
-if(WXM_USE_OPENMP AND OpenMP_CXX_FOUND)
-    target_link_libraries(wxmaxima OpenMP::OpenMP_CXX ${wxWidgets_LIBRARIES})
-else()
-    target_link_libraries(wxmaxima ${wxWidgets_LIBRARIES})
-endif()
+target_link_libraries(wxmaxima ${wxWidgets_LIBRARIES})
 
 if(MINGW)
     target_link_libraries(wxmaxima -lws2_32)
@@ -257,7 +278,8 @@ if(APPLE)
     install(TARGETS wxmaxima
 	     BUNDLE  DESTINATION .
 	     RUNTIME DESTINATION bin
-	     COMPONENT Runtime)
+	     COMPONENT Runtime
+	     RESOURCE DESTINATION resource)
 else()
     install(TARGETS wxmaxima RUNTIME DESTINATION bin)
 endif()

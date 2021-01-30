@@ -1,10 +1,20 @@
+# Current
+ * A Spanish translation update by cyphra
+ * Replaced openMP by c++11's built-in thread handling. This should improve 
+   stability at the cost of making loading files with lots of images slower.
+
+# 21.01.0
+ * Chinese translation updates by 刘荣.
+ * A Russian translation update by OlesyaGerasimenko
+ * Many small bugfixes including a crash on loading files with images.
+
 # 20.12.2
  * Compilation now works if wxWidgets was compiled with stl support
  * Eye candy: Nicer display of sets
 
 # 20.12.1
  * If there are still IE9 users the manual of 20.12.0 would have included a
-   file from the internet - which debian judget to be a privacy issue.
+   file from the internet - which Debian judged to be a privacy issue.
 
 # 20.12.0
  * A chinese translation of the manual by 刘荣.

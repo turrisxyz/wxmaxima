@@ -55,7 +55,7 @@ _Maxima_ is a full-featured computer algebra system (CAS). A CAS is a program th
 
 ![Maxima screenshot, command line](./maxima_screenshot.png){ id=img_maxima_screenshot }
 
-Extensive documentation for _Maxima_ is  [available in the internet](http://maxima.sourceforge.net/documentation.html). Part of this documentation is also available in wxMaxima’s help menu. Pressing the Help key (on most systems the F1 key) causes _wxMaxima_’s context-sensitive help feature to automatically jump to _Maxima_’s manual page for the command at the cursor.
+Extensive documentation for _Maxima_ is  [available in the internet](https://maxima.sourceforge.io/documentation.html). Part of this documentation is also available in wxMaxima’s help menu. Pressing the Help key (on most systems the F1 key) causes _wxMaxima_’s context-sensitive help feature to automatically jump to _Maxima_’s manual page for the command at the cursor.
 
 ### wxMaxima
 
@@ -163,21 +163,21 @@ The same mechanism also allows to enter some miscellaneous mathematical symbols:
 | /2             | 1/2                                                   |
 | partial        | partial sign (the d of dx/dt)                         |
 | integral       | integral sign                                         |
-| sq             | root                                                  |
+| sq             | square root                                           |
 | ii             | imaginary                                             |
 | ee             | element                                               |
 | in             | in                                                    |
 | impl implies   | implies                                               |
 | inf            | infinity                                              |
 | empty          | empty                                                 |
-| TB             | Big triangle right                                    |
+| TB             | big triangle right                                    |
 | tb             | small triangle right                                  |
 | and            | and                                                   |
 | or             | or                                                    |
 | xor            | xor                                                   |
 | nand           | nand                                                  |
 | nor            | nor                                                   |
-| equiv          | equivalent                                            |
+| equiv          | equivalent to                                         |
 | not            | not                                                   |
 | union          | union                                                 |
 | inter          | intersection                                          |
@@ -193,7 +193,6 @@ The same mechanism also allows to enter some miscellaneous mathematical symbols:
 | >= or geq      | equal or greater than                                 |
 | << or ll       | much less than                                        |
 | >> or gg       | much greater than                                     |
-| equiv          | equivalent to                                         |
 | qed            | end of proof                                          |
 | nabla          | a nabla operator                                      |
 | sum            | sum sign                                              |

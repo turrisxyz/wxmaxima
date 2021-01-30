@@ -1376,10 +1376,10 @@ void wxMaximaFrame::SetupMenu()
                    _("Show wxMaxima help"), wxT("gtk-help"));
 #endif
   m_HelpMenu->Append(menu_wxmaximahelp, _("wxMaxima help"),
-                     _("The offline manual of wxMaxima"),
+                     _("The manual of wxMaxima"),
                      wxITEM_NORMAL);
   m_HelpMenu->Append(menu_maximahelp, _("&Maxima help"),
-                     _("The offline manual of Maxima"),
+                     _("The manual of Maxima"),
                      wxITEM_NORMAL);
   m_HelpMenu->Append(menu_example, _("&Example..."),
                      _("Show an example of usage"),
@@ -1420,7 +1420,7 @@ void wxMaximaFrame::SetupMenu()
                      wxITEM_NORMAL);
   m_HelpMenu->AppendSeparator();
   m_HelpMenu->Append(menu_check_updates, _("Check for Updates"),
-                     _("Check if a newer version of wxMaxima/Maxima exist."),
+                     _("Check if a newer version of wxMaxima is available."),
                      wxITEM_NORMAL);
 #ifndef __WXOSX__
   m_HelpMenu->AppendSeparator();
@@ -1965,7 +1965,7 @@ void wxMaximaFrame::GreekPane::UpdateSymbols()
       {L'\u03A3', _("Sigma")},
       {L'\u03A4', _("Tau"), Cond::ShowLatinLookalikes},
       {L'\u03A5', _("Upsilon"), Cond::ShowLatinLookalikes},
-      {L'\u03A6', _("Phi"), Cond::ShowLatinLookalikes},
+      {L'\u03A6', _("Phi")},
       {L'\u03A7', _("Chi"), Cond::ShowLatinLookalikes},
       {L'\u03A8', _("Psi")},
       {L'\u03A9', _("Omega")},

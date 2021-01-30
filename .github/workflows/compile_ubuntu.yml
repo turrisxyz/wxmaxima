@@ -17,7 +17,9 @@ jobs:
         # a pull request then we can checkout the head.
         fetch-depth: 15
     - name: install_packages
-      run: sudo apt-get install gettext doxygen graphviz gnuplot gnuplot-x11 libomp-dev libwxgtk3.0-gtk3-dev maxima maxima-share ninja-build netcat-openbsd xvfb appstream-util desktop-file-utils cmake
+      run: |
+           sudo apt update
+           sudo apt-get install appstream-util cmake desktop-file-utils doxygen gettext gnuplot gnuplot-x11 graphviz libwxgtk3.0-gtk3-dev maxima maxima-share netcat-openbsd ninja-build pandoc xvfb
     - name: configure
       run: |
            export CXXFLAGS="-Wall -Wextra -ansi -std=c++11"
@@ -40,9 +42,10 @@ jobs:
     - name: run_tests
       run: |
            cd build
+           export HOME=`pwd`
            export CTEST_OUTPUT_ON_FAILURE=1
            export LD_PRELOAD=$(gcc -print-file-name=libSegFault.so)
-           xvfb-run -a ctest -j 3;    
+           xvfb-run -a ctest -j 3 --timeout 120;   
            cd ..
 
   compile_oldgcc:
@@ -60,7 +63,7 @@ jobs:
            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
            sudo apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ xenial main'
            sudo apt-get update
-           sudo apt-get install graphviz gnuplot gnuplot-x11 libwxgtk3.0-dev maxima maxima-share ninja-build netcat-openbsd xvfb cmake appstream-util desktop-file-utils
+           sudo apt-get install appstream-util cmake desktop-file-utils gnuplot gnuplot-x11 graphviz libwxgtk3.0-dev maxima maxima-share netcat-openbsd ninja-build pandoc xvfb
     - name: configure
       run: |
            export CC=gcc-5
@@ -82,10 +85,14 @@ jobs:
            cd build
            cmake --build . --target update-locale
            cd ..
+
+# On this ubuntu version maxima is unable to load the draw() package => we need to skip all
+# tests that include draw()
     - name: run_tests
       run: |
            cd build
+           export HOME=`pwd`
            export CTEST_OUTPUT_ON_FAILURE=1
            export LD_PRELOAD=$(gcc -print-file-name=libSegFault.so)
-           xvfb-run -a ctest -j 3 -E ImgCell;    
+           xvfb-run -a ctest -j 3 -E "(ImgCell|threadtest)" --timeout 120;
            cd ..
