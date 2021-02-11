@@ -9,7 +9,6 @@ env:
 jobs:
   compile_windows:
     runs-on: windows-latest
-
     steps:
     - name: Checkout wxMaxima
       uses: actions/checkout@v2
@@ -18,6 +17,10 @@ jobs:
         # a pull request then we can checkout the head.
         fetch-depth: 15
         path: wxMaxima
+
+    - name: Install Ninja
+      run: |
+          choco install ninja
 
     - name: Cache wxWidgets
       uses: actions/cache@v2
@@ -49,7 +52,7 @@ jobs:
           new-item build -itemtype directory
           new-item build\Release -itemtype directory
           cd build
-          cmake -DwxWidgets_ROOT_DIR="../../wxWidgets-${{env.WXVERSION}}" -DwxWidgets_LIB_DIR="../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib" -DwxWidgets_CONFIGURATION=mswu -DCMAKE_BUILD_TYPE=release -G "MinGW Makefiles" -DwxWidgets_USE_DEBUG=false -DwxWidgets_USE_UNICODE=true -DwxWidgets_USE_STATIC=true ..
+          cmake -DwxWidgets_ROOT_DIR="../../wxWidgets-${{env.WXVERSION}}" -DwxWidgets_LIB_DIR="../../wxWidgets-${{env.WXVERSION}}/lib/gcc_lib" -DwxWidgets_CONFIGURATION=mswu -DCMAKE_BUILD_TYPE=release -G "MinGW Makefiles" -DwxWidgets_USE_DEBUG=false -DwxWidgets_USE_UNICODE=true -DwxWidgets_USE_STATIC=true -G Ninja ..
           cd ..
           cd ..
     - name: Compile wxMaxima
