@@ -116,12 +116,11 @@ set(CLISP_MD5 "8d58d64f83dd7ad01c054aecc16c1f52")
 
 if(BUILD_CURRENT)
     set(USE_WXMAXIMA_GIT YES)
-    set(MAXIMAVERSION "current")
 else()
     # Get Maxima version from configure.ac
     file(STRINGS "${CMAKE_SOURCE_DIR}/../configure.ac" CONFIGUREAC REGEX "AC_INIT\\(.*\\)")
-    string(REGEX REPLACE "AC_INIT\\(\\[maxima\\], \\[(.*)\\]\\)" "\\1" MAXIMAVERSION ${CONFIGUREAC})
-    message(STATUS "Maxima version (from configure.ac): ${MAXIMAVERSION}")
+    string(REGEX REPLACE "AC_INIT\\(\\[maxima\\], \\[(.*)\\]\\)" "\\1" MAXIMA_TAG ${CONFIGUREAC})
+    message(STATUS "Maxima version (from configure.ac): ${MAXIMA_TAG}")
 endif()
 
 
@@ -207,7 +206,7 @@ externalproject_add(maxima
   DEPENDS clisp sbcl tcl tk ${ABCL_DEPENDS}
   BUILD_IN_SOURCE 1
   CONFIGURE_COMMAND sh -c "test -x ./bootstrap && ./bootstrap || return 0"
-            COMMAND ./configure --host=${HOST} --enable-clisp --with-clisp=${CMAKE_BINARY_DIR}/wine-clisp.sh --with-clisp-runtime=${CMAKE_BINARY_DIR}/wine-lisp.sh --enable-sbcl --with-sbcl=${CMAKE_BINARY_DIR}/wine-sbcl.sh ${ABCL_ENABLE} "${ABCL_JAR}" --with-default-lisp=${WITH_DEFAULT_LISP} --prefix=${WINDOWS_DRIVELETTER}:/maxima-${MAXIMAVERSION}
+            COMMAND ./configure --host=${HOST} --enable-clisp --with-clisp=${CMAKE_BINARY_DIR}/wine-clisp.sh --with-clisp-runtime=${CMAKE_BINARY_DIR}/wine-lisp.sh --enable-sbcl --with-sbcl=${CMAKE_BINARY_DIR}/wine-sbcl.sh ${ABCL_ENABLE} "${ABCL_JAR}" --with-default-lisp=${WITH_DEFAULT_LISP} --prefix=${WINDOWS_DRIVELETTER}:/maxima-${MAXIMA_TAG}
   # clisp-depends.mk is generated with "\" as path seperator, not "/" - correct that...
   BUILD_COMMAND LANG=C $(MAKE) -C src clisp-depends.mk
         COMMAND sed -i s+\\\\+/+g src/clisp-depends.mk
@@ -232,10 +231,10 @@ add_executable(maxima_longnames maxima_longnames.c)
 install(FILES "${CMAKE_BINARY_DIR}/maxima_longnames.exe" DESTINATION bin/ COMPONENT Maxima)
 
 
-install(DIRECTORY ${CMAKE_BINARY_DIR}/maxima-installroot/${WINDOWS_DRIVELETTER}:/maxima-${MAXIMAVERSION}/
+install(DIRECTORY ${CMAKE_BINARY_DIR}/maxima-installroot/${WINDOWS_DRIVELETTER}:/maxima-${MAXIMA_TAG}/
         DESTINATION . COMPONENT Maxima PATTERN "binary-abcl" EXCLUDE)
 if(WITH_ABCL)
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/maxima-installroot/${WINDOWS_DRIVELETTER}:/maxima-${MAXIMAVERSION}/
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/maxima-installroot/${WINDOWS_DRIVELETTER}:/maxima-${MAXIMA_TAG}/
             DESTINATION . COMPONENT ABCL PATTERN "binary-abcl")
 endif()
 
@@ -255,7 +254,7 @@ install(FILES "${CMAKE_BINARY_DIR}/licenses.html" DESTINATION share/doc/ COMPONE
 
 
 set(CPACK_GENERATOR "NSIS;ZIP")
-set(CPACK_PACKAGE_VERSION "${MAXIMAVERSION}")
+set(CPACK_PACKAGE_VERSION "${MAXIMA_TAG}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Maxima")
 set(CPACK_PACKAGE_VENDOR "Maxima Team")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/../README")
