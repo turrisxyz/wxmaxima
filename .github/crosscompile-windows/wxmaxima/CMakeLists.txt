@@ -10,12 +10,9 @@
 # updated setup-file automatically.
 
 message(STATUS "Copying the local wxmaxima git version.")
-execute_process(COMMAND mkdir -p ${CMAKE_SOURCE_DIR}/downloads
-  COMMAND ${CMAKE_COMMAND} -e ${CMAKE_SOURCE_DIR}/../.. downloads/wxmaxima-git
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/downloads)
 
 externalproject_add(wxmaxima-git
-  GIT_REPOSITORY ${CMAKE_SOURCE_DIR}/downloads/wxmaxima-git
+  URL /../..
   DEPENDS wxwidgets
   # search wx-config here - do not use the host wx-config
   # had to set CMAKE_LIBRARY_PATH=/usr/${HOST}/lib - libraries for mingw are installed there, but CMake (>3.8)
