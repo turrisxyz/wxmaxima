@@ -94,3 +94,33 @@ jobs:
         asset_name: wxmaxima-installer.exe
         asset_content_type: application/x-executable
         
+  crosscompile_all:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout_git
+      uses: actions/checkout@v2
+      with:
+        # We must fetch at least the immediate parents so that if this is
+        # a pull request then we can checkout the head.
+        fetch-depth: 15
+    - name: install_packages
+      run: |
+           sudo apt update
+           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a 
+    - name: configure
+      run: |
+           mkdir build
+           cd build
+           cmake ../.github/crosscompile-windows
+           dc ..
+    - name: compile
+      run: |
+           cd build
+           cmake --build .
+           cd ..
+    - name: package
+      run: |
+           cd build
+           cpack
+           cd ..

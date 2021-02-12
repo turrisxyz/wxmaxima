@@ -186,15 +186,18 @@ endfunction()
 # Build Items
 #
 
-add_subdirectory(Doxygen)
-add_subdirectory(data)
-add_subdirectory(info)
-add_subdirectory(locales)
-add_subdirectory(src)
-add_subdirectory(examples)
-
-enable_testing()
-add_subdirectory(test)
+if(NOT BUILD_CROSSCOMPILED_INSTALLER)
+    enable_testing()
+    add_subdirectory(Doxygen)
+    add_subdirectory(data)
+    add_subdirectory(info)
+    add_subdirectory(locales)
+    add_subdirectory(src)
+    add_subdirectory(examples)
+    add_subdirectory(test)
+else()
+    add_subdirectory(crosscompile-windows)
+endif()
 
 add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
