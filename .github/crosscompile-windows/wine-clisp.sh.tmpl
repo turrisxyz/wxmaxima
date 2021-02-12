@@ -1,6 +1,6 @@
 #!/bin/sh
-export WINEPREFIX=@CMAKE_BINARY_DIR@/wine32
-export WINEARCH=win32
+export WINEPREFIX=@CMAKE_BINARY_DIR@/wine64
+export WINEARCH=win64
 # do not install (and pop up a window) for Mono and Gecko - not needed.
 WINEDLLOVERRIDES="mscoree,mshtml="
 export WINEDLLOVERRIDES

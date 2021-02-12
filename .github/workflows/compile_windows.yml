@@ -107,17 +107,17 @@ jobs:
     - name: install_packages
       run: |
            sudo apt update
-           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine libwine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc
+           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine libwine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc xvfb
     - name: configure
       run: |
            mkdir build
            cd build
            cmake ../.github/crosscompile-windows
-           dc ..
+           cd ..
     - name: compile
       run: |
            cd build
-           cmake --build .
+           xvfb-run -a cmake --build .
            cd ..
     - name: package
       run: |
