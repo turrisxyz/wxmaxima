@@ -107,7 +107,7 @@ jobs:
     - name: install_packages
       run: |
            sudo apt update
-           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a 
+           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3
     - name: configure
       run: |
            mkdir build
