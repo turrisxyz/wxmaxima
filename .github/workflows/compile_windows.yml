@@ -95,7 +95,7 @@ jobs:
         asset_content_type: application/x-executable
         
   crosscompile_all:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-16.04
 
     steps:
     - name: Checkout_git
@@ -107,7 +107,7 @@ jobs:
     - name: install_packages
       run: |
            sudo apt update
-           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine libwine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc
+           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine wine32 wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc
     - name: configure
       run: |
            mkdir build
