@@ -12,7 +12,7 @@
 message(STATUS "Copying the local wxmaxima git version.")
 
 externalproject_add(wxmaxima-git
-  URL /../..
+  URL ../../..
   DEPENDS wxwidgets
   # search wx-config here - do not use the host wx-config
   # had to set CMAKE_LIBRARY_PATH=/usr/${HOST}/lib - libraries for mingw are installed there, but CMake (>3.8)
