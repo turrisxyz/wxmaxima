@@ -5,7 +5,7 @@
 # There is NO WARRANTY, to the extent permitted by law.
 
 set(CMAKE_SYSTEM_NAME Windows)
-set(MAXIMA_URL "https://peterpall@git.code.sf.net/p/maxima/code")
+set(MAXIMA_URL "https://git.code.sf.net/p/maxima/code")
 set(MAXIMA_TAG "5.44.0")
 
 option(BUILD_64BIT "Build a 64 bit installer." YES)
