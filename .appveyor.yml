@@ -162,20 +162,3 @@ after_test:
       popd
 #      echo '* Compressing the executable'
 #      7z a wxMaxima.exe.7z build/src/*.exe
-
-
-for:
-  -
-    matrix:
-      only:
-        - WXW_LIB: gcc_x64_lib
-#    artifacts:
-#    - path: 'wxMaxima.exe.7z'
-#      name: wxMaxima.exe.7z
-    deploy:
-      - provider: Environment
-        name: GithubReleases
-        draft: false
-        prerelease: false
-        on:
-          APPVEYOR_REPO_TAG: true
