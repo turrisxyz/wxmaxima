@@ -114,10 +114,10 @@ jobs:
       run: |
            mkdir ../build
            cd ../build
-           cmake .github/crosscompile-windows
+           cmake ../wxmaxima/.github/crosscompile-windows
     - name: compile
       run: |
            xvfb-run -a cmake --build -j 4 .
     - name: package
       run: |
-           cpack
+           cpack .
