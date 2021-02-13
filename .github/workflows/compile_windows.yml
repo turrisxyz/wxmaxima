@@ -113,7 +113,7 @@ jobs:
     - name: configure
       run: |
            mkdir ../build
-           cmake -B ../build ../.github/crosscompile-windows
+           cmake -B .../build .github/crosscompile-windows
     - name: compile
       run: |
            xvfb-run -a cmake --build -j 4 -B ../build .
