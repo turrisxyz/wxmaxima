@@ -112,17 +112,11 @@ jobs:
            sudo apt-get install wine32 
     - name: configure
       run: |
-           mkdir build
-           cd build
-           cmake ../.github/crosscompile-windows
-           cd ..
+           mkdir ../build
+           cmake -B ../build ../.github/crosscompile-windows
     - name: compile
       run: |
-           cd build
-           xvfb-run -a cmake --build .
-           cd ..
+           xvfb-run -a cmake --build -B ../build .
     - name: package
       run: |
-           cd build
-           cpack
-           cd ..
+           cpack -B ../build
