@@ -126,4 +126,5 @@ jobs:
     - name: package
       run: |
            cd /home/runner/work/wxmaxima/build
+           export LANG=C
            cpack .
