@@ -94,7 +94,7 @@ jobs:
         asset_name: wxmaxima-installer.exe
         asset_content_type: application/x-executable
         
-  crosscompile_all:
+  crosscompile:
     runs-on: ubuntu-20.04
 
     steps:
@@ -106,8 +106,10 @@ jobs:
         fetch-depth: 15
     - name: install_packages
       run: |
+           sudo dpkg --add-architecture i386
            sudo apt update
-           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine libwine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc xvfb
+           sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc xvfb
+           sudo apt-get install wine32 
     - name: configure
       run: |
            mkdir build
