@@ -109,6 +109,7 @@ jobs:
            sudo dpkg --add-architecture i386
            sudo apt update
            sudo apt-get install g++-mingw-w64-x86-64 cmake nsis wine wine64 automake texinfo texlive texlive-plain-generic texlive-xetex rsync p7zip-full g++ gettext tcl pandoc po4a python3 dc xvfb
+           echo "1"| sudo update-alternatives --config x86_64-w64-mingw32-g++  # use the x86_64-w64-mingw32-g++-posix compiler, we use threads.
            sudo apt-get install wine32 gnutls-bin
     - name: configure git
       run: |
