@@ -125,4 +125,5 @@ jobs:
            xvfb-run -a cmake --build . -- -j 4
     - name: package
       run: |
+           cd /home/runner/work/wxmaxima/build
            cpack .
