@@ -21,7 +21,7 @@ endif()
 set(CMAKE_C_COMPILER   ${HOST}-gcc)
 set(CMAKE_CXX_COMPILER ${HOST}-g++)
 set(CMAKE_RC_COMPILER  ${HOST}-windres)
-project(maxima)
+project(maxima_installer)
 cmake_minimum_required(VERSION 3.7)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/ ${CMAKE_BINARY_DIR}/)
@@ -216,17 +216,26 @@ externalproject_add(maxima
           COMMAND LANG=C $(MAKE) extradocinstall DESTDIR=${CMAKE_BINARY_DIR}/maxima-installroot/
 )
 
-# The README file exists after maxima has been downloaded as an external project
-# and before cpack is executed
-if(EXISTS maxima-prefix/src/maxima/README)
-  # crosscompiling winkill with autoconf does not work, compile it using CMake.
-  add_library(winkill_lib SHARED maxima-prefix/src/maxima/interfaces/xmaxima/win32/winkill_lib.c)
-  add_executable(winkill maxima-prefix/src/maxima/interfaces/xmaxima/win32/winkill.c)
-  set_target_properties(winkill_lib PROPERTIES PREFIX "") # remove 'lib' prefix from libwinkill_lib.dll
-  target_link_libraries(winkill winkill_lib)
-  install(TARGETS winkill winkill_lib COMPONENT Maxima RUNTIME DESTINATION bin LIBRARY DESTINATION bin/)
-  install(FILES "maxima-prefix/src/maxima/interfaces/xmaxima/win32/win_signals.lisp" DESTINATION bin/ COMPONENT Maxima)
-endif()
+# Copy the files from maxima which makes it officially available to us
+add_custom_command(OUTPUT winkill_lib.c
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/interfaces/wxmaxima/win32/winkill_lib.c winkill_lib.c
+  DEPENDS maxima
+)
+add_custom_command(OUTPUT winkill.c
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/interfaces/wxmaxima/win32/winkill.c winkill.c
+  DEPENDS maxima
+)
+add_custom_command(OUTPUT win_signals.lisp
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/interfaces/wxmaxima/win32/win_signals.lisp win_signals.lisp
+  DEPENDS maxima
+)
+# crosscompiling winkill with autoconf does not work, compile it using CMake.
+add_library(winkill_lib SHARED winkill_lib.c)
+add_executable(winkill winkill.c)
+set_target_properties(winkill_lib PROPERTIES PREFIX "") # remove 'lib' prefix from libwinkill_lib.dll
+target_link_libraries(winkill winkill_lib)
+install(TARGETS winkill winkill_lib COMPONENT Maxima RUNTIME DESTINATION bin LIBRARY DESTINATION bin/)
+install(FILES "win_signals.lisp" DESTINATION bin/ COMPONENT Maxima)
 
 # convert windows short names to long names (e.g.
 # "C:/Users/TESTTE~1/AppData/Local/Temp" to "C:/Users/test test/AppData/Local/Temp")
@@ -243,7 +252,7 @@ if(WITH_ABCL)
 endif()
 
 install(FILES "${CMAKE_SOURCE_DIR}/xmaxima.bat" DESTINATION bin/ COMPONENT Maxima)
-#install(FILES "${CMAKE_BINARY_DIR}/maxima-prefix/src/maxima/doc/info/maxima.pdf" DESTINATION share/doc/ COMPONENT Maxima)
+install(CODE "install(FILES \"${CMAKE_BINARY_DIR}/maxima-prefix/src/maxima/doc/info/maxima.pdf\" DESTINATION share/doc/ COMPONENT Maxima)")
 configure_file("${CMAKE_SOURCE_DIR}/lispselector.tcl" "${CMAKE_BINARY_DIR}/lispselector.tcl")
 install(FILES "${CMAKE_BINARY_DIR}/lispselector.tcl" DESTINATION bin/ COMPONENT Maxima)
 install(FILES "${CMAKE_SOURCE_DIR}/lispselector.bat" DESTINATION bin/ COMPONENT Maxima)
@@ -261,13 +270,27 @@ set(CPACK_GENERATOR "NSIS;ZIP")
 set(CPACK_PACKAGE_VERSION "${MAXIMA_TAG}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Maxima")
 set(CPACK_PACKAGE_VENDOR "Maxima Team")
-# The README file exists after maxima has been downloaded as an external project
-# and before cpack is executed
-if(EXISTS maxima-prefix/src/maxima/README)
-  set(CPACK_PACKAGE_DESCRIPTION_FILE "maxima-prefix/src/maxima/README")
-  set(CPACK_RESOURCE_FILE_LICENSE "maxima-prefix/src/maxima/COPYING")
-  set(CPACK_NSIS_MUI_ICON "maxima-prefix/src/maxima/interfaces/xmaxima\\\\maxima-icon.ico")
-endif()
+# Copy the file from maxima which makes it officially available to us
+add_custom_command(OUTPUT README
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/README README
+  COMMENT copying the README from the maxima sources
+  DEPENDS maxima
+)
+#set(CPACK_PACKAGE_DESCRIPTION_FILE "README")
+# Copy the file from maxima which makes it officially available to us
+add_custom_command(OUTPUT COPYING
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/COPYING COPYING
+  COMMENT copying the COPYING from the maxima sources
+  DEPENDS maxima
+)
+#set(CPACK_RESOURCE_FILE_LICENSE "COPYING")
+# Copy the file from maxima which makes it officially available to us
+add_custom_command(OUTPUT maxima-icon.ico
+  COMMAND ${CMAKE_COMMAND} -E copy maxima-prefix/src/maxima/interfaces/xmaxima/maxima-icon.ico maxima-icon.ico
+  COMMENT copying the maxima icon from the maxima sources
+  DEPENDS maxima
+)
+#set(CPACK_NSIS_MUI_ICON "maxima-icon.ico")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "maxima-${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_INSTALL_ROOT "${WINDOWS_DRIVELETTER}:")
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
