@@ -95,18 +95,18 @@ jobs:
         asset_content_type: application/x-executable
 
   crosscompile:
-    on:
-      schedule:
-      - cron: '0 2 * * *' # run at 2 AM UTC
-        # Trigger the workflow on push or pull request,
-        # but only for the main branch
-        push:
-          branches:
-          - feature/KoenGu/maximaCrossCompiler
-        page_build:
-            release:
-            types:
-            - created      
+    # on:
+    #   schedule:
+    #   - cron: '0 2 * * *' # run at 2 AM UTC
+    #     # Trigger the workflow on push or pull request,
+    #     # but only for the main branch
+    #     push:
+    #       branches:
+    #       - feature/KoenGu/maximaCrossCompiler
+    #     page_build:
+    #         release:
+    #         types:
+    #         - created      
     runs-on: ubuntu-20.04
 
     steps:
