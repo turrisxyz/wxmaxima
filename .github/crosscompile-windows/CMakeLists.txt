@@ -225,17 +225,13 @@ add_custom_command(OUTPUT winkill.c
   COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/maxima-prefix/src/maxima/interfaces/xmaxima/win32/winkill.c winkill.c
   DEPENDS maxima
 )
-add_custom_command(OUTPUT win_signals.lisp
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/maxima-prefix/src/maxima/interfaces/xmaxima/win32/win_signals.lisp win_signals.lisp
-  DEPENDS maxima
-)
 # crosscompiling winkill with autoconf does not work, compile it using CMake.
 add_library(winkill_lib SHARED winkill_lib.c)
 add_executable(winkill winkill.c)
 set_target_properties(winkill_lib PROPERTIES PREFIX "") # remove 'lib' prefix from libwinkill_lib.dll
 target_link_libraries(winkill winkill_lib)
 install(TARGETS winkill winkill_lib COMPONENT Maxima RUNTIME DESTINATION bin LIBRARY DESTINATION bin/)
-install(FILES "win_signals.lisp" DESTINATION bin/ COMPONENT Maxima)
+install( CODE "install(FILES \"${CMAKE_BINARY_DIR}/maxima-prefix/src/maxima/interfaces/xmaxima/win32/win_signals.lisp\" DESTINATION bin/ COMPONENT Maxima)")
 
 # convert windows short names to long names (e.g.
 # "C:/Users/TESTTE~1/AppData/Local/Temp" to "C:/Users/test test/AppData/Local/Temp")
