@@ -93,7 +93,19 @@ jobs:
         asset_path: ./wxMaxima/build/*64.exe
         asset_name: wxmaxima-installer.exe
         asset_content_type: application/x-executable
-        
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - feature/KoenGu/maximaCrossCompiler
+  page_build:
+  release:
+    types:
+      - created      
   crosscompile:
     runs-on: ubuntu-20.04
 

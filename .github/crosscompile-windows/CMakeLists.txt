@@ -218,15 +218,15 @@ externalproject_add(maxima
 
 # Copy the files from maxima which makes it officially available to us
 add_custom_command(OUTPUT winkill_lib.c
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/src/maxima/interfaces/wxmaxima/win32/winkill_lib.c winkill_lib.c
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/interfaces/xmaxima/win32/winkill_lib.c winkill_lib.c
   DEPENDS maxima
 )
 add_custom_command(OUTPUT winkill.c
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/src/maxima/interfaces/wxmaxima/win32/winkill.c winkill.c
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/interfaces/xmaxima/win32/winkill.c winkill.c
   DEPENDS maxima
 )
 add_custom_command(OUTPUT win_signals.lisp
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/src/maxima/interfaces/wxmaxima/win32/win_signals.lisp win_signals.lisp
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/interfaces/xmaxima/win32/win_signals.lisp win_signals.lisp
   DEPENDS maxima
 )
 # crosscompiling winkill with autoconf does not work, compile it using CMake.
@@ -286,7 +286,7 @@ add_custom_command(OUTPUT COPYING
 #set(CPACK_RESOURCE_FILE_LICENSE "COPYING")
 # Copy the file from maxima which makes it officially available to us
 add_custom_command(OUTPUT maxima-icon.ico
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/src/maxima/interfaces/xmaxima/maxima-icon.ico maxima-icon.ico
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/maxima-prefix/interfaces/xmaxima/maxima-icon.ico maxima-icon.ico
   COMMENT copying the maxima icon from the maxima sources
   DEPENDS maxima
 )
