@@ -27,8 +27,10 @@
   should be overridden, before they are displayed.
  */
 
+#include "DigitCell.h"
 #include "LongNumberCell.h"
 #include "CellImpl.h"
+#include "CellList.h"
 #include "StringUtils.h"
 
 LongNumberCell::LongNumberCell(GroupCell *parent,
@@ -74,7 +76,9 @@ void LongNumberCell::UpdateDisplayedText()
 bool LongNumberCell::NeedsRecalculation(AFontSize fontSize) const
 {
   return TextCell::NeedsRecalculation(fontSize) ||
-    (m_displayedDigits_old != (*m_configuration)->GetDisplayedDigits());
+    (m_displayedDigits_old != (*m_configuration)->GetDisplayedDigits()) ||
+    (m_showAllDigits_old != (*m_configuration)->ShowAllDigits()) ||
+    (m_linebreaksInLongLines_old != (*m_configuration)->LineBreaksInLongNums());
 }
 
 void LongNumberCell::SetStyle(TextStyle style)
@@ -91,24 +95,34 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
     UpdateDisplayedText();
   
   if(NeedsRecalculation(fontsize))
-  {      
-    if(m_numStart.IsEmpty())
-      TextCell::Recalculate(fontsize);
+  {
+    if (IsBrokenIntoLines())
+    {
+      m_width = 0;
+      m_height = 0;
+      m_center = 0;
+      m_innerCell->RecalculateList(fontsize);
+    }
     else
     {
-      Cell::Recalculate(fontsize);
-      SetFont(m_fontSize_Scaled);
-      Configuration *configuration = (*m_configuration);
-      wxDC *dc = configuration->GetDC();
-      auto numStartSize = CalculateTextSize(dc, m_numStart, numberStart);
-      auto ellipsisSize = CalculateTextSize(dc, m_ellipsis, ellipsis);
-      auto numEndSize   = CalculateTextSize(dc, m_numEnd,   numberEnd);
-      m_numStartWidth = numStartSize.GetWidth();
-      m_ellipsisWidth = ellipsisSize.GetWidth();
-      m_width = m_numStartWidth + m_ellipsisWidth + numEndSize.GetWidth();
-      m_height = wxMax(
-        wxMax(numStartSize.GetHeight(), ellipsisSize.GetHeight()), numEndSize.GetHeight());
-      m_center = m_height / 2;
+      if(m_numStart.IsEmpty())
+        TextCell::Recalculate(fontsize);
+      else
+      {
+        Cell::Recalculate(fontsize);
+        SetFont(m_fontSize_Scaled);
+        Configuration *configuration = (*m_configuration);
+        wxDC *dc = configuration->GetDC();
+        auto numStartSize = CalculateTextSize(dc, m_numStart, numberStart);
+        auto ellipsisSize = CalculateTextSize(dc, m_ellipsis, ellipsis);
+        auto numEndSize   = CalculateTextSize(dc, m_numEnd,   numberEnd);
+        m_numStartWidth = numStartSize.GetWidth();
+        m_ellipsisWidth = ellipsisSize.GetWidth();
+        m_width = m_numStartWidth + m_ellipsisWidth + numEndSize.GetWidth();
+        m_height = wxMax(
+          wxMax(numStartSize.GetHeight(), ellipsisSize.GetHeight()), numEndSize.GetHeight());
+        m_center = m_height / 2;
+      }
     }
   }
 }
@@ -151,3 +165,50 @@ void LongNumberCell::Draw(wxPoint point)
   }
 }
 
+bool LongNumberCell::BreakUp()
+{
+  if (IsBrokenIntoLines())
+    return false;
+
+  if (!(*m_configuration)->ShowAllDigits())
+    return false;
+  if (!(*m_configuration)->LineBreaksInLongNums())
+    return false;
+  if(m_text.IsEmpty())
+    return false;
+  
+  if(!m_innerCell)
+  {
+    Cell *last = NULL;
+    for (wxString::const_iterator it = m_text.begin(); it != m_text.end(); ++it)
+    {
+      if(!last)
+      {
+        m_innerCell = std::make_unique<DigitCell>(GetGroup(), m_configuration, wxString(*it));
+        last = m_innerCell.get();
+      }
+      else
+      {
+        CellList::AppendCell(last, std::make_unique<DigitCell>(GetGroup(),
+                                                               m_configuration, wxString(*it)));
+        last = last->GetNext();
+      }
+    }
+  }
+  m_innerCell->last()->SetNextToDraw(m_nextToDraw);
+  m_nextToDraw = m_innerCell;
+  Cell::BreakUpAndMark();
+  ResetCellListSizes();
+  m_width = 0;
+  m_height = 0;
+  m_center = 0;
+  return true;
+}
+
+void LongNumberCell::SetNextToDraw(Cell *next)
+{
+  if(IsBrokenIntoLines())
+    m_innerCell->last()->SetNextToDraw(next);
+  else
+    m_nextToDraw = next;
+}
