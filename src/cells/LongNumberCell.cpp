@@ -54,7 +54,8 @@ DEFINE_CELL(LongNumberCell)
 void LongNumberCell::UpdateDisplayedText()
 {
   unsigned int displayedDigits = (*m_configuration)->GetDisplayedDigits();
-  if (m_displayedText.Length() > displayedDigits)
+  if ((m_displayedText.Length() > displayedDigits) &&
+      (!(*m_configuration)->ShowAllDigits()))
   {
     int left = displayedDigits / 3;
     if (left > 30) left = 30;      
@@ -138,6 +139,8 @@ void LongNumberCell::Draw(wxPoint point)
     else
     {
       Cell::Draw(point);
+      if(IsBrokenIntoLines())
+        return;
       SetForeground();
       SetFont(m_fontSize_Scaled);
       Configuration *configuration = (*m_configuration);
