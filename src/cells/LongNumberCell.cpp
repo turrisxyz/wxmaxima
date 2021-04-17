@@ -92,17 +92,25 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
 {
   // If the config settings about how many digits to display has changed we
   // need to regenerate the info which number to show.
-  if ((m_displayedDigits_old != (*m_configuration)->GetDisplayedDigits()))
+  if (
+    ((m_displayedDigits_old != (*m_configuration)->GetDisplayedDigits())) ||
+    (m_showAllDigits_old = (*m_configuration)->ShowAllDigits())
+    )
     UpdateDisplayedText();
   
   if(NeedsRecalculation(fontsize))
   {
     if (IsBrokenIntoLines())
     {
+      m_innerCell->RecalculateList(fontsize);
+      m_keepPercent_last = (*m_configuration)->CheckKeepPercent();
+      Cell::Recalculate(fontsize);
       m_width = 0;
       m_height = 0;
       m_center = 0;
-      m_innerCell->RecalculateList(fontsize);
+      m_numStart.clear();
+      m_ellipsis.clear();
+      m_numEnd.clear();
     }
     else
     {
@@ -111,6 +119,7 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
       else
       {
         Cell::Recalculate(fontsize);
+        m_keepPercent_last = (*m_configuration)->CheckKeepPercent();
         SetFont(m_fontSize_Scaled);
         Configuration *configuration = (*m_configuration);
         wxDC *dc = configuration->GetDC();
@@ -126,6 +135,9 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
       }
     }
   }
+  m_displayedDigits_old = (*m_configuration)->GetDisplayedDigits();
+  m_showAllDigits_old = (*m_configuration)->ShowAllDigits();
+  m_linebreaksInLongLines_old = (*m_configuration)->LineBreaksInLongNums();
 }
 
 void LongNumberCell::Draw(wxPoint point)
@@ -202,9 +214,6 @@ bool LongNumberCell::BreakUp()
   m_nextToDraw = m_innerCell;
   Cell::BreakUpAndMark();
   ResetCellListSizes();
-  m_width = 0;
-  m_height = 0;
-  m_center = 0;
   return true;
 }
 

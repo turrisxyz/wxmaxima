@@ -482,6 +482,8 @@ void GroupCell::Recalculate()
       m_width = configuration->GetCellBracketWidth();
       m_height = 2;
       m_center = 1;
+      m_clientWidth_old = (*m_configuration)->GetClientWidth();
+      m_cellsAppended = false;
       return;
     }
     
@@ -498,8 +500,7 @@ void GroupCell::Recalculate()
   }
   // The line breaking will have set our "needs recalculation" flag again.
   UpdateYPosition();
-  Cell::Recalculate((*m_configuration)->GetDefaultFontSize(
-                      ));
+  Cell::Recalculate((*m_configuration)->GetDefaultFontSize());
   wxASSERT(!NeedsRecalculation((*m_configuration)->GetDefaultFontSize()));
 }
 

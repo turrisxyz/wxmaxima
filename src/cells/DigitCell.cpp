@@ -41,6 +41,7 @@ void DigitCell::Recalculate(AFontSize fontsize)
     m_width = sz.GetWidth();
     m_height = sz.GetHeight();
     m_height += 2 * MC_TEXT_PADDING;
+    m_center = m_height / 2;
   }
 }
 
