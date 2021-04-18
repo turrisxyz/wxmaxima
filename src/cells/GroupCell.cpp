@@ -501,6 +501,7 @@ void GroupCell::Recalculate()
   // The line breaking will have set our "needs recalculation" flag again.
   UpdateYPosition();
   Cell::Recalculate((*m_configuration)->GetDefaultFontSize());
+  m_cellsAppended = false;
   wxASSERT(!NeedsRecalculation((*m_configuration)->GetDefaultFontSize()));
 }
 
