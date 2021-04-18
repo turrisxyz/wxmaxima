@@ -502,6 +502,7 @@ void GroupCell::Recalculate()
   UpdateYPosition();
   Cell::Recalculate((*m_configuration)->GetDefaultFontSize());
   m_cellsAppended = false;
+  m_clientWidth_old = (*m_configuration)->GetClientWidth();
   wxASSERT(!NeedsRecalculation((*m_configuration)->GetDefaultFontSize()));
 }
 
@@ -660,7 +661,7 @@ void GroupCell::RecalculateOutput()
 bool GroupCell::NeedsRecalculation(AFontSize fontSize) const
 {
   return Cell::NeedsRecalculation(fontSize) ||
-    (GetEditable() && GetEditable()->NeedsRecalculation(EditorFontSize())) ||
+//    (GetEditable() && GetEditable()->NeedsRecalculation(EditorFontSize())) ||
     (m_clientWidth_old != (*m_configuration)->GetClientWidth()) || m_cellsAppended;
 }
 
