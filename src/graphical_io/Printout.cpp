@@ -320,8 +320,9 @@ void Printout::PrintHeader(int pageNum, wxDC *dc)
 
 void Printout::Recalculate()
 {
-  GroupCell *tmp = m_tree.get();
-
+  if(!m_tree)
+    return;
+  
   int marginX, marginY;
   GetPageMargins(&marginX, &marginY);
   int pageWidth, pageHeight;
@@ -329,15 +330,13 @@ void Printout::Recalculate()
 
 //  marginX += (*m_configuration)->Scale_Px((*m_configuration)->GetBaseIndent());
 
-  while (tmp != NULL)
-  {
-    tmp->ResetSize();
-    tmp->Recalculate();
-    tmp = tmp->GetNext();
-  }
+  m_tree -> ResetDataList();
+
+  for (GroupCell &tmp : OnList(m_tree.get()))
+    tmp.Recalculate();
 }
 
 void Printout::DestroyTree()
 {
-  m_tree = NULL;
+  m_tree.reset();
 }
