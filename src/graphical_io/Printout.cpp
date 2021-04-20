@@ -58,8 +58,6 @@ Printout::~Printout()
 void Printout::SetData(std::unique_ptr<GroupCell> &&tree)
 {
   m_tree = std::move(tree);
-  if (m_tree != NULL)
-    m_tree->BreakPage(true);
 }
 
 bool Printout::HasPage(int num)
@@ -86,8 +84,7 @@ bool Printout::OnPrintPage(int num)
 
   marginX += (*m_configuration)->Scale_Px((*m_configuration)->GetBaseIndent());
 
-  // Print current page
-  GroupCell *tmp = m_pages[num - 1];
+  GroupCell *tmp = m_pages[num - 1]->GetGroup();
   if (!tmp)
     return false;
   if (tmp->GetGroupType() == GC_TYPE_PAGEBREAK)
@@ -95,6 +92,8 @@ bool Printout::OnPrintPage(int num)
   if (!tmp)
     return true;
 
+  // Print the header
+  dc->SetDeviceOrigin(0,0);
   wxPoint point;
   point.x = marginX;
   point.y = marginY + tmp->GetCenterList() + GetHeaderHeight();
@@ -106,7 +105,27 @@ bool Printout::OnPrintPage(int num)
 
   PrintHeader(num, dc);
 
-  while (tmp && tmp->GetGroupType() != GC_TYPE_PAGEBREAK)
+  // Print the page contents
+  dc->SetDeviceOrigin(
+    marginX,
+    marginY + GetHeaderHeight() - m_pages[num - 1]->GetCurrentPoint().y -
+    (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
+    );
+  point = tmp->GetCurrentPoint();
+
+  Cell *end;
+  if(m_pages.size() > num)
+    end = m_pages[num];
+  else
+  {
+    end = tmp->GetGroup();
+    while(end->GetNext())
+      end = end->GetNext();
+  }
+  
+  while (tmp &&
+         (tmp->GetGroupType() != GC_TYPE_PAGEBREAK) &&
+         (tmp != end->GetGroup()))
   {
     auto *const next = tmp->GetNext();
 
@@ -125,8 +144,6 @@ bool Printout::OnPrintPage(int num)
     }
 
     tmp = tmp->GetNext();
-    if (!tmp || tmp->BreakPageHere())
-      break;
   }
   return true;
 }
@@ -159,8 +176,6 @@ void Printout::BreakPages()
   m_numberOfPages = 1;
   while (tmp != NULL)
   {
-    tmp->BreakPage(false);
-
     if (currentHeight + tmp->GetHeightList() + skip >= pageHeight - marginY ||
         tmp->GetGroupType() == GC_TYPE_PAGEBREAK)
     {
@@ -168,7 +183,6 @@ void Printout::BreakPages()
         currentHeight = marginY + tmp->GetHeightList() + headerHeight;
       else
         currentHeight = marginY;
-      tmp->BreakPage(true);
       m_pages.push_back(tmp);
       m_numberOfPages++;
     }
