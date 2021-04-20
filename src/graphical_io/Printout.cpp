@@ -108,7 +108,7 @@ bool Printout::OnPrintPage(int num)
   // Print the page contents
   dc->SetDeviceOrigin(
     marginX,
-    marginY + GetHeaderHeight() - m_pages[num - 1]->GetCurrentPoint().y -
+    marginY + GetHeaderHeight() - m_pages[num - 1]->GetCurrentPoint().y +
     (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
     );
   point = tmp->GetCurrentPoint();
