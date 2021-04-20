@@ -170,27 +170,54 @@ void Printout::BreakPages()
   int currentHeight = marginY;
   int skip = (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip());;
 
-  GroupCell *tmp = m_tree.get();
-  m_pages.push_back(tmp);
+  GroupCell *group = m_tree.get();
+  m_pages.push_back(group);
 
   m_numberOfPages = 1;
-  while (tmp != NULL)
+  for (GroupCell &group : OnList(m_tree.get()))
   {
-    if (currentHeight + tmp->GetHeightList() + skip >= pageHeight - marginY ||
-        tmp->GetGroupType() == GC_TYPE_PAGEBREAK)
+    if(group.GetGroupType() == GC_TYPE_PAGEBREAK)
     {
-      if (tmp->GetGroupType() != GC_TYPE_PAGEBREAK)
-        currentHeight = marginY + tmp->GetHeightList() + headerHeight;
-      else
-        currentHeight = marginY;
-      m_pages.push_back(tmp);
+      m_pages.push_back(&group);
       m_numberOfPages++;
+      currentHeight = marginY;
+      continue;
+    }
+    if (currentHeight + group.GetHeightList() + skip >= pageHeight - marginY)
+    {
+      if(currentHeight + group.GetHeightList() + skip >= .8 * (pageHeight - marginY))
+      {
+        m_pages.push_back(&group);
+        m_numberOfPages++;
+        currentHeight = marginY;
+        continue;
+      }
+      if (currentHeight + group.GetPrompt()->GetHeightList() >= pageHeight - marginY)
+      {
+        m_pages.push_back(&group);
+        m_numberOfPages++;
+        currentHeight = marginY;
+        continue;
+      }
+
+      m_pages.push_back(group.GetPrompt());
+      m_numberOfPages++;
+      currentHeight += group.GetPrompt()->GetHeightList();
+
+      Cell *pageEnd = group.GetPrompt();
+
+      Cell *out = group.GetOutput();
+      while(out && currentHeight + out->GetHeightList() < pageHeight - marginY)
+      {
+        currentHeight += out->GetHeightList();
+        pageEnd = out;
+        while(out && (!out->BreakLineHere()))
+          out = out->GetNext();
+      }      
     }
     else
-      currentHeight += tmp->GetHeightList() + skip;
-
-    tmp = tmp->GetNext();
-  }
+      currentHeight += group.GetHeightList() + skip;
+    }
 }
 
 void Printout::SetupData()
@@ -332,8 +359,8 @@ void Printout::Recalculate()
 
   m_tree -> ResetDataList();
 
-  for (GroupCell &tmp : OnList(m_tree.get()))
-    tmp.Recalculate();
+  for (GroupCell &group : OnList(m_tree.get()))
+    group.Recalculate();
 }
 
 void Printout::DestroyTree()
