@@ -33,6 +33,7 @@
 
 #include <wx/config.h>
 #include <wx/busyinfo.h>
+#include <wx/log.h>
 
 #define PRINT_MARGIN_HORIZONTAL 50
 #define PRINT_MARGIN_VERTICAL 50
@@ -125,24 +126,19 @@ bool Printout::OnPrintPage(int num)
   
   while (tmp &&
          (tmp->GetGroupType() != GC_TYPE_PAGEBREAK) &&
-         (tmp != end->GetGroup()))
+         (tmp != end))
   {
     auto *const next = tmp->GetNext();
 
-    // The following line seems to misteriously fix the "subsequent text
+    // The following line seems to mysteriously fix the "subsequent text
     // cells aren't printed" problem on linux.
     // No Idea why, though.
     dc->SetPen(wxPen(wxT("light grey"), 1, wxPENSTYLE_SOLID));
 
     tmp->Draw(point);
-    if (next)
-    {
-      point.x = marginX;
-      point.y += drop + next->GetCenterList();
-      point.y += (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip());
-      drop = next->GetMaxDrop();
-    }
 
+    if(tmp == end->GetGroup())
+      break;
     tmp = tmp->GetNext();
   }
   return true;
@@ -185,8 +181,10 @@ void Printout::BreakPages()
     }
     if (currentHeight + group.GetHeightList() + skip >= pageHeight - marginY)
     {
+      std::cerr << currentHeight + group.GetHeightList() + skip << " < " << pageHeight - marginY << "\n";
       if(currentHeight + group.GetHeightList() + skip >= .8 * (pageHeight - marginY))
       {
+        wxLogMessage(_("printout: Page full to < 80%"));
         m_pages.push_back(&group);
         m_numberOfPages++;
         currentHeight = marginY;
@@ -199,21 +197,25 @@ void Printout::BreakPages()
         currentHeight = marginY;
         continue;
       }
-
-      m_pages.push_back(group.GetPrompt());
-      m_numberOfPages++;
-      currentHeight += group.GetPrompt()->GetHeightList();
-
-      Cell *pageEnd = group.GetPrompt();
-
-      Cell *out = group.GetOutput();
-      while(out && currentHeight + out->GetHeightList() < pageHeight - marginY)
+      else
       {
-        currentHeight += out->GetHeightList();
-        pageEnd = out;
-        while(out && (!out->BreakLineHere()))
-          out = out->GetNext();
-      }      
+        wxLogMessage(_("printout: Input of next cell still fits on page!"));
+        currentHeight += group.GetPrompt()->GetHeightList();
+        
+        Cell *pageEnd = group.GetPrompt();
+        
+        Cell *out = group.GetOutput();
+        while(out && currentHeight + out->GetHeightList() < pageHeight - marginY)
+        {
+          wxLogMessage(_("printout: Found a output line that still fits on page!"));
+          currentHeight += out->GetHeightList();
+          pageEnd = out;
+          while(out && (!out->BreakLineHere()))
+            out = out->GetNext();
+        }
+        m_pages.push_back(pageEnd);
+        m_numberOfPages++;
+      }
     }
     else
       currentHeight += group.GetHeightList() + skip;
