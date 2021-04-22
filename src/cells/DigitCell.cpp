@@ -29,6 +29,15 @@
  */
 
 #include "DigitCell.h"
+#include "CellImpl.h"
+#include "CellList.h"
+#include "StringUtils.h"
+
+DigitCell::DigitCell(GroupCell *parent, Configuration **config, const wxString &text, TextStyle style):
+  TextCell(parent,config,text,style)
+{}
+
+DEFINE_CELL(DigitCell)
 
 void DigitCell::Recalculate(AFontSize fontsize)
 {
@@ -54,7 +63,7 @@ void DigitCell::Draw(wxPoint point)
     wxDC *dc = configuration->GetDC();
     SetForeground();
     SetFont(m_fontSize_Scaled);
-    dc->DrawText(m_displayedText,
+    dc->DrawText(m_text,
                  point.x,
                  point.y - m_center + MC_TEXT_PADDING);
   }

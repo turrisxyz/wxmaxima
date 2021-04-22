@@ -32,12 +32,12 @@
 class DigitCell : public TextCell
 {
 public:
-  DigitCell(GroupCell *parent, Configuration **config, const wxString &text = {}, TextStyle style = TS_NUMBER):
-    TextCell(parent,config,text,style)
-    {}
+  DigitCell(GroupCell *parent, Configuration **config, const wxString &text = {}, TextStyle style = TS_NUMBER);
   DigitCell(const TextCell &cell);
   ~DigitCell(){}
-  
+  std::unique_ptr<Cell> Copy() const override;
+  const CellTypeInfo &GetInfo() override;
+
   void Recalculate(AFontSize fontsize) override;
   void Draw(wxPoint point) override;
 };

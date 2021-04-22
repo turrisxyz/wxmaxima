@@ -142,10 +142,14 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
 
 void LongNumberCell::Draw(wxPoint point)
 {
+  if(!(*m_configuration)->ClipToDrawRegion())
+    std::cerr<<"print1\n";
   if((point.x >= 0) && (point.y >= 0))
     SetCurrentPoint(point);
   if (InUpdateRegion())
   {
+    if(!(*m_configuration)->ClipToDrawRegion())
+      std::cerr<<"print2\n";
     if(m_numStart == wxEmptyString)
       TextCell::Draw(point);
     else

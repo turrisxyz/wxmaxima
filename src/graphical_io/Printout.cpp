@@ -112,7 +112,6 @@ bool Printout::OnPrintPage(int num)
     marginY + GetHeaderHeight() - m_pages[num - 1]->GetCurrentPoint().y +
     (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
     );
-  point = tmp->GetCurrentPoint();
 
   Cell *end;
   if(m_pages.size() > num)
@@ -129,6 +128,7 @@ bool Printout::OnPrintPage(int num)
          (tmp != end))
   {
     auto *const next = tmp->GetNext();
+    point = tmp->GetCurrentPoint();
 
     // The following line seems to mysteriously fix the "subsequent text
     // cells aren't printed" problem on linux.
@@ -363,6 +363,8 @@ void Printout::Recalculate()
 
   for (GroupCell &group : OnList(m_tree.get()))
     group.Recalculate();
+
+  m_tree->UpdateYPositionList();
 }
 
 void Printout::DestroyTree()
