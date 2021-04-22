@@ -37,6 +37,12 @@ DigitCell::DigitCell(GroupCell *parent, Configuration **config, const wxString &
   TextCell(parent,config,text,style)
 {}
 
+DigitCell::DigitCell(const DigitCell &cell):
+  DigitCell(cell.m_group, cell.m_configuration, cell.m_text, cell.m_style)
+{
+}
+
+
 DEFINE_CELL(DigitCell)
 
 void DigitCell::Recalculate(AFontSize fontsize)

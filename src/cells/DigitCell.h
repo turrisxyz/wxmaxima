@@ -33,7 +33,7 @@ class DigitCell : public TextCell
 {
 public:
   DigitCell(GroupCell *parent, Configuration **config, const wxString &text = {}, TextStyle style = TS_NUMBER);
-  DigitCell(const TextCell &cell);
+  DigitCell(const DigitCell &cell);
   ~DigitCell(){}
   std::unique_ptr<Cell> Copy() const override;
   const CellTypeInfo &GetInfo() override;
