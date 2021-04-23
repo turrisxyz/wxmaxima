@@ -124,8 +124,7 @@ bool Printout::OnPrintPage(int num)
   }
   
   while (tmp &&
-         (tmp->GetGroupType() != GC_TYPE_PAGEBREAK) &&
-         (tmp != end))
+         (tmp->GetGroupType() != GC_TYPE_PAGEBREAK))
   {
     auto *const next = tmp->GetNext();
     point = tmp->GetCurrentPoint();
@@ -133,7 +132,7 @@ bool Printout::OnPrintPage(int num)
     // The following line seems to mysteriously fix the "subsequent text
     // cells aren't printed" problem on linux.
     // No Idea why, though.
-    dc->SetPen(wxPen(wxT("light grey"), 1, wxPENSTYLE_SOLID));
+    dc->SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_SOLID));
 
     tmp->Draw(point);
 
@@ -181,7 +180,6 @@ void Printout::BreakPages()
     }
     if (currentHeight + group.GetHeightList() + skip >= pageHeight - marginY)
     {
-      std::cerr << currentHeight + group.GetHeightList() + skip << " < " << pageHeight - marginY << "\n";
       if(currentHeight + group.GetHeightList() + skip >= .8 * (pageHeight - marginY))
       {
         wxLogMessage(_("printout: Page full to < 80%"));
