@@ -115,12 +115,20 @@ bool Printout::OnPrintPage(int num)
 
   Cell *end;
   if(m_pages.size() > num)
+  {
     end = m_pages[num];
+    dc->DestroyClippingRegion();
+    dc->SetClippingRegion(0,
+                          m_pages[num - 1]->GetCurrentPoint().y,
+                          pageWidth,
+                          end->GetCurrentPoint().y-1);
+  }
   else
   {
     end = tmp->GetGroup();
     while(end->GetNext())
       end = end->GetNext();
+    end = NULL;
   }
   
   while (tmp &&
@@ -136,7 +144,7 @@ bool Printout::OnPrintPage(int num)
 
     tmp->Draw(point);
 
-    if(tmp == end->GetGroup())
+    if(end && (tmp == end->GetGroup()))
       break;
     tmp = tmp->GetNext();
   }
