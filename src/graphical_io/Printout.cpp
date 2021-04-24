@@ -118,16 +118,17 @@ bool Printout::OnPrintPage(int num)
   {
     end = m_pages[num];
     dc->DestroyClippingRegion();
-    dc->SetClippingRegion(0,
-                          m_pages[num - 1]->GetCurrentPoint().y,
+    int startpoint = m_pages[num - 1]->GetCurrentPoint().y - m_pages[num - 1]->GetMaxDrop();
+    dc->SetClippingRegion(0, startpoint,
                           pageWidth,
-                          end->GetCurrentPoint().y-1);
+                          end->GetCurrentPoint().y - startpoint +end->GetCenterList());
   }
   else
   {
-    end = tmp->GetGroup();
-    while(end->GetNext())
-      end = end->GetNext();
+    dc->SetClippingRegion(0,
+                          m_pages[num - 1]->GetCurrentPoint().y - m_pages[num - 1]->GetMaxDrop(),
+                          pageWidth,
+                          pageHeight);
     end = NULL;
   }
   
