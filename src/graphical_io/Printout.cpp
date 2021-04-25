@@ -171,12 +171,14 @@ void Printout::BreakPages()
   GetPageMargins(&marginX, &marginY);
   GetPageSizePixels(&pageWidth, &pageHeight);
 
-  int currentHeight = marginY;
+  wxCoord pageStart;
+  wxCoord maxContentHeight = pageHeight - 2 * marginY;
   int skip = (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip());;
 
   GroupCell *group = m_tree.get();
   m_pages.push_back(group);
-
+  if(group)
+    pageStart =group->GetCurrentPoint().y;
   m_numberOfPages = 1;
   for (GroupCell &group : OnList(m_tree.get()))
   {
@@ -184,38 +186,39 @@ void Printout::BreakPages()
     {
       m_pages.push_back(&group);
       m_numberOfPages++;
-      currentHeight = marginY;
+      pageStart =group.GetCurrentPoint().y;
       continue;
     }
-    if (currentHeight + group.GetHeightList() + skip >= pageHeight - marginY)
+    if (group.GetCurrentPoint().y - pageStart >= maxContentHeight)
     {
-      if(currentHeight + group.GetHeightList() + skip >= .8 * (pageHeight - marginY))
+      if(group.GetCurrentPoint().y - pageStart >= .7*maxContentHeight)
       {
-        wxLogMessage(_("printout: Page full to < 80%"));
         m_pages.push_back(&group);
+        wxLogMessage(wxString::Format(
+                       _("printout: Page %i filled to > 70\% ⇒ Flushing the page."),
+                       m_numberOfPages));
         m_numberOfPages++;
-        currentHeight = marginY;
+        pageStart =group.GetCurrentPoint().y;
         continue;
       }
-      if (currentHeight + group.GetPrompt()->GetHeightList() >= pageHeight - marginY)
+      if (group.GetPrompt()->GetCurrentPoint().y+group.GetPrompt()->GetHeightList() - pageStart >=
+          maxContentHeight)
       {
+        wxLogMessage(_("printout: The next input cell doesn't fit on the current page"));
         m_pages.push_back(&group);
         m_numberOfPages++;
-        currentHeight = marginY;
+        pageStart = group.GetCurrentPoint().y;
         continue;
       }
       else
       {
-        wxLogMessage(_("printout: Input of next cell still fits on page!"));
-        currentHeight += group.GetPrompt()->GetHeightList();
-        
-        Cell *pageEnd = group.GetPrompt();
-        
+        wxLogMessage(_("printout: Input of next cell still fits on page!"));        
         Cell *out = group.GetOutput();
-        while(out && currentHeight + out->GetHeightList() < pageHeight - marginY)
+        Cell *pageEnd = out;
+        while(out &&
+              (out->GetCurrentPoint().y-pageStart < maxContentHeight))
         {
           wxLogMessage(_("printout: Found a output line that still fits on page!"));
-          currentHeight += out->GetHeightList();
           pageEnd = out;
           while(out && (!out->BreakLineHere()))
             out = out->GetNext();
@@ -224,9 +227,7 @@ void Printout::BreakPages()
         m_numberOfPages++;
       }
     }
-    else
-      currentHeight += group.GetHeightList() + skip;
-    }
+  }
 }
 
 void Printout::SetupData()
