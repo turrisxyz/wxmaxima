@@ -43,7 +43,6 @@ Printout::Printout(wxString title, Configuration **configuration, double scaleFa
   m_scaleFactor = scaleFactor;
   m_configuration = configuration;
   m_oldconfig = *m_configuration;
-  m_numberOfPages = 0;
   m_printConfigCreated = false;
 }
 
@@ -63,13 +62,15 @@ void Printout::SetData(std::unique_ptr<GroupCell> &&tree)
 
 bool Printout::HasPage(int num)
 {
-  if (num > 0 && num <= m_numberOfPages)
+  if (num > 0 && num <= m_pages.size())
     return true;
   return false;
 }
 
 bool Printout::OnPrintPage(int num)
 {
+  if(num > m_pages.size())
+    return false;
 //  wxBusyInfo busyInfo(wxString::Format(_("Printing page %i..."),num));
   wxDC *dc = GetDC();
   dc->SetBackground(*wxWHITE_BRUSH);
@@ -81,10 +82,6 @@ bool Printout::OnPrintPage(int num)
   GetPageMargins(&marginX, &marginY);
   (*m_configuration)->SetCanvasSize({pageWidth - marginX, pageHeight - marginY});
   
-  // Make sure that during print nothing is outside the crop rectangle
-
-  marginX += (*m_configuration)->Scale_Px((*m_configuration)->GetBaseIndent());
-
   GroupCell *tmp = m_pages[num - 1]->GetGroup();
   if (!tmp)
     return false;
@@ -113,28 +110,26 @@ bool Printout::OnPrintPage(int num)
     (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
     );
 
-  Cell *end;
-  if(m_pages.size() > num)
+  Cell *end = NULL;
+  wxCoord startpoint;
+  wxCoord endpoint;
+  startpoint = m_pages[num - 1]->GetRect().GetTop();
+  endpoint = startpoint + 2*pageHeight;
+            
+  if((m_pages.size() > num) && (m_pages[num]))
   {
+    endpoint = m_pages[num]->GetRect().GetTop()-1;
     end = m_pages[num];
-    dc->DestroyClippingRegion();
-    int startpoint = m_pages[num - 1]->GetCurrentPoint().y - m_pages[num - 1]->GetMaxDrop();
-    dc->SetClippingRegion(0, startpoint,
-                          pageWidth,
-                          end->GetCurrentPoint().y - startpoint +end->GetCenterList());
   }
-  else
-  {
-    dc->SetClippingRegion(0,
-                          m_pages[num - 1]->GetCurrentPoint().y - m_pages[num - 1]->GetMaxDrop(),
-                          pageWidth,
-                          pageHeight);
-    end = NULL;
-  }
+  dc->DestroyClippingRegion();
+  wxCoord len = endpoint - startpoint;
+//    dc->SetClippingRegion(0, startpoint, pageWidth, len);
   
   while (tmp &&
          (tmp->GetGroupType() != GC_TYPE_PAGEBREAK))
   {
+    if(end && (tmp == end->GetGroup()))
+      break;
     auto *const next = tmp->GetNext();
     point = tmp->GetCurrentPoint();
 
@@ -142,13 +137,16 @@ bool Printout::OnPrintPage(int num)
     // cells aren't printed" problem on linux.
     // No Idea why, though.
     dc->SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_SOLID));
-
+    point.x = 0;
     tmp->Draw(point);
 
-    if(end && (tmp == end->GetGroup()))
-      break;
     tmp = tmp->GetNext();
   }
+
+  wxPen pen = *(wxThePenList->FindOrCreatePen(*wxRED,
+                                              10,
+                                              wxPENSTYLE_SOLID)
+    );
   return true;
 }
 
@@ -171,70 +169,40 @@ void Printout::BreakPages()
   GetPageMargins(&marginX, &marginY);
   GetPageSizePixels(&pageWidth, &pageHeight);
 
-  wxCoord pageStart;
   wxCoord maxContentHeight = pageHeight - 2 * marginY;
   int skip = (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip());;
 
+  // The 1st page starts at the beginning of the document
   GroupCell *group = m_tree.get();
   m_pages.push_back(group);
-  if(group)
-    pageStart =group->GetCurrentPoint().y;
-  m_numberOfPages = 1;
+
+  // Now see where the next pages shuld start
   for (GroupCell &group : OnList(m_tree.get()))
   {
-    if(group.GetGroupType() == GC_TYPE_PAGEBREAK)
+    wxCoord pageStart = m_pages[m_pages.size()-1]->GetRect().GetTop();
+    // Handle pagebreak cells
+    if((group.GetGroupType() == GC_TYPE_PAGEBREAK) && (group.GetNext()))
     {
-      m_pages.push_back(&group);
-      m_numberOfPages++;
-      pageStart =group.GetCurrentPoint().y;
+      m_pages.push_back(group.GetNext());
       continue;
     }
-    if (group.GetCurrentPoint().y - pageStart >= maxContentHeight)
-    {
-      if(group.GetCurrentPoint().y - pageStart >= .7*maxContentHeight)
-      {
-        m_pages.push_back(&group);
-        wxLogMessage(wxString::Format(
-                       _("printout: Page %i filled to > 70\% ⇒ Flushing the page."),
-                       m_numberOfPages));
-        m_numberOfPages++;
-        pageStart =group.GetCurrentPoint().y;
-        continue;
-      }
-      if (group.GetPrompt()->GetCurrentPoint().y+group.GetPrompt()->GetHeightList() - pageStart >=
-          maxContentHeight)
-      {
-        wxLogMessage(_("printout: The next input cell doesn't fit on the current page"));
-        m_pages.push_back(&group);
-        m_numberOfPages++;
-        pageStart = group.GetCurrentPoint().y;
-        continue;
-      }
-      else
-      {
-        wxLogMessage(_("printout: Input of next cell still fits on page!"));        
-        Cell *out = group.GetOutput();
-        Cell *pageEnd = out;
-        while(out &&
-              (out->GetCurrentPoint().y-pageStart < maxContentHeight))
-        {
-          wxLogMessage(_("printout: Found a output line that still fits on page!"));
-          pageEnd = out;
-          while(out && (!out->BreakLineHere()))
-            out = out->GetNext();
-        }
-        m_pages.push_back(pageEnd);
-        m_numberOfPages++;
-      }
-    }
+
+    // Make sure that the page contains at least one GroupCell
+    if (&group == m_pages[m_pages.size()-1])
+      continue;
+    
+    // Add complete GroupCells as long as they fit on the page 
+    if ((group.GetRect().GetBottom() - pageStart >
+         maxContentHeight))
+      m_pages.push_back(&group);
   }
 }
+
 
 void Printout::SetupData()
 {
   wxDC *dc = GetDC();
   *m_configuration = new Configuration(dc, Configuration::temporary);
-  // Make sure that during print nothing is outside the crop rectangle
   (*m_configuration)->LineWidth_em(10000);
   
   m_printConfigCreated = true;
@@ -291,7 +259,6 @@ void Printout::SetupData()
   (*m_configuration)->SetIndent(marginX);
   // Inform the output routines that we are printing
   (*m_configuration)->SetPrinting(true);
-  // Make sure that during print nothing is outside the crop rectangle
   (*m_configuration)->LineWidth_em(10000);
   Recalculate();
   BreakPages();
@@ -301,9 +268,9 @@ void Printout::GetPageInfo(int *minPage, int *maxPage,
                                int *fromPage, int *toPage)
 {
   *minPage = 1;
-  *maxPage = m_numberOfPages;
+  *maxPage = m_pages.size();
   *fromPage = 1;
-  *toPage = m_numberOfPages;
+  *toPage = m_pages.size();
 }
 
 void Printout::OnPreparePrinting()
@@ -342,7 +309,7 @@ void Printout::PrintHeader(int pageNum, wxDC *dc)
 
   dc->SetFont(wxFont((*m_configuration)->Scale_Px(10), wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
   dc->GetTextExtent(GetTitle(), &title_width, &title_height);
-  wxString page = wxString::Format(wxT("%d / %d"), pageNum, m_numberOfPages);
+  wxString page = wxString::Format(wxT("%d / %li"), pageNum, (long)m_pages.size());
   dc->GetTextExtent(page, &page_width, &page_height);
 
   dc->DrawText(GetTitle(), marginX, marginY);

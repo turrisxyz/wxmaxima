@@ -74,7 +74,6 @@ public:
 
 private:
   Configuration **m_configuration, *m_oldconfig;
-  int m_numberOfPages;
   bool m_printConfigCreated;
   wxString m_title;
   std::unique_ptr<GroupCell> m_tree;
