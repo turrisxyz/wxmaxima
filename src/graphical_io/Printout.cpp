@@ -123,7 +123,7 @@ bool Printout::OnPrintPage(int num)
   }
   dc->DestroyClippingRegion();
   wxCoord len = endpoint - startpoint;
-//    dc->SetClippingRegion(0, startpoint, pageWidth, len);
+  dc->SetClippingRegion(0, startpoint, pageWidth, len);
   
   while (tmp &&
          (tmp->GetGroupType() != GC_TYPE_PAGEBREAK))
