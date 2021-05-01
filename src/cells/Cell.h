@@ -146,6 +146,7 @@ class Cell: public Observed
   // This class can be derived from wxAccessible which has no copy constructor
   void operator=(const Cell&) = delete;
   Cell(const Cell&) = delete;
+  Cell(GroupCell *group, const Cell&) = delete;
 
   template <typename C, typename std::enable_if<std::is_base_of<Cell, C>::value, bool>::type>
   friend inline auto OnInner(const C *cell);
@@ -161,7 +162,7 @@ public:
     This method is purely virtual, which means every child class has to define
     its own Copy() method.
    */
-  virtual std::unique_ptr<Cell> Copy() const = 0;
+  virtual std::unique_ptr<Cell> Copy(GroupCell *group) const = 0;
 
   //! Returns the information about this cell's type.
   virtual const CellTypeInfo &GetInfo() = 0;
@@ -520,6 +521,9 @@ public:
   //! Returns the group cell this cell belongs to
   GroupCell *GetGroup() const;
 
+  //! Set the group this list of cells belongs to
+  void SetGroupList(const CellPtr<GroupCell> group);
+
   //! For the bitmap export we sometimes want to know how big the result will be...
   struct SizeInMillimeters
   {
@@ -739,10 +743,10 @@ public:
   void CopyCommonData(const Cell & cell);
 
   //! Return a copy of the list of cells beginning with this one.
-  std::unique_ptr<Cell> CopyList() const;
+  std::unique_ptr<Cell> CopyList(GroupCell *group) const;
 
   //! Return a copy of the given list of cells.
-  static std::unique_ptr<Cell> CopyList(const Cell *cell);
+  static std::unique_ptr<Cell> CopyList(GroupCell *group, const Cell *cell);
 
   //! Remove this cell's tooltip
   void ClearToolTip();

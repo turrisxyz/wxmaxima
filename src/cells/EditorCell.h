@@ -67,9 +67,9 @@ private:
 
 public:
   //! The constructor
-  EditorCell(GroupCell *parent, Configuration **config, const wxString &text = {});
-  EditorCell(const EditorCell &cell);
-  std::unique_ptr<Cell> Copy() const override;
+  EditorCell(GroupCell *group, Configuration **config, const wxString &text = {});
+  EditorCell(GroupCell *group, const EditorCell &cell);
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   //! Get the previous EditorCell in the list

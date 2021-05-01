@@ -37,7 +37,7 @@ SumCell::SumCell(GroupCell *group, Configuration **config, sumStyle style,
                  std::unique_ptr<Cell> &&base)
     : Cell(group, config),
       m_paren(std::make_unique<ParenCell>(group, config, std::move(base))),
-      m_var(under->Copy()),
+      m_var(under->Copy(group)),
       m_start(MakeStart(under.get())),
       m_over(std::move(over)),
       m_under(std::move(under)),
@@ -52,10 +52,11 @@ SumCell::SumCell(GroupCell *group, Configuration **config, sumStyle style,
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signHeight
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signWidth
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signWCenter
-SumCell::SumCell(const SumCell &cell)
-    : SumCell(cell.m_group, cell.m_configuration, cell.m_sumStyle,
-              CopyList(cell.m_under.get()), CopyList(cell.m_over.get()),
-              CopyList(cell.Base()))
+SumCell::SumCell(GroupCell *group, const SumCell &cell)
+    : SumCell(group, cell.m_configuration, cell.m_sumStyle,
+              CopyList(group, cell.m_under.get()),
+              CopyList(group, cell.m_over.get()),
+              CopyList(group, cell.Base()))
 {
   CopyCommonData(cell);
   m_altCopyText = cell.m_altCopyText;

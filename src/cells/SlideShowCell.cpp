@@ -51,8 +51,8 @@
 // filesystem cannot be passed by const reference as we want to keep the
 // pointer to the file system alive in a background task
 // cppcheck-suppress performance symbolName=filesystem
-SlideShow::SlideShow(GroupCell *parent, Configuration **config, std::shared_ptr <wxFileSystem> filesystem, int framerate) :
-    Cell(parent, config),
+SlideShow::SlideShow(GroupCell *group, Configuration **config, std::shared_ptr <wxFileSystem> filesystem, int framerate) :
+    Cell(group, config),
     m_timer(m_cellPointers->GetWorksheet(), wxNewId()),
     m_fileSystem(filesystem),
     m_framerate(framerate),
@@ -63,8 +63,8 @@ SlideShow::SlideShow(GroupCell *parent, Configuration **config, std::shared_ptr 
   ReloadTimer();
 }
 
-SlideShow::SlideShow(GroupCell *parent, Configuration **config, int framerate) :
-    Cell(parent, config),
+SlideShow::SlideShow(GroupCell *group, Configuration **config, int framerate) :
+    Cell(group, config),
     m_timer(m_cellPointers->GetWorksheet(), wxNewId()),
     m_framerate(framerate),
     m_imageBorderWidth(Scale_Px(1))
@@ -73,17 +73,29 @@ SlideShow::SlideShow(GroupCell *parent, Configuration **config, int framerate) :
   m_type = MC_TYPE_SLIDE;
   ReloadTimer();
 }
+  InitBitFields();
+  m_type = MC_TYPE_IMAGE;
 
-SlideShow::SlideShow(GroupCell *parent, Configuration **config, const wxMemoryBuffer &image, const wxString &WXUNUSED(type)):
-    SlideShow(parent, config)
+SlideShow::SlideShow(GroupCell *group, Configuration **config, const wxMemoryBuffer &image, const wxString &WXUNUSED(type)):
+    SlideShow(group, config)
 {
   LoadImages(image);
 }
 
-SlideShow::SlideShow(GroupCell *parent, Configuration **config, const wxString &image, bool remove):
-    SlideShow(parent, config)
+SlideShow::SlideShow(GroupCell *group, Configuration **config, const wxString &image, bool remove):
+    SlideShow(group, config)
 {
   LoadImages(image);
+  if (remove)
+    wxRemoveFile(image);
+}
+
+SlideShow::SlideShow(GroupCell *group, const SlideShow &cell):
+  SlideShow(group, config)
+{
+  for(i: m_images)
+    m_images.push_back(std::make_shared<Image>(i));
+
   if (remove)
     wxRemoveFile(image);
 }

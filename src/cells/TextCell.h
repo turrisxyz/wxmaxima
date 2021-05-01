@@ -36,9 +36,9 @@
 class TextCell : public Cell
 {
 public:
-  TextCell(GroupCell *parent, Configuration **config, const wxString &text = {}, TextStyle style = TS_FUNCTION);
-  TextCell(const TextCell &cell);
-  virtual std::unique_ptr<Cell> Copy() const override;
+  TextCell(GroupCell *group, Configuration **config, const wxString &text = {}, TextStyle style = TS_FUNCTION);
+  TextCell(GroupCell *group, const TextCell &cell);
+  virtual std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   virtual const CellTypeInfo &GetInfo() override;
 
   AFontSize GetScaledTextSize() const;

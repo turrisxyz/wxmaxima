@@ -158,17 +158,17 @@ void Cell::CopyCommonData(const Cell & cell)
     BreakUp();
 }
 
-std::unique_ptr<Cell> Cell::CopyList() const
+std::unique_ptr<Cell> Cell::CopyList(GroupCell *group) const
 {
   CellListBuilder<> copy;
   for (auto &src : OnList(this))
-    copy.Append(src.Copy());
+    copy.Append(src.Copy(group));
   return std::move(copy);
 }
 
-std::unique_ptr<Cell> Cell::CopyList(const Cell *cell)
+std::unique_ptr<Cell> Cell::CopyList(GroupCell *group, const Cell *cell)
 {
-  return cell ? cell->CopyList() : nullptr;
+  return cell ? cell->CopyList(group) : nullptr;
 }
 
 void Cell::ClearCacheList()

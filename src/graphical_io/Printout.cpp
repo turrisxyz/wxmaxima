@@ -106,7 +106,7 @@ bool Printout::OnPrintPage(int num)
   // Print the page contents
   dc->SetDeviceOrigin(
     marginX,
-    marginY + GetHeaderHeight() - m_pages[num - 1]->GetCurrentPoint().y +
+    marginY + GetHeaderHeight() - m_pages[num - 1]->GetRect().GetTop() +
     (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
     );
 
@@ -128,8 +128,6 @@ bool Printout::OnPrintPage(int num)
   while (tmp &&
          (tmp->GetGroupType() != GC_TYPE_PAGEBREAK))
   {
-    if(end && (tmp == end->GetGroup()))
-      break;
     auto *const next = tmp->GetNext();
     point = tmp->GetCurrentPoint();
 
@@ -139,6 +137,9 @@ bool Printout::OnPrintPage(int num)
     dc->SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_SOLID));
     point.x = 0;
     tmp->Draw(point);
+
+    if(end && (tmp == end->GetGroup()))
+      break;
 
     tmp = tmp->GetNext();
   }
@@ -190,11 +191,26 @@ void Printout::BreakPages()
     // Make sure that the page contains at least one GroupCell
     if (&group == m_pages[m_pages.size()-1])
       continue;
-    
+   
     // Add complete GroupCells as long as they fit on the page 
     if ((group.GetRect().GetBottom() - pageStart >
          maxContentHeight))
-      m_pages.push_back(&group);
+    {
+      // Drawing a cell assigns its output positions
+      group.Recalculate();
+      group.Draw(group.GetCurrentPoint());
+
+      if((group.GetOutput()) && (group.GetOutput()->GetRect().GetTop() - pageStart <
+                                 maxContentHeight))
+      {
+        std::cerr<<group.GetOutput()->GetRect().GetTop()<<"\n";
+        wxLogMessage(wxString::Format("Page %li: Adding a partial GroupCell!",
+                                        (long)m_pages.size()));
+        m_pages.push_back(group.GetOutput());
+      }
+      else
+        m_pages.push_back(&group);
+    }
   }
 }
 

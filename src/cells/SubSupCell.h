@@ -30,9 +30,9 @@
 class SubSupCell final : public Cell
 {
 public:
-  SubSupCell(GroupCell *parent, Configuration **config, std::unique_ptr<Cell> &&base);
-  SubSupCell(const SubSupCell &cell);
-  std::unique_ptr<Cell> Copy() const override;
+  SubSupCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base);
+  SubSupCell(GroupCell *group, const SubSupCell &cell);
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 5; }
