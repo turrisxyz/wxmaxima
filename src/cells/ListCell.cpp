@@ -29,7 +29,7 @@
 #include "ListCell.h"
 #include "CellImpl.h"
 
-ListCell::ListCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+ListCell::ListCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_open(std::make_unique<TextCell>(group, config, wxT("["))),
     m_innerCell(std::move(inner)),
@@ -62,7 +62,7 @@ ListCell::ListCell(GroupCell *group, Configuration **config, std::unique_ptr<Cel
 // cppcheck-suppress uninitMemberVar symbolName=ListCell::m_signTopHeight
 // cppcheck-suppress uninitMemberVar symbolName=ListCell::m_signBotHeight
 // cppcheck-suppress uninitMemberVar symbolName=ListCell::m_extendHeight
-ListCell::ListCell(GroupCell *group, const ListCell &cell):
+ListCell::ListCell(const GroupCell *group, const ListCell &cell):
   ListCell(group, cell.m_configuration, CopyList(group, cell.m_innerCell.get()))
 {
   CopyCommonData(cell);

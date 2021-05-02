@@ -38,7 +38,7 @@
 #include <wx/regex.h>
 #include <wx/tokenzr.h>
 
-EditorCell::EditorCell(GroupCell *group, Configuration **config, const wxString &text) :
+EditorCell::EditorCell(const GroupCell *group, Configuration **config, const wxString &text) :
     Cell(group, config),
     m_text(text)
 {
@@ -75,7 +75,7 @@ void EditorCell::AddDrawParameter(wxString param)
 
   wxString paramTrimmed = param;
   paramTrimmed.Trim();
-  if(paramTrimmGroupCell *grouped == wxEmptyString)
+  if(paramTrimmed == wxEmptyString)
     return;
 
   int pos = 1;
@@ -270,7 +270,7 @@ wxString EditorCell::PrependNBSP(wxString input)
 // cppcheck-suppress uninitMemberVar symbolName=EditorCell::m_endHistory
 // cppcheck-suppress uninitMemberVar symbolName=EditorCell::m_fontName
 // cppcheck-suppress uninitMemberVar symbolName=EditorCell::m_tokens
-EditorCell::EditorCell(GroupCell *group, const EditorCell &cell):
+EditorCell::EditorCell(const GroupCell *group, const EditorCell &cell):
   EditorCell(group, cell.m_configuration, cell.m_text)
 {
   CopyCommonData(cell);

@@ -46,11 +46,11 @@ enum sumStyle : int8_t
 class SumCell final : public Cell
 {
 public:
-  SumCell(GroupCell *group, Configuration **config, sumStyle style,
+  SumCell(const GroupCell *group, Configuration **config, sumStyle style,
           std::unique_ptr<Cell> &&under, std::unique_ptr<Cell> &&over,
           std::unique_ptr<Cell> &&base);
-  SumCell(GroupCell *group, const SumCell &cell);
-  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
+  SumCell(const GroupCell *group, const SumCell &cell);
+  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 10; }

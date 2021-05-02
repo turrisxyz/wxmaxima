@@ -31,7 +31,7 @@
 
 #define SUB_DEC 2
 
-SubCell::SubCell(GroupCell *group, Configuration **config,
+SubCell::SubCell(const GroupCell *group, Configuration **config,
                  std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index)
     : Cell(group, config), m_baseCell(std::move(base)),
       m_indexCell(std::move(index))
@@ -40,7 +40,7 @@ SubCell::SubCell(GroupCell *group, Configuration **config,
   SetStyle(TS_VARIABLE);
 }
 
-SubCell::SubCell(GroupCell *group, const SubCell &cell)
+SubCell::SubCell(const GroupCell *group, const SubCell &cell)
     : SubCell(group, cell.m_configuration,
               CopyList(group, cell.m_baseCell.get()),
               CopyList(group, cell.m_indexCell.get()))

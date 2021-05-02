@@ -31,7 +31,7 @@
 #include "CellImpl.h"
 #include "VisiblyInvalidCell.h"
 
-ParenCell::ParenCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+ParenCell::ParenCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_open(std::make_unique<TextCell>(group, config, wxT("("))),
     m_innerCell(std::move(inner)),
@@ -57,7 +57,7 @@ ParenCell::ParenCell(GroupCell *group, Configuration **config, std::unique_ptr<C
 // cppcheck-suppress uninitMemberVar symbolName=ParenCell::m_signTopHeight
 // cppcheck-suppress uninitMemberVar symbolName=ParenCell::m_signBotHeight
 // cppcheck-suppress uninitMemberVar symbolName=ParenCell::m_extendHeight
-ParenCell::ParenCell(GroupCell *group, const ParenCell &cell):
+ParenCell::ParenCell(const GroupCell *group, const ParenCell &cell):
     ParenCell(group, cell.m_configuration, CopyList(group, cell.m_innerCell.get()))
 {
   CopyCommonData(cell);

@@ -32,7 +32,7 @@
 #include "CellImpl.h"
 #include "TextCell.h"
 
-AbsCell::AbsCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+AbsCell::AbsCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_innerCell(std::move(inner))
 {
@@ -43,7 +43,7 @@ AbsCell::AbsCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell>
 // Old cppcheck bugs:
 // cppcheck-suppress uninitMemberVar symbolName=AbsCell::m_open
 // cppcheck-suppress uninitMemberVar symbolName=AbsCell::m_close
-AbsCell::AbsCell(GroupCell *group, const AbsCell &cell) :
+AbsCell::AbsCell(const GroupCell *group, const AbsCell &cell) :
   AbsCell(group, cell.m_configuration, CopyList(group, cell.m_innerCell.get()))
 {
   CopyCommonData(cell);

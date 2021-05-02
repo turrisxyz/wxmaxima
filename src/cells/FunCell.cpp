@@ -30,7 +30,7 @@
 #include "CellImpl.h"
 #include "TextCell.h"
 
-FunCell::FunCell(GroupCell *group, Configuration **config,
+FunCell::FunCell(const GroupCell *group, Configuration **config,
                  std::unique_ptr<Cell> &&name, std::unique_ptr<Cell> &&arg)
     : Cell(group, config),
       m_nameCell(std::move(name)),
@@ -41,7 +41,7 @@ FunCell::FunCell(GroupCell *group, Configuration **config,
   m_nameCell->SetStyle(TS_FUNCTION);
 }
 
-FunCell::FunCell(GroupCell *group,const FunCell &cell)
+FunCell::FunCell(const GroupCell *group,const FunCell &cell)
     : FunCell(group, cell.m_configuration,
               CopyList(group, cell.m_nameCell.get()), CopyList(group, cell.m_argCell.get()))
 {

@@ -40,11 +40,11 @@
 class LimitCell final : public Cell
 {
 public:
-  LimitCell(GroupCell *group, Configuration **config,
+  LimitCell(const GroupCell *group, Configuration **config,
             std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&under,
             std::unique_ptr<Cell> &&name);
-  LimitCell(GroupCell *group, const LimitCell &cell);
-  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
+  LimitCell(const GroupCell *group, const LimitCell &cell);
+  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 6; }

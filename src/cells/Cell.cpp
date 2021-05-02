@@ -58,7 +58,7 @@ const wxString &Cell::GetToolTip(const wxPoint point) const
   return *m_toolTip;
 }
 
-Cell::Cell(GroupCell *group, Configuration **config) :
+Cell::Cell(const GroupCell *group, Configuration **config) :
     m_group(group),
     m_configuration(config),
     m_toolTip(&wxm::emptyString),
@@ -158,7 +158,7 @@ void Cell::CopyCommonData(const Cell & cell)
     BreakUp();
 }
 
-std::unique_ptr<Cell> Cell::CopyList(GroupCell *group) const
+std::unique_ptr<Cell> Cell::CopyList(const GroupCell *group) const
 {
   CellListBuilder<> copy;
   for (auto &src : OnList(this))
@@ -166,7 +166,7 @@ std::unique_ptr<Cell> Cell::CopyList(GroupCell *group) const
   return std::move(copy);
 }
 
-std::unique_ptr<Cell> Cell::CopyList(GroupCell *group, const Cell *cell)
+std::unique_ptr<Cell> Cell::CopyList(const GroupCell *group, const Cell *cell)
 {
   return cell ? cell->CopyList(group) : nullptr;
 }

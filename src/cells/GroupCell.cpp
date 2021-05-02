@@ -205,7 +205,7 @@ GroupCell::GroupCell(const GroupCell &cell):
   if (cell.m_inputLabel)
     SetInput(cell.m_inputLabel->CopyList(this));
   if (cell.m_output)
-    SetOutput(this, cell.m_output->CopyList());
+    SetOutput(cell.m_output->CopyList(this));
   SetAutoAnswer(cell.m_autoAnswer);
   UpdateYPosition();
 }
@@ -1324,7 +1324,8 @@ wxString GroupCell::ToTeXImage(Cell *tmp, wxString imgDir, wxString filename, in
 
   if (imgDir != wxEmptyString)
   {
-    auto const copy = tmp->Copy(this);
+    // TODO: Is this the right Group?
+    auto const copy = tmp->Copy(tmp->GetGroup());
     auto *const imgCopy = dynamic_cast<ImgCell *>(copy.get());
     (*imgCounter)++;
     wxString image = filename + wxString::Format(wxT("_%d"), *imgCounter);

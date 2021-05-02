@@ -37,7 +37,7 @@
 static constexpr AFontSize INTEGRAL_FONT_SIZE{ 12.0f };
 #endif
 
-IntCell::IntCell(GroupCell *group, Configuration **config,
+IntCell::IntCell(const GroupCell *group, Configuration **config,
                  std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&under,
                  std::unique_ptr<Cell> &&over, std::unique_ptr<Cell> &&var)
     : Cell(group, config),
@@ -50,7 +50,7 @@ IntCell::IntCell(GroupCell *group, Configuration **config,
   SetStyle(TS_VARIABLE);
 }
 
-IntCell::IntCell(GroupCell *group, Configuration **config,
+IntCell::IntCell(const GroupCell *group, Configuration **config,
                  std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&var)
     : IntCell(group, config, std::move(base),
               std::make_unique<TextCell>(group, config),
@@ -63,7 +63,7 @@ IntCell::IntCell(GroupCell *group, Configuration **config,
 // cppcheck-suppress uninitMemberVar symbolName=IntCell::m_signTop
 // cppcheck-suppress uninitMemberVar symbolName=IntCell::m_charHeight
 // cppcheck-suppress uninitMemberVar symbolName=IntCell::m_charWidth
-IntCell::IntCell(GroupCell *group, const IntCell &cell)
+IntCell::IntCell(const GroupCell *group, const IntCell &cell)
     : IntCell(group, cell.m_configuration,
               CopyList(group, cell.m_base.get()),
               CopyList(group, cell.m_under.get()),

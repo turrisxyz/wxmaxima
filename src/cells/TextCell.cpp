@@ -33,7 +33,7 @@
 #include "StringUtils.h"
 #include "wx/config.h"
 
-TextCell::TextCell(GroupCell *group, Configuration **config,
+TextCell::TextCell(const GroupCell *group, Configuration **config,
                    const wxString &text, TextStyle style) :
   Cell(group, config)
 {
@@ -74,7 +74,7 @@ TextCell::TextCell(GroupCell *group, Configuration **config,
 // cppcheck-suppress uninitMemberVar symbolName=TextCell::m_alt
 // cppcheck-suppress uninitMemberVar symbolName=TextCell::m_altJs
 // cppcheck-suppress uninitMemberVar symbolName=TextCell::m_initialToolTip
-TextCell::TextCell(GroupCell *group, const TextCell &cell):
+TextCell::TextCell(const GroupCell *group, const TextCell &cell):
     Cell(group, cell.m_configuration),
     m_text(cell.m_text),
     m_displayedText(cell.m_displayedText)

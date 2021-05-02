@@ -43,10 +43,10 @@
 class FracCell final : public Cell
 {
 public:
-  FracCell(GroupCell *group, Configuration **config,
+  FracCell(const GroupCell *group, Configuration **config,
            std::unique_ptr<Cell> &&num, std::unique_ptr<Cell> &&denom);
-  FracCell(GroupCell *group, const FracCell &cell);
-  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
+  FracCell(const GroupCell *group, const FracCell &cell);
+  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 3; }

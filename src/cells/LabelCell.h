@@ -34,10 +34,10 @@ class LabelCell final : public TextCell
 {
 public:
   //! The constructor for cell that, if displayed, means that something is amiss
-  LabelCell(GroupCell *group,
+  LabelCell(const GroupCell *group,
             Configuration **config, wxString automaticLabel, TextStyle style = TS_MAIN_PROMPT);
-  LabelCell(GroupCell *group, const LabelCell &cell);
-  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
+  LabelCell(const GroupCell *group, const LabelCell &cell);
+  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   void Recalculate(AFontSize fontsize) override;
