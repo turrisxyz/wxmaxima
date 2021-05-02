@@ -153,7 +153,7 @@ class Cell: public Observed
   friend inline auto OnInner(C *cell);
 
 public:
-
+//  Cell(GroupCell *group, Configuration **config);
   Cell(const GroupCell *group, Configuration **config);
 
   /*! Create a copy of this cell
@@ -849,7 +849,7 @@ public:
     const wxString &GetLocalToolTip() const;
 protected:
   /*! The GroupCell this list of cells belongs to. */
-  CellPtr<GroupCell> const m_group;
+  CellPtr<const GroupCell> m_group;
   //! The next cell in the draw list. This has been factored into Cell temporarily to
   //! reduce the change "noise" when it will be subsequently removed.
   CellPtr<Cell> m_nextToDraw;
