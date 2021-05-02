@@ -31,7 +31,7 @@
 
 #define FRAC_DEC 1
 
-FracCell::FracCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&num, std::unique_ptr<Cell> &&denom) :
+FracCell::FracCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&num, std::unique_ptr<Cell> &&denom) :
     Cell(group, config),
     m_numParenthesis(std::make_unique<ParenCell>(group, m_configuration, std::move(num))),
     m_denomParenthesis(std::make_unique<ParenCell>(group, m_configuration, std::move(denom)))
@@ -41,7 +41,7 @@ FracCell::FracCell(const GroupCell *group, Configuration **config, std::unique_p
   SetupBreakUps();
 }
 
-FracCell::FracCell(const GroupCell *group, const FracCell &cell) :
+FracCell::FracCell(GroupCell *group, const FracCell &cell) :
     FracCell(group, cell.m_configuration,
              CopyList(group, cell.Num()),
              CopyList(group, cell.Denom()))

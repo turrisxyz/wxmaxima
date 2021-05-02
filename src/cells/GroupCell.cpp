@@ -198,7 +198,7 @@ GroupCell::GroupCell(Configuration **config, GroupType groupType, const wxString
   }
 }
 
-GroupCell::GroupCell(const GroupCell &cell):
+GroupCell::GroupCell(GroupCell &cell):
     GroupCell(cell.m_configuration, cell.m_groupType)
 {
   CopyCommonData(cell);
@@ -214,7 +214,8 @@ DEFINE_CELL(GroupCell)
 
 std::unique_ptr<GroupCell> GroupCell::CopyList() const
 {
-  auto copy = Cell::CopyList(this);
+  GroupCell parent(m_configuration, GC_TYPE_CODE);
+  auto copy = Cell::CopyList(&parent);
   return stx::static_unique_ptr_cast<GroupCell>(std::move(copy));
 }
 
@@ -1145,7 +1146,8 @@ wxString GroupCell::ToTeX(wxString imgDir, wxString filename, int *imgCounter) c
     case GC_TYPE_IMAGE:
       if (imgDir != wxEmptyString)
       {
-        auto const copy = m_output->Copy(this);
+        GroupCell parent(m_configuration, GC_TYPE_CODE);
+        auto const copy = m_output->Copy(&parent);
         auto *const imgCopy = dynamic_cast<ImgCell *>(copy.get());
         (*imgCounter)++;
         wxString image = filename + wxString::Format(wxT("_%d"), *imgCounter);

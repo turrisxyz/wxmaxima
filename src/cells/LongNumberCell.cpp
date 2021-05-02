@@ -33,7 +33,7 @@
 #include "CellList.h"
 #include "StringUtils.h"
 
-LongNumberCell::LongNumberCell(const GroupCell *group,
+LongNumberCell::LongNumberCell(GroupCell *group,
                                Configuration **config,
                                const wxString &number)
   : TextCell(group, config, number, TS_NUMBER)
@@ -44,7 +44,7 @@ LongNumberCell::LongNumberCell(const GroupCell *group,
 // cppcheck-suppress uninitMemberVar symbolName=LongNumberCell::m_alt
 // cppcheck-suppress uninitMemberVar symbolName=LongNumberCell::m_altJs
 // cppcheck-suppress uninitMemberVar symbolName=LongNumberCell::m_initialToolTip
-LongNumberCell::LongNumberCell(const GroupCell *group, const LongNumberCell &cell):
+LongNumberCell::LongNumberCell(GroupCell *group, const LongNumberCell &cell):
   LongNumberCell(group, cell.m_configuration, cell.m_text)
 {
 }

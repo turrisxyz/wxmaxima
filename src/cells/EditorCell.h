@@ -67,11 +67,11 @@ private:
 
 public:
   //! The constructor
-  EditorCell(const GroupCell *group, Configuration **config, const wxString &text = {});
-  EditorCell(const GroupCell *group, const EditorCell &cell);
-//  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
+  EditorCell(GroupCell *group, Configuration **config, const wxString &text = {});
+  EditorCell(GroupCell *group, const EditorCell &cell);
+//  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
-  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
 
   //! Get the previous EditorCell in the list
   EditorCell *GetPrevious() const { return dynamic_cast<EditorCell*>(Cell::GetPrevious()); }

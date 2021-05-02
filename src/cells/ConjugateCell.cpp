@@ -29,7 +29,7 @@
 #include "ConjugateCell.h"
 #include "CellImpl.h"
 
-ConjugateCell::ConjugateCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+ConjugateCell::ConjugateCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_innerCell(std::move(inner))
 {
@@ -40,7 +40,7 @@ ConjugateCell::ConjugateCell(const GroupCell *group, Configuration **config, std
 // Old cppcheck bugs:
 // cppcheck-suppress uninitMemberVar symbolName=ConjugateCell::m_open
 // cppcheck-suppress uninitMemberVar symbolName=ConjugateCell::m_close
-ConjugateCell::ConjugateCell(const GroupCell *group, const ConjugateCell &cell) :
+ConjugateCell::ConjugateCell(GroupCell *group, const ConjugateCell &cell) :
   ConjugateCell(group, cell.m_configuration, CopyList(group, cell.m_innerCell.get()))
 {
   CopyCommonData(cell);

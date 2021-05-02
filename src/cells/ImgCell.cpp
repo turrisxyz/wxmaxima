@@ -42,7 +42,7 @@
 #include <wx/clipbrd.h>
 #include <wx/mstream.h>
 
-ImgCell::ImgCell(const GroupCell *group, Configuration **config) :
+ImgCell::ImgCell(GroupCell *group, Configuration **config) :
     Cell(group, config),
     m_imageBorderWidth(1)
 {
@@ -50,7 +50,7 @@ ImgCell::ImgCell(const GroupCell *group, Configuration **config) :
   m_type = MC_TYPE_IMAGE;
 }
 
-ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxMemoryBuffer &image, const wxString &type) :
+ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxMemoryBuffer &image, const wxString &type) :
     Cell(group, config),
     m_image(new Image(m_configuration, image, type)),
     m_imageBorderWidth(1)
@@ -59,7 +59,7 @@ ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxMemoryB
   m_type = MC_TYPE_IMAGE;
 }
 
-ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxBitmap &bitmap) :
+ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxBitmap &bitmap) :
     Cell(group, config),
     m_image(new Image(m_configuration, bitmap)),
     m_imageBorderWidth(1)
@@ -71,7 +71,7 @@ ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxBitmap 
 int ImgCell::s_counter = 0;
 
 // constructor which load image
-ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove)
+ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove)
   : Cell(group, config)
 {
   InitBitFields();
@@ -83,7 +83,7 @@ ImgCell::ImgCell(const GroupCell *group, Configuration **config, const wxString 
   m_drawBoundingBox = false;
 }
 
-ImgCell::ImgCell(const GroupCell *group, const ImgCell &cell) :
+ImgCell::ImgCell(GroupCell *group, const ImgCell &cell) :
   Cell(group, m_configuration)
 {
   InitBitFields();

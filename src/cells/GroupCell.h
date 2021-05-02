@@ -69,10 +69,10 @@ class GroupCell final : public Cell
 {
 public:
   GroupCell(Configuration **config, GroupType groupType, const wxString &initString = {});
-  GroupCell(const GroupCell &cell);
-  GroupCell(const GroupCell *group, const GroupCell &cell);
+  GroupCell(GroupCell &cell);
+  GroupCell(GroupCell *group, GroupCell &cell);
   std::unique_ptr<Cell> Copy() const;
-  std::unique_ptr<Cell> Copy(const GroupCell *WXUNUSED(group)) const;
+  std::unique_ptr<Cell> Copy(GroupCell *WXUNUSED(group)) const;
   const CellTypeInfo &GetInfo() override;
   std::unique_ptr<GroupCell> CopyList() const;
   ~GroupCell();

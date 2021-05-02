@@ -29,7 +29,7 @@
 #include "AtCell.h"
 #include "CellImpl.h"
 
-AtCell::AtCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index) :
+AtCell::AtCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index) :
     Cell(group, config),
     m_baseCell(std::move(base)),
     m_indexCell(std::move(index))
@@ -38,7 +38,7 @@ AtCell::AtCell(const GroupCell *group, Configuration **config, std::unique_ptr<C
   SetStyle(TS_VARIABLE);
 }
 
-AtCell::AtCell(const GroupCell *group, const AtCell &cell)
+AtCell::AtCell(GroupCell *group, const AtCell &cell)
     : AtCell(group, cell.m_configuration,
              CopyList(group, cell.m_baseCell.get()),
              CopyList(group, cell.m_indexCell.get()))

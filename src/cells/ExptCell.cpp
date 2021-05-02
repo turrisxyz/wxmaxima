@@ -31,7 +31,7 @@
 
 #define EXPT_DEC 2
 
-ExptCell::ExptCell(const GroupCell *parent, Configuration **config,
+ExptCell::ExptCell(GroupCell *parent, Configuration **config,
                    std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&expt)
     : Cell(parent, config), m_baseCell(std::move(base)),
       m_exptCell(std::move(expt))
@@ -40,7 +40,7 @@ ExptCell::ExptCell(const GroupCell *parent, Configuration **config,
   SetStyle(TS_VARIABLE);
 }
 
-ExptCell::ExptCell(const GroupCell *group, const ExptCell &cell)
+ExptCell::ExptCell(GroupCell *group, const ExptCell &cell)
     : ExptCell(group, cell.m_configuration,
                CopyList(group, cell.m_baseCell.get()),
                CopyList(group, cell.m_exptCell.get()))

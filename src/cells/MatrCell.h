@@ -30,9 +30,9 @@
 class MatrCell final : public Cell
 {
 public:
-  MatrCell(const GroupCell *group, Configuration **config);
-  MatrCell(const GroupCell *group, const MatrCell &cell);
-  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
+  MatrCell(GroupCell *group, Configuration **config);
+  MatrCell(GroupCell *group, const MatrCell &cell);
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return m_cells.size(); }

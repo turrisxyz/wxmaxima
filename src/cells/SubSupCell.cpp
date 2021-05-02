@@ -34,14 +34,14 @@
 
 #define SUBSUP_DEC 3
 
-SubSupCell::SubSupCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base) :
+SubSupCell::SubSupCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base) :
   Cell(group, config),
   m_baseCell(std::move(base))
 {
   InitBitFields();
 }
 
-SubSupCell::SubSupCell(const GroupCell *group, const SubSupCell &cell)
+SubSupCell::SubSupCell(GroupCell *group, const SubSupCell &cell)
     : SubSupCell(group, cell.m_configuration,
                  CopyList(group, cell.m_baseCell.get()))
 {

@@ -31,7 +31,7 @@
 #include "CellImpl.h"
 #include "StringUtils.h"
 
-LabelCell::LabelCell(const GroupCell *group,
+LabelCell::LabelCell(GroupCell *group,
                      Configuration **config, wxString automaticLabel, TextStyle style)
   : TextCell(group, config, automaticLabel, style),
     m_labelChoice_Last((*config)->GetLabelChoice())
@@ -43,7 +43,7 @@ LabelCell::LabelCell(const GroupCell *group,
 // cppcheck-suppress uninitMemberVar symbolName=LabelCell::m_alt
 // cppcheck-suppress uninitMemberVar symbolName=LabelCell::m_altJs
 // cppcheck-suppress uninitMemberVar symbolName=LabelCell::m_initialToolTip
-LabelCell::LabelCell(const GroupCell *group, const LabelCell &cell):
+LabelCell::LabelCell(GroupCell *group, const LabelCell &cell):
   TextCell(group, cell.m_configuration),
   m_userDefinedLabel(cell.m_userDefinedLabel)
 {

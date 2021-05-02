@@ -32,7 +32,7 @@
 #include "TextCell.h"
 #include "wx/config.h"
 
-DiffCell::DiffCell(const GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&diff) :
+DiffCell::DiffCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&diff) :
   Cell(group, config),
   m_baseCell(std::move(base)),
   m_diffCell(std::move(diff))
@@ -43,7 +43,7 @@ DiffCell::DiffCell(const GroupCell *group, Configuration **config, std::unique_p
   m_diffCell->SetSuppressMultiplicationDot(true);
 }
 
-DiffCell::DiffCell(const GroupCell *group, const DiffCell &cell)
+DiffCell::DiffCell(GroupCell *group, const DiffCell &cell)
     : DiffCell(group, cell.m_configuration,
                CopyList(group, cell.m_baseCell.get()),
                CopyList(group, cell.m_diffCell.get()))

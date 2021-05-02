@@ -33,7 +33,7 @@
 
 static wxString cellContents(wxT("?"));
 
-VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
+VisiblyInvalidCell::VisiblyInvalidCell(GroupCell *group,
                                        Configuration **config)
     : TextCell(group, config, cellContents, TS_ERROR)
 {
@@ -45,7 +45,7 @@ VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
   SetToolTip(&T_("Missing contents. Bug?"));
 }
 
-VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
+VisiblyInvalidCell::VisiblyInvalidCell(GroupCell *group,
                                        Configuration **config, wxString &&toolTip)
     : TextCell(group, config, cellContents, TS_ERROR)
 {
@@ -53,7 +53,7 @@ VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
   SetToolTip(std::move(toolTip));
 }
 
-VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
+VisiblyInvalidCell::VisiblyInvalidCell(GroupCell *group,
                                        Configuration **config, const wxString *toolTip)
     : TextCell(group, config, cellContents, TS_ERROR)
 {
@@ -61,7 +61,7 @@ VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
   SetToolTip(toolTip);
 }
 
-VisiblyInvalidCell::VisiblyInvalidCell(const GroupCell *group,
+VisiblyInvalidCell::VisiblyInvalidCell(GroupCell *group,
                                        const VisiblyInvalidCell &cell)
   : VisiblyInvalidCell(group, cell.m_configuration)
 {

@@ -32,7 +32,7 @@
 #include "CellImpl.h"
 #include "TextCell.h"
 
-SumCell::SumCell(const GroupCell *group, Configuration **config, sumStyle style,
+SumCell::SumCell(GroupCell *group, Configuration **config, sumStyle style,
                  std::unique_ptr<Cell> &&under, std::unique_ptr<Cell> &&over,
                  std::unique_ptr<Cell> &&base)
     : Cell(group, config),
@@ -52,7 +52,7 @@ SumCell::SumCell(const GroupCell *group, Configuration **config, sumStyle style,
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signHeight
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signWidth
 // cppcheck-suppress uninitMemberVar symbolName=SumCell::m_signWCenter
-SumCell::SumCell(const GroupCell *group, const SumCell &cell)
+SumCell::SumCell(GroupCell *group, const SumCell &cell)
     : SumCell(group, cell.m_configuration, cell.m_sumStyle,
               CopyList(group, cell.m_under.get()),
               CopyList(group, cell.m_over.get()),

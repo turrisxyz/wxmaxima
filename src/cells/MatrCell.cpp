@@ -30,13 +30,13 @@
 #include "MatrCell.h"
 #include "CellImpl.h"
 
-MatrCell::MatrCell(const GroupCell *group, Configuration **config) :
+MatrCell::MatrCell(GroupCell *group, Configuration **config) :
     Cell(group, config)
 {
   InitBitFields();
 }
 
-MatrCell::MatrCell(const GroupCell *group, const MatrCell &cell):
+MatrCell::MatrCell(GroupCell *group, const MatrCell &cell):
     MatrCell(group, cell.m_configuration)
 {
   CopyCommonData(cell);

@@ -29,14 +29,14 @@
 #include "SetCell.h"
 #include "CellImpl.h"
 
-SetCell::SetCell(const GroupCell *parent, Configuration **config, std::unique_ptr<Cell> &&inner) :
+SetCell::SetCell(GroupCell *parent, Configuration **config, std::unique_ptr<Cell> &&inner) :
   ListCell(parent, config, std::move(inner))
 {
   m_open = std::make_unique<TextCell>(parent, config, wxT("{"));
   m_close = std::make_unique<TextCell>(parent, config, wxT("}"));
 }
 
-SetCell::SetCell(const GroupCell *group, const SetCell &cell):
+SetCell::SetCell(GroupCell *group, const SetCell &cell):
   SetCell(group, cell.m_configuration, CopyList(group, cell.m_innerCell.get()))
 {
   CopyCommonData(cell);

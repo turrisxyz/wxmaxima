@@ -28,10 +28,10 @@
 class SubCell final : public Cell
 {
 public:
-  SubCell(const GroupCell *group, Configuration **config,
+  SubCell(GroupCell *group, Configuration **config,
           std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index);
-  SubCell(const GroupCell *group, const SubCell &cell);
-  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
+  SubCell(GroupCell *group, const SubCell &cell);
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 2; }

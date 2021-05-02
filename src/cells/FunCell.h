@@ -52,10 +52,10 @@
 class FunCell final : public Cell
 {
 public:
-  FunCell(const GroupCell *group, Configuration **config,
+  FunCell(GroupCell *group, Configuration **config,
           std::unique_ptr<Cell> &&name, std::unique_ptr<Cell> &&arg);
-  FunCell(const GroupCell *group, const FunCell &cell);
-  std::unique_ptr<Cell> Copy(const GroupCell *group) const override;
+  FunCell(GroupCell *group, const FunCell &cell);
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 
   int GetInnerCellCount() const override { return 2; }
