@@ -89,6 +89,13 @@ SlideShow::SlideShow(GroupCell *group, Configuration **config, const wxString &i
     wxRemoveFile(image);
 }
 
+SlideShow::SlideShow(GroupCell *group, const SlideShow &cell):
+    SlideShow(group, cell.m_configuration)
+{
+  for(auto i:cell.m_images)
+    m_images.push_back(std::make_shared<Image>(*(i.get())));
+}
+
 DEFINE_CELL(SlideShow)
 
 int SlideShow::GetFrameRate() const

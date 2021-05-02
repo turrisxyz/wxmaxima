@@ -198,7 +198,11 @@ GroupCell::GroupCell(Configuration **config, GroupType groupType, const wxString
   }
 }
 
-GroupCell::GroupCell(GroupCell &cell):
+GroupCell::GroupCell(GroupCell *WXUNUSED(group), GroupCell const &cell):
+  GroupCell::GroupCell(cell)
+{}
+
+GroupCell::GroupCell(GroupCell const &cell):
     GroupCell(cell.m_configuration, cell.m_groupType)
 {
   CopyCommonData(cell);
