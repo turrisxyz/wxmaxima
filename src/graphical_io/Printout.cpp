@@ -106,19 +106,19 @@ bool Printout::OnPrintPage(int num)
   // Print the page contents
   dc->SetDeviceOrigin(
     marginX,
-    marginY + GetHeaderHeight() - m_pages[num - 1]->GetRect().GetTop() +
+    marginY + GetHeaderHeight() - m_pages[num - 1]->GetRect(true).GetTop() +
     (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip())
     );
 
   Cell *end = NULL;
   wxCoord startpoint;
   wxCoord endpoint;
-  startpoint = m_pages[num - 1]->GetRect().GetTop();
+  startpoint = m_pages[num - 1]->GetRect(true).GetTop();
   endpoint = startpoint + 2*pageHeight;
             
   if((m_pages.size() > num) && (m_pages[num]))
   {
-    endpoint = m_pages[num]->GetRect().GetTop()-1;
+    endpoint = m_pages[num]->GetRect(true).GetTop()-1;
     end = m_pages[num];
   }
   dc->DestroyClippingRegion();
@@ -180,7 +180,7 @@ void Printout::BreakPages()
   // Now see where the next pages shuld start
   for (GroupCell &group : OnList(m_tree.get()))
   {
-    wxCoord pageStart = m_pages[m_pages.size()-1]->GetRect().GetTop();
+    wxCoord pageStart = m_pages[m_pages.size()-1]->GetRect(true).GetTop();
     // Handle pagebreak cells
     if((group.GetGroupType() == GC_TYPE_PAGEBREAK) && (group.GetNext()))
     {
@@ -193,17 +193,16 @@ void Printout::BreakPages()
       continue;
    
     // Add complete GroupCells as long as they fit on the page 
-    if ((group.GetRect().GetBottom() - pageStart >
+    if ((group.GetRect(true).GetBottom() - pageStart >
          maxContentHeight))
     {
       // Drawing a cell assigns its output positions
       group.Recalculate();
       group.Draw(group.GetCurrentPoint());
 
-      if((group.GetOutput()) && (group.GetOutput()->GetRect().GetTop() - pageStart <
+      if((group.GetOutput()) && (group.GetOutput()->GetRect(true).GetTop() - pageStart <
                                  maxContentHeight))
       {
-        std::cerr<<group.GetOutput()->GetRect().GetTop()<<"\n";
         wxLogMessage(wxString::Format("Page %li: Adding a partial GroupCell!",
                                         (long)m_pages.size()));
         m_pages.push_back(group.GetOutput());
