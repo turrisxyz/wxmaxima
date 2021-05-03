@@ -91,9 +91,7 @@ bool Printout::OnPrintPage(int num)
     return true;
 
   // Print the header
-  dc->SetDeviceOrigin(0,0);
-  wxConfigBase *config = wxConfig::Get();
-  
+  dc->SetDeviceOrigin(0,0);  
   PrintHeader(num, dc);
   
   // Print the page contents
@@ -121,8 +119,6 @@ bool Printout::OnPrintPage(int num)
   while (group &&
          (group->GetGroupType() != GC_TYPE_PAGEBREAK))
   {
-    auto *const next = group->GetNext();
-
     // The following line seems to mysteriously fix the "subsequent text
     // cells aren't printed" problem on linux.
     // No Idea why, though.
@@ -161,8 +157,7 @@ void Printout::BreakPages()
   GetPageMargins(&marginX, &marginY);
   GetPageSizePixels(&pageWidth, &pageHeight);
 
-  wxCoord maxContentHeight = pageHeight - 2 * marginY;
-  int skip = (*m_configuration)->Scale_Px((*m_configuration)->GetGroupSkip());;
+  wxCoord maxContentHeight = pageHeight - 2 * marginY - headerHeight;
 
   // The 1st page starts at the beginning of the document
   GroupCell *group = m_tree.get();
