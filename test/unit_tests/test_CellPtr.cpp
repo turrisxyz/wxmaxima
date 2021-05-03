@@ -489,7 +489,7 @@ class FullTestCell : WithGroup, public Cell {
 public:
   FullTestCell() : Cell(&group, &config) {}
   FullTestCell(GroupCell *group, const FullTestCell &) : Cell(group, &config) {}
-  std::unique_ptr<Cell> Copy(GropuCell *group) const override;
+  std::unique_ptr<Cell> Copy(GroupCell *group) const override;
   const CellTypeInfo &GetInfo() override;
 };
 DEFINE_CELL(FullTestCell)
