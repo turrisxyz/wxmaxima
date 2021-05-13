@@ -170,7 +170,7 @@ void Printout::BreakPages()
   GroupCell *group = m_tree.get();
   m_pages.push_back(group);
 
-  // Now see where the next pages shuld start
+  // Now see where the next pages should start
   for (GroupCell &group : OnList(m_tree.get()))
   {
     wxCoord pageStart = m_pages[m_pages.size()-1]->GetRect(true).GetTop();
@@ -188,7 +188,9 @@ void Printout::BreakPages()
     {
       if(!group.GetOutput())
       {
-        m_pages.push_back(&group);
+        if(((group.GetRect(true).GetBottom() - pageStart >
+             maxContentHeight)))
+          m_pages.push_back(&group);
       }
       else
       {
