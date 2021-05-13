@@ -75,8 +75,6 @@ private:
   wxString m_title;
   std::unique_ptr<GroupCell> m_tree;
   std::vector<Cell *> m_pages;
-  wxBitmap m_dcBitmap;
-  wxMemoryDC m_dc;
   Configuration m_configuration;
   Configuration *m_configPointer;
   double m_scaleFactor;

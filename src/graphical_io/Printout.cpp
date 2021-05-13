@@ -40,15 +40,12 @@
 
 Printout::Printout(wxString title, GroupCell *tree, double scaleFactor) :
   wxPrintout(title),
-  m_dcBitmap(10000,10000),
-  m_dc(m_dcBitmap),
-  m_configuration(&m_dc, Configuration::temporary),
+  m_configuration(GetDC(), Configuration::temporary),
   m_configPointer(&m_configuration)
 {
-  if(m_tree)
+  if(tree)
   {
-
-    auto copy = m_tree->CopyList();
+    auto copy = tree->CopyList();
     m_tree = std::move(copy);
     m_tree->SetConfigurationList(&m_configPointer);
 
@@ -58,37 +55,6 @@ Printout::Printout(wxString title, GroupCell *tree, double scaleFactor) :
     m_configuration.ShowCodeCells(m_tree->GetConfiguration()->ShowCodeCells());
     m_configuration.ShowBrackets((m_tree->GetConfiguration())->PrintBrackets());
     m_configuration.ClipToDrawRegion(false);
-
-    //  SetUserScale(1/DCSCALE,
-    //               1/DCSCALE);
-    // on MSW according to https://groups.google.com/forum/#!topic/wx-users/QF_W4g3Oe98
-    // the wxFont::SetPointSize is scaled relative to the screen DPI rate in order to
-    // get the right font size in pixels. Unfortunately this is true for printing, too,
-    // which might employ an entirely different DPI rate.
-    //
-    // Also it could be shown that on a 600dpi printer the font is only half the size
-    // one would get on an 300dpi printer => we need to correct the scale factor for
-    // the DPI rate, too. It seems that for a 75dpi and a 300dpi printer the scaling
-    // factor is 1.0.
-    wxSize printPPI;
-    printPPI = m_tree->GetConfiguration()->GetDC()->GetPPI();
-    if(printPPI.x < 1)
-      printPPI.x = 72;
-    if(printPPI.y < 1)
-      printPPI.y = 72;
-    m_tree->GetConfiguration()->GetDC()->SetUserScale(1.0,1.0);
-    m_configuration.SetZoomFactor_temporarily(
-      printPPI.x / DPI_REFERENCE * m_tree->GetConfiguration()->PrintScale() / m_scaleFactor
-      );
- 
-    // wxSize screenPPI;
-    // screenPPI = m_tree->GetConfiguration()->GetDC()->GetPPI();
-    // double oldZoomFactor = m_tree->GetConfiguration()->GetZoomFactor();
-    // wxMessageDialog dialog(NULL,
-    //   wxString::Format(wxT("screenPPI.x=%i,\nprintPPI.x=%i\nzoomFactor=%f\nUserScale.x=%f"),
-    //     screenPPI.x, printPPI.x, oldZoomFactor, userScale_x),
-    //   wxString("Printer Parameters"));
-    // dialog.ShowModal();
 
   }
 }
@@ -107,6 +73,7 @@ bool Printout::HasPage(int num)
 
 bool Printout::OnPrintPage(int num)
 {
+  m_configuration.SetContext(*GetDC());
   if(num > m_pages.size())
     return false;
 //  wxBusyInfo busyInfo(wxString::Format(_("Printing page %i..."),num));
@@ -178,6 +145,7 @@ bool Printout::OnPrintPage(int num)
 
 bool Printout::OnBeginDocument(int startPage, int endPage)
 {
+  m_configuration.SetContext(*GetDC());
   if (!wxPrintout::OnBeginDocument(startPage, endPage))
     return false;
   return true;
@@ -185,6 +153,7 @@ bool Printout::OnBeginDocument(int startPage, int endPage)
 
 void Printout::BreakPages()
 {
+  m_configuration.SetContext(*GetDC());
   if (m_tree == NULL)
     return;
 
@@ -266,6 +235,39 @@ void Printout::BreakPages()
 
 void Printout::SetupData()
 {
+  m_configuration.SetContext(*GetDC());
+  //  SetUserScale(1/DCSCALE,
+  //               1/DCSCALE);
+  // on MSW according to https://groups.google.com/forum/#!topic/wx-users/QF_W4g3Oe98
+  // the wxFont::SetPointSize is scaled relative to the screen DPI rate in order to
+  // get the right font size in pixels. Unfortunately this is true for printing, too,
+  // which might employ an entirely different DPI rate.
+  //
+  // Also it could be shown that on a 600dpi printer the font is only half the size
+  // one would get on an 300dpi printer => we need to correct the scale factor for
+  // the DPI rate, too. It seems that for a 75dpi and a 300dpi printer the scaling
+  // factor is 1.0.
+  wxSize printPPI;
+  printPPI = GetDC()->GetPPI();
+  if(printPPI.x < 1)
+    printPPI.x = 72;
+  if(printPPI.y < 1)
+    printPPI.y = 72;
+  m_tree->GetConfiguration()->GetDC()->SetUserScale(1.0,1.0);
+  m_configuration.SetZoomFactor_temporarily(
+    printPPI.x / DPI_REFERENCE * m_tree->GetConfiguration()->PrintScale() / m_scaleFactor
+    );
+ 
+  // wxSize screenPPI;
+  // screenPPI = m_tree->GetConfiguration()->GetDC()->GetPPI();
+  // double oldZoomFactor = m_tree->GetConfiguration()->GetZoomFactor();
+  // wxMessageDialog dialog(NULL,
+  //   wxString::Format(wxT("screenPPI.x=%i,\nprintPPI.x=%i\nzoomFactor=%f\nUserScale.x=%f"),
+  //     screenPPI.x, printPPI.x, oldZoomFactor, userScale_x),
+  //   wxString("Printer Parameters"));
+  // dialog.ShowModal();
+
+
   int pageWidth, pageHeight;
   int marginX, marginY;
   GetPageSizePixels(&pageWidth, &pageHeight);
@@ -300,6 +302,7 @@ void Printout::GetPageInfo(int *minPage, int *maxPage,
 
 void Printout::OnPreparePrinting()
 {
+  m_configuration.SetContext(*GetDC());
   SetupData();
 }
 
