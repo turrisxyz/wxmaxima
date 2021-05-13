@@ -29,7 +29,7 @@
 #include "ListCell.h"
 #include "CellImpl.h"
 
-ListCell::ListCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+ListCell::ListCell(GroupCell *group, Configuration *config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_open(std::make_unique<TextCell>(group, config, wxT("["))),
     m_innerCell(std::move(inner)),
@@ -117,7 +117,7 @@ void ListCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point))
   { 
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxPoint innerCellPos(point);
     
     if(m_drawAsAscii)

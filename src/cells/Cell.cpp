@@ -58,7 +58,7 @@ const wxString &Cell::GetToolTip(const wxPoint point) const
   return *m_toolTip;
 }
 
-Cell::Cell(GroupCell *group, Configuration **config) :
+Cell::Cell(GroupCell *group, Configuration *config) :
   m_group(group),
   m_configuration(config),
   m_toolTip(&wxm::emptyString),
@@ -193,10 +193,10 @@ int Cell::CellsInListRecursive() const
 
 wxRect Cell::CropToUpdateRegion(wxRect rect) const
 {
-  if (!(*m_configuration)->ClipToDrawRegion())
+  if (!m_configuration->ClipToDrawRegion())
     return rect;
   else
-    return rect.Intersect((*m_configuration)->GetUpdateRegion());
+    return rect.Intersect(m_configuration->GetUpdateRegion());
 }
 
 void Cell::FontsChangedList()
@@ -304,7 +304,7 @@ int Cell::GetLineWidth() const
  */
 void Cell::Draw(wxPoint point)
 {
-  Configuration *configuration = *m_configuration;
+  Configuration *configuration = m_configuration;
   configuration->NotifyOfCellRedraw(this);
 
   if((point.x >= 0) && (point.y >= 0))
@@ -319,7 +319,7 @@ void Cell::Draw(wxPoint point)
     {
       wxDC *dc = configuration->GetDC();
       dc->SetPen(*wxTRANSPARENT_PEN);
-      dc->SetBrush((*m_configuration)->GetTooltipBrush());
+      dc->SetBrush(m_configuration->GetTooltipBrush());
       dc->DrawRectangle(rect);
     }
   }
@@ -428,7 +428,7 @@ bool Cell::DrawThisCell(wxPoint point)
   if(m_isBrokenIntoLines)
     return false;
   
-  if(!(*m_configuration)->ClipToDrawRegion())
+  if(!m_configuration->ClipToDrawRegion())
     return true;
   
   return(InUpdateRegion());
@@ -450,13 +450,13 @@ bool Cell::HasValidPosition() const
   return (m_currentPoint.x >= 0) & (m_currentPoint.y >= 0);
 }
 
-void Cell::SetConfigurationList(Configuration **config)
+void Cell::SetConfigurationList(Configuration *config)
 {
   for (Cell &tmp : OnList(this))
     tmp.SetConfiguration(config);
 }
 
-void Cell::SetConfiguration(Configuration **config)
+void Cell::SetConfiguration(Configuration *config)
 {
   m_configuration = config;
   for (Cell &cell : OnInner(this))
@@ -475,7 +475,7 @@ wxRect Cell::GetRect(bool wholeList) const
 
 bool Cell::InUpdateRegion() const
 {
-  auto *const configuration = *m_configuration;
+  auto *const configuration = m_configuration;
   if (!configuration->ClipToDrawRegion())
     return true;
   if (HasStaleSize())
@@ -1110,7 +1110,7 @@ void Cell::UnbreakList()
 
 wxColour Cell::GetForegroundColor() const
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxColour color;  
   if (m_highlight)
     color = configuration->GetColor(TS_HIGHLIGHT);
@@ -1129,7 +1129,7 @@ wxColour Cell::GetForegroundColor() const
 // Set the pen in device context according to the style of the cell.
 void Cell::SetPen(double lineWidth) const
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxDC *dc = configuration->GetDC();
   
   wxPen pen = *(wxThePenList->FindOrCreatePen(GetForegroundColor(),
@@ -1144,7 +1144,7 @@ void Cell::SetPen(double lineWidth) const
 
 void Cell::SetBrush() const
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxDC *dc = configuration->GetDC();
   
   wxBrush brush = *(wxTheBrushList->FindOrCreateBrush(GetForegroundColor()));
@@ -1161,7 +1161,7 @@ const wxString &Cell::GetValue() const
 
 void Cell::SetForeground()
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxColour color;
   wxDC *dc = configuration->GetDC();
   if (m_highlight)
@@ -1405,17 +1405,17 @@ wxAccStatus Cell::GetLocation(wxRect &rect, int elementId)
 {
   if (elementId == 0)
   {
-    rect = wxRect(GetRect().GetTopLeft()     + (*m_configuration)->GetVisibleRegion().GetTopLeft(),
-                  GetRect().GetBottomRight() + (*m_configuration)->GetVisibleRegion().GetTopLeft());
+    rect = wxRect(GetRect().GetTopLeft()     + m_configuration->GetVisibleRegion().GetTopLeft(),
+                  GetRect().GetBottomRight() + m_configuration->GetVisibleRegion().GetTopLeft());
     if(rect.GetTop() < 0)
       rect.SetTop(0);
     if(rect.GetLeft() < 0)
       rect.SetLeft(0);
-    if(rect.GetBottom() > (*m_configuration)->GetVisibleRegion().GetWidth())
-      rect.SetBottom((*m_configuration)->GetVisibleRegion().GetWidth());
-    if(rect.GetRight() > (*m_configuration)->GetVisibleRegion().GetHeight())
-      rect.SetRight((*m_configuration)->GetVisibleRegion().GetHeight());
-    rect = wxRect(rect.GetTopLeft()+(*m_configuration)->GetWorksheetPosition(),rect.GetBottomRight()+(*m_configuration)->GetWorksheetPosition());
+    if(rect.GetBottom() > m_configuration->GetVisibleRegion().GetWidth())
+      rect.SetBottom(m_configuration->GetVisibleRegion().GetWidth());
+    if(rect.GetRight() > m_configuration->GetVisibleRegion().GetHeight())
+      rect.SetRight(m_configuration->GetVisibleRegion().GetHeight());
+    rect = wxRect(rect.GetTopLeft()+m_configuration->GetWorksheetPosition(),rect.GetBottomRight()+m_configuration->GetWorksheetPosition());
     return wxACC_OK;
   }
 

@@ -84,8 +84,7 @@ Worksheet::Worksheet(wxWindow *parent, int id, Worksheet* &observer, wxPoint pos
     ),
   m_cellPointers(this),
   m_dc(this),
-  m_configuration(&m_configurationTopInstance),
-  m_autocomplete(&m_configurationTopInstance),
+  m_autocomplete(&m_configuration),
   m_observer(observer)
 {
   m_dontSkipScrollEvent = false;

@@ -37,7 +37,7 @@
 static constexpr AFontSize INTEGRAL_FONT_SIZE{ 12.0f };
 #endif
 
-IntCell::IntCell(GroupCell *group, Configuration **config,
+IntCell::IntCell(GroupCell *group, Configuration *config,
                  std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&under,
                  std::unique_ptr<Cell> &&over, std::unique_ptr<Cell> &&var)
     : Cell(group, config),
@@ -50,7 +50,7 @@ IntCell::IntCell(GroupCell *group, Configuration **config,
   SetStyle(TS_VARIABLE);
 }
 
-IntCell::IntCell(GroupCell *group, Configuration **config,
+IntCell::IntCell(GroupCell *group, Configuration *config,
                  std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&var)
     : IntCell(group, config, std::move(base),
               std::make_unique<TextCell>(group, config),
@@ -89,7 +89,7 @@ void IntCell::MakeBreakUpCells()
 void IntCell::Recalculate(AFontSize fontsize)
 {
   wxASSERT(fontsize.IsValid());
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   
   m_signHeight = Scale_Px(35 * configuration->GetZoomFactor());
   m_signWidth = Scale_Px(18 * configuration->GetZoomFactor());
@@ -209,7 +209,7 @@ void IntCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point))
   {
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     
     wxDC *dc = configuration->GetDC();
     

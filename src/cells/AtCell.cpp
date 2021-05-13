@@ -29,7 +29,7 @@
 #include "AtCell.h"
 #include "CellImpl.h"
 
-AtCell::AtCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index) :
+AtCell::AtCell(GroupCell *group, Configuration *config, std::unique_ptr<Cell> &&base, std::unique_ptr<Cell> &&index) :
     Cell(group, config),
     m_baseCell(std::move(base)),
     m_indexCell(std::move(index))
@@ -66,7 +66,7 @@ void AtCell::Draw(wxPoint point)
   if (DrawThisCell(point))
   {
     
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxDC *dc = configuration->GetDC();
     wxPoint bs, in;
 

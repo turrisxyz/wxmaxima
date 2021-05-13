@@ -33,7 +33,7 @@
 #include "StringUtils.h"
 #include "wx/config.h"
 
-TextCell::TextCell(GroupCell *group, Configuration **config,
+TextCell::TextCell(GroupCell *group, Configuration *config,
                    const wxString &text, TextStyle style) :
   Cell(group, config)
 {
@@ -320,7 +320,7 @@ AFontSize TextCell::GetScaledTextSize() const
 bool TextCell::NeedsRecalculation(AFontSize fontSize) const
 {
   return Cell::NeedsRecalculation(fontSize) ||
-    (m_keepPercent_last != (*m_configuration)->CheckKeepPercent());
+    (m_keepPercent_last != m_configuration->CheckKeepPercent());
 }
 
 wxSize TextCell::CalculateTextSize(wxDC *const dc, const wxString &text, TextCell::TextIndex const index)
@@ -338,7 +338,7 @@ void TextCell::UpdateDisplayedText()
 {
   m_displayedText = m_text;
 
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   
   m_displayedText.Replace(wxT("\xDCB6"), wxT("\u00A0")); // A non-breakable space
   m_displayedText.Replace(wxT("\n"), wxEmptyString);
@@ -362,10 +362,10 @@ void TextCell::UpdateDisplayedText()
   if ((GetStyle() == TS_DEFAULT) && m_text.StartsWith("\""))
     return;
   
-  if ((GetStyle() == TS_GREEK_CONSTANT) && (*m_configuration)->Latin2Greek())
+  if ((GetStyle() == TS_GREEK_CONSTANT) && m_configuration->Latin2Greek())
     m_displayedText = GetGreekStringUnicode();
 
-  wxString unicodeSym = GetSymbolUnicode((*m_configuration)->CheckKeepPercent());
+  wxString unicodeSym = GetSymbolUnicode(m_configuration->CheckKeepPercent());
   if(!unicodeSym.IsEmpty())
     m_displayedText = unicodeSym;
 
@@ -381,19 +381,19 @@ void TextCell::UpdateDisplayedText()
 
 void TextCell::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   if(m_textStyle == TS_ASCIIMATHS)
     ForceBreakLine(true);
-  if(m_keepPercent_last != (*m_configuration)->CheckKeepPercent())
+  if(m_keepPercent_last != m_configuration->CheckKeepPercent())
     UpdateDisplayedText();
   if(NeedsRecalculation(fontsize))
   {      
     Cell::Recalculate(fontsize);
-    m_keepPercent_last = (*m_configuration)->CheckKeepPercent();
+    m_keepPercent_last = m_configuration->CheckKeepPercent();
     SetFont(m_fontSize_Scaled);
 
 
-    wxSize sz = CalculateTextSize((*m_configuration)->GetDC(), m_displayedText, cellText);
+    wxSize sz = CalculateTextSize(m_configuration->GetDC(), m_displayedText, cellText);
     m_width = sz.GetWidth();
     m_height = sz.GetHeight();
     
@@ -414,7 +414,7 @@ void TextCell::Recalculate(AFontSize fontsize)
 void TextCell::Draw(wxPoint point)
 {
   Cell::Draw(point);
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   if (DrawThisCell(point) &&
       !(IsHidden() || (GetHidableMultSign() && configuration->HidemultiplicationSign())))
   {
@@ -433,15 +433,15 @@ void TextCell::Draw(wxPoint point)
 
 void TextCell::SetFont(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxDC *dc = configuration->GetDC();
   auto style = configuration->GetStyle(m_textStyle, fontsize);
   
   // Mark special variables that are printed as ordinary letters as being special.
-  if ((!(*m_configuration)->CheckKeepPercent()) &&
+  if ((!m_configuration->CheckKeepPercent()) &&
       ((m_text == wxT("%e")) || (m_text == wxT("%i"))))
   {
-    if((*m_configuration)->IsItalic(TS_VARIABLE) != wxFONTSTYLE_NORMAL)
+    if(m_configuration->IsItalic(TS_VARIABLE) != wxFONTSTYLE_NORMAL)
       style.SetItalic(false);
     else
       style.SetItalic(true);
@@ -601,7 +601,7 @@ wxString TextCell::ToTeX() const
 {
   wxString text = ToString();
 
-  if (!(*m_configuration)->CheckKeepPercent())
+  if (!m_configuration->CheckKeepPercent())
   {
     if (text == wxT("%e"))
       text = wxT("e");
@@ -765,7 +765,7 @@ wxString TextCell::ToTeX() const
   text.Replace(wxT("\u2794"), mathModeStart + wxT("\\longrightarrow") + mathModeEnd);
 
   // IsHidden() is set for parenthesis that don't need to be shown
-  if (IsHidden() || (((*m_configuration)->HidemultiplicationSign()) && GetHidableMultSign()))
+  if (IsHidden() || ((m_configuration->HidemultiplicationSign()) && GetHidableMultSign()))
   {
     // Normally in TeX the spacing between variable names following each other directly
     // is chosen to show that this is a multiplication.
@@ -1025,7 +1025,7 @@ wxString TextCell::ToMathML() const
   wxString text = XMLescape(ToString());
 
   // If we didn't display a multiplication dot we want to do the same in MathML.
-  if (IsHidden() || (((*m_configuration)->HidemultiplicationSign()) && GetHidableMultSign()))
+  if (IsHidden() || ((m_configuration->HidemultiplicationSign()) && GetHidableMultSign()))
   {
     text.Replace(wxT("*"), wxT("&#8290;"));
     text.Replace(wxT("\u00B7"), wxT("&#8290;"));
@@ -1046,7 +1046,7 @@ wxString TextCell::ToMathML() const
       // support this currently => Commenting it out.
       // if((GetStyle() == TS_SPECIAL_CONSTANT) && (text == wxT("d")))
       //   text = wxT("&#2146;");
-      bool keepPercent = (*m_configuration)->CheckKeepPercent();
+      bool keepPercent = m_configuration->CheckKeepPercent();
       if (!keepPercent)
       {
         if (text == wxT("%e"))
@@ -1060,7 +1060,7 @@ wxString TextCell::ToMathML() const
     {
       text = GetGreekStringUnicode();
 
-      bool keepPercent = (*m_configuration)->CheckKeepPercent();
+      bool keepPercent = m_configuration->CheckKeepPercent();
 
       if (!keepPercent)
       {
@@ -1111,7 +1111,7 @@ wxString TextCell::ToOMML() const
   wxString text = XMLescape(m_displayedText);
 
   // If we didn't display a multiplication dot we want to do the same in MathML.
-  if (IsHidden() || (((*m_configuration)->HidemultiplicationSign()) && GetHidableMultSign()))
+  if (IsHidden() || ((m_configuration->HidemultiplicationSign()) && GetHidableMultSign()))
   {
     text.Replace(wxT("*"), wxT("&#8290;"));
     text.Replace(wxT("\u00B7"), wxT("&#8290;"));
@@ -1129,7 +1129,7 @@ wxString TextCell::ToOMML() const
       // support this currently => Commenting it out.
       // if((GetStyle() == TS_SPECIAL_CONSTANT) && (text == wxT("d")))
       //   text = wxT("&#2146;");
-      bool keepPercent = (*m_configuration)->CheckKeepPercent();
+      bool keepPercent = m_configuration->CheckKeepPercent();
       if (!keepPercent)
       {
         if (text == wxT("%e"))
@@ -1141,7 +1141,7 @@ wxString TextCell::ToOMML() const
     /* FALLTHRU */
   case TS_VARIABLE:
     {
-      if (!(*m_configuration)->CheckKeepPercent())
+      if (!m_configuration->CheckKeepPercent())
       {
         if (text == wxT("%pi"))
           text = wxT("\u03C0");

@@ -33,7 +33,7 @@
 #include "CellList.h"
 #include "StringUtils.h"
 
-DigitCell::DigitCell(GroupCell *group, Configuration **config, const wxString &text, TextStyle style):
+DigitCell::DigitCell(GroupCell *group, Configuration *config, const wxString &text, TextStyle style):
   TextCell(group,config,text,style)
 {}
 
@@ -47,12 +47,12 @@ DEFINE_CELL(DigitCell)
 
 void DigitCell::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   if(NeedsRecalculation(fontsize))
   {      
     Cell::Recalculate(fontsize);
     SetFont(m_fontSize_Scaled);
-    wxSize sz = CalculateTextSize((*m_configuration)->GetDC(), m_displayedText, cellText);
+    wxSize sz = CalculateTextSize(m_configuration->GetDC(), m_displayedText, cellText);
     m_width = sz.GetWidth();
     m_height = sz.GetHeight();
     m_height += 2 * MC_TEXT_PADDING;
@@ -63,7 +63,7 @@ void DigitCell::Recalculate(AFontSize fontsize)
 void DigitCell::Draw(wxPoint point)
 {
   Cell::Draw(point);
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   if (DrawThisCell(point))
   {
     wxDC *dc = configuration->GetDC();

@@ -31,7 +31,7 @@
 #include "CellImpl.h"
 #include "VisiblyInvalidCell.h"
 
-ParenCell::ParenCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+ParenCell::ParenCell(GroupCell *group, Configuration *config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_open(std::make_unique<TextCell>(group, config, wxT("("))),
     m_innerCell(std::move(inner)),
@@ -81,7 +81,7 @@ void ParenCell::SetFont(AFontSize fontsize)
 {
   wxASSERT(fontsize.IsValid());
 
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   wxDC *dc = configuration->GetDC();
 
   Style style;
@@ -133,7 +133,7 @@ void ParenCell::SetFont(AFontSize fontsize)
 
 void ParenCell::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   
   m_innerCell->RecalculateList(fontsize);
   m_open->RecalculateList(fontsize);
@@ -181,7 +181,7 @@ void ParenCell::Recalculate(AFontSize fontsize)
     }
     else
     {
-      m_signWidth = Scale_Px(6) + (*m_configuration)->GetDefaultLineWidth();
+      m_signWidth = Scale_Px(6) + m_configuration->GetDefaultLineWidth();
       if(m_signWidth < size / 15)
         m_signWidth = size / 15;
     }
@@ -245,7 +245,7 @@ void ParenCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point))
   { 
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxDC *dc = configuration->GetDC();
     wxPoint innerCellPos(point);
 

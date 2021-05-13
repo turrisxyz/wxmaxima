@@ -51,7 +51,7 @@
 // filesystem cannot be passed by const reference as we want to keep the
 // pointer to the file system alive in a background task
 // cppcheck-suppress performance symbolName=filesystem
-SlideShow::SlideShow(GroupCell *group, Configuration **config, std::shared_ptr <wxFileSystem> filesystem, int framerate) :
+SlideShow::SlideShow(GroupCell *group, Configuration *config, std::shared_ptr <wxFileSystem> filesystem, int framerate) :
     Cell(group, config),
     m_timer(m_cellPointers->GetWorksheet(), wxNewId()),
     m_fileSystem(filesystem),
@@ -63,7 +63,7 @@ SlideShow::SlideShow(GroupCell *group, Configuration **config, std::shared_ptr <
   ReloadTimer();
 }
 
-SlideShow::SlideShow(GroupCell *group, Configuration **config, int framerate) :
+SlideShow::SlideShow(GroupCell *group, Configuration *config, int framerate) :
     Cell(group, config),
     m_timer(m_cellPointers->GetWorksheet(), wxNewId()),
     m_framerate(framerate),
@@ -74,14 +74,14 @@ SlideShow::SlideShow(GroupCell *group, Configuration **config, int framerate) :
   ReloadTimer();
 }
 
-SlideShow::SlideShow(GroupCell *group, Configuration **config, const wxMemoryBuffer &image, const wxString &WXUNUSED(type)):
+SlideShow::SlideShow(GroupCell *group, Configuration *config, const wxMemoryBuffer &image, const wxString &WXUNUSED(type)):
     SlideShow(group, config)
 {
   LoadImages(image);
                       
 }
 
-SlideShow::SlideShow(GroupCell *group, Configuration **config, const wxString &image, bool remove):
+SlideShow::SlideShow(GroupCell *group, Configuration *config, const wxString &image, bool remove):
     SlideShow(group, config)
 {
   LoadImages(image);
@@ -107,7 +107,7 @@ int SlideShow::GetFrameRate() const
   else
   {
 
-    framerate = (*m_configuration)->DefaultFramerate();
+    framerate = m_configuration->DefaultFramerate();
   }
   if (framerate > 30)
     framerate = 30;
@@ -297,7 +297,7 @@ void SlideShow::Draw(wxPoint point)
     // will trigger this function and will trigger the animation to be
     // restarted anyway.
     //
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     if(configuration->GetPrinting()) {
         m_images[m_displayed]->Recalculate(configuration->GetZoomFactor() * PRINT_SIZE_MULTIPLIER);
     } else {

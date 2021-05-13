@@ -30,7 +30,7 @@
 #include "MatrCell.h"
 #include "CellImpl.h"
 
-MatrCell::MatrCell(GroupCell *group, Configuration **config) :
+MatrCell::MatrCell(GroupCell *group, Configuration *config) :
     Cell(group, config)
 {
   InitBitFields();
@@ -109,7 +109,7 @@ void MatrCell::Draw(wxPoint point)
   SetBrush();
   if (DrawThisCell(point))
   {
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxDC *dc = configuration->GetDC();
     wxPoint mp;
     mp.x = point.x + Scale_Px(5);

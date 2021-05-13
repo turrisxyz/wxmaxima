@@ -29,7 +29,7 @@
 #include "SetCell.h"
 #include "CellImpl.h"
 
-SetCell::SetCell(GroupCell *parent, Configuration **config, std::unique_ptr<Cell> &&inner) :
+SetCell::SetCell(GroupCell *parent, Configuration *config, std::unique_ptr<Cell> &&inner) :
   ListCell(parent, config, std::move(inner))
 {
   m_open = std::make_unique<TextCell>(parent, config, wxT("{"));
@@ -49,7 +49,7 @@ void SetCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point))
   { 
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxPoint innerCellPos(point);
     
     if(m_drawAsAscii)

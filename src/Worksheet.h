@@ -112,7 +112,7 @@ private:
   //! Is our window currently active?
   bool m_windowActive;
   //! The configuration storage
-  Configuration m_configurationTopInstance;
+  Configuration m_configuration;
   //! The rectangle we need to refresh. -1 as "left" coordinate means: No rectangle
   wxRect m_rectToRefresh;
   /*! The size of a scroll step
@@ -655,12 +655,6 @@ public:
 
   //! Is called if this element looses or gets the focus
   void OnActivate(wxActivateEvent &event);
-  /*! The pointer to the currently active central settings storage
-
-    Whilst printing or exporting the worksheet a settings storage
-    with the print settings might be active.
-   */
-  Configuration *m_configuration;
   //! The storage for the autocompletion feature
   AutoComplete m_autocomplete;
 
@@ -764,7 +758,7 @@ public:
   void CodeCellVisibilityChanged();
 
   //! Re-read the configuration
-  void UpdateConfig() { m_configuration->ReadConfig(); }
+  void UpdateConfig() { m_configuration.ReadConfig(); }
 
   //! The thread the help file anchors are compiled in
   std::unique_ptr<std::thread> m_helpfileanchorsThread;
@@ -1637,7 +1631,7 @@ protected:
 };
 
 inline Worksheet *Cell::GetWorksheet() const
-{ return static_cast<Worksheet*>((*m_configuration)->GetWorkSheet()); }
+{ return static_cast<Worksheet*>(m_configuration->GetWorkSheet()); }
 
 inline void Configuration::SetWorkSheet(wxWindow *workSheet)
 { m_workSheet = dynamic_cast<Worksheet*>(workSheet); }

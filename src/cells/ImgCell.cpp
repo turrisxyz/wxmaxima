@@ -42,7 +42,7 @@
 #include <wx/clipbrd.h>
 #include <wx/mstream.h>
 
-ImgCell::ImgCell(GroupCell *group, Configuration **config) :
+ImgCell::ImgCell(GroupCell *group, Configuration *config) :
     Cell(group, config),
     m_imageBorderWidth(1)
 {
@@ -50,7 +50,7 @@ ImgCell::ImgCell(GroupCell *group, Configuration **config) :
   m_type = MC_TYPE_IMAGE;
 }
 
-ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxMemoryBuffer &image, const wxString &type) :
+ImgCell::ImgCell(GroupCell *group, Configuration *config, const wxMemoryBuffer &image, const wxString &type) :
     Cell(group, config),
     m_image(new Image(m_configuration, image, type)),
     m_imageBorderWidth(1)
@@ -59,7 +59,7 @@ ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxMemoryBuffer 
   m_type = MC_TYPE_IMAGE;
 }
 
-ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxBitmap &bitmap) :
+ImgCell::ImgCell(GroupCell *group, Configuration *config, const wxBitmap &bitmap) :
     Cell(group, config),
     m_image(new Image(m_configuration, bitmap)),
     m_imageBorderWidth(1)
@@ -71,7 +71,7 @@ ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxBitmap &bitma
 int ImgCell::s_counter = 0;
 
 // constructor which load image
-ImgCell::ImgCell(GroupCell *group, Configuration **config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove)
+ImgCell::ImgCell(GroupCell *group, Configuration *config, const wxString &image, std::shared_ptr<wxFileSystem> filesystem, bool remove)
   : Cell(group, config),
     m_imageBorderWidth(1)
 {
@@ -136,7 +136,7 @@ const wxString &ImgCell::GetToolTip(const wxPoint point) const
 
 void ImgCell::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   if (m_image)
   {
     // Here we recalculate the height, as well:
@@ -169,7 +169,7 @@ void ImgCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point) && (m_image != NULL))
   {
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
 
     if (!InUpdateRegion()) return;
     

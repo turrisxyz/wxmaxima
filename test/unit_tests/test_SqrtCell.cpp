@@ -53,7 +53,7 @@ SCENARIO("SqrtCell recalculates") {
   configuration.SetZoomFactor(1.0);
 
   Configuration *pConfig = &configuration;
-  Configuration **config = &pConfig;
+  Configuration *config = &pConfig;
   GroupCell group(config, GC_TYPE_TEXT);
 
   GIVEN("a SqrtCell") {

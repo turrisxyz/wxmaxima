@@ -31,7 +31,7 @@
 
 #define SIGN_FONT_SCALE 2.0
 
-SqrtCell::SqrtCell(GroupCell *group, Configuration **config, std::unique_ptr<Cell> &&inner) :
+SqrtCell::SqrtCell(GroupCell *group, Configuration *config, std::unique_ptr<Cell> &&inner) :
     Cell(group, config),
     m_innerCell(std::move(inner))
 {
@@ -65,7 +65,7 @@ void SqrtCell::MakeBreakUpCells()
 
 void SqrtCell::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = (*m_configuration);
+  Configuration *configuration = m_configuration;
   m_innerCell->RecalculateList(fontsize);
 
   if (configuration->CheckTeXFonts())
@@ -147,7 +147,7 @@ void SqrtCell::Draw(wxPoint point)
   Cell::Draw(point);
   if (DrawThisCell(point))
   {
-    Configuration *configuration = (*m_configuration);
+    Configuration *configuration = m_configuration;
     wxDC *dc = configuration->GetDC();
 
     wxPoint in(point);
