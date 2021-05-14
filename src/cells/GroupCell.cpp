@@ -423,7 +423,7 @@ void GroupCell::UpdateConfusableCharWarnings()
 
   if (GetEditable())
     for (auto const &tok : MaximaTokenizer(
-           output, *m_configuration, GetEditable()->GetTokens()).PopTokens())
+           output, m_configuration, GetEditable()->GetTokens()).PopTokens())
       if((tok.GetStyle() == TS_CODE_VARIABLE) || (tok.GetStyle() == TS_CODE_FUNCTION))
         cmdsAndVariables[tok.GetText()] = 1;
   

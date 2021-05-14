@@ -111,8 +111,6 @@ private:
   bool m_scrollToTopOfCell;
   //! Is our window currently active?
   bool m_windowActive;
-  //! The configuration storage
-  Configuration m_configuration;
   //! The rectangle we need to refresh. -1 as "left" coordinate means: No rectangle
   wxRect m_rectToRefresh;
   /*! The size of a scroll step
@@ -609,6 +607,8 @@ private:
   AutocompletePopup *m_autocompletePopup;
 
 public:
+  //! The configuration storage
+  Configuration m_configuration;
   wxString GetMaximaHelpFile();
   //! A helper function for GetHelpFile()
   void SetMaximaVersion(wxString version){m_maximaVersion = version;}

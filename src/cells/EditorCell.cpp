@@ -506,7 +506,7 @@ wxString EditorCell::ToTeX() const
     text.Replace(wxT("\u2192"), wxT("\\ensuremath{\\rightarrow}"));
     text.Replace(wxT("\u27F6"), wxT("\\ensuremath{\\longrightarrow}"));
     // Now we might want to introduce some markdown:
-    MarkDownTeX MarkDownm_configuration;
+    MarkDownTeX MarkDown(m_configuration);
     if(m_type != MC_TYPE_INPUT)
       text = MarkDown.MarkDown(text);
     else
@@ -3427,7 +3427,7 @@ void EditorCell::StyleTextCode()
   }
 
   // Split the line into commands, numbers etc.
-  m_tokens = MaximaTokenizer(textToStyle, *m_configuration).PopTokens();
+  m_tokens = MaximaTokenizer(textToStyle, m_configuration).PopTokens();
 
   // Now handle the text pieces one by one
   wxString lastTokenWithText;

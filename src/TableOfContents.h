@@ -57,7 +57,7 @@ public:
     popid_ToggleTOCshowsSectionNumbers
   };
 
-  TableOfContents(wxWindow *parent, int id, Configuration **config);
+  TableOfContents(wxWindow *parent, int id, Configuration *config);
 
   /* The destructor
    */
@@ -99,7 +99,7 @@ private:
   RegexCtrl *m_regex;
   //! The items we displayed the last time update() was called
   wxArrayString m_items_old;
-  Configuration **m_configuration;
+  Configuration *m_configuration;
 
   std::vector<GroupCell *> m_structure;
 };

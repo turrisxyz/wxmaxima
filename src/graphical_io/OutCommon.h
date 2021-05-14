@@ -67,9 +67,9 @@ public:
    * \param filename The name of the output file
    * \param scale The scaling factor of the output document
    */
-  explicit OutCommon(Configuration **configuration, const wxString &filename,
+  explicit OutCommon(Configuration *configuration, const wxString &filename,
                      int fullWidth, double scale);
-  explicit OutCommon(Configuration **configuration, int fullWidth, double scale);
+  explicit OutCommon(Configuration *configuration, int fullWidth, double scale);
   ~OutCommon();
 
   OutCommon(const OutCommon&) = delete;
@@ -118,8 +118,8 @@ private:
   wxDC *m_recalculationDc = {};
 
   wxString m_filename;
-  Configuration **m_configuration;
-  Configuration *m_oldconfig = *m_configuration;
+  Configuration *m_configuration;
+  Configuration *m_oldconfig = m_configuration;
   Configuration m_thisconfig{ {}, Configuration::temporary };
   //! How many times the natural resolution do we want this output to be?
   double m_scale = 1.0;

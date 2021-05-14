@@ -30,7 +30,7 @@
 
 #include <wx/sizer.h>
 
-TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) : wxPanel(parent, id)
+TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration *config) : wxPanel(parent, id)
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -128,7 +128,7 @@ void TableOfContents::UpdateDisplay()
     // the list more readable.
     wxString curr;
 
-    if ((*m_configuration)->TocShowsSectionNumbers())
+    if (m_configuration->TocShowsSectionNumbers())
     {
       if(m_structure[i]->GetPrompt() != NULL)
         curr = m_structure[i]->GetPrompt() -> ToString() + wxT(" ");
@@ -200,7 +200,7 @@ GroupCell *TableOfContents::GetCell(int index)
   {
     wxString curr;
     
-    if ((*m_configuration)->TocShowsSectionNumbers())
+    if (m_configuration->TocShowsSectionNumbers())
     {
       if(m_structure[i]->GetPrompt() != NULL)
         curr = m_structure[i]->GetPrompt()->ToString() + wxT(" ");
@@ -275,7 +275,7 @@ void TableOfContents::OnMouseRightDown(wxListEvent &event)
     popupMenu->AppendSeparator();
   popupMenu->AppendCheckItem(popid_ToggleTOCshowsSectionNumbers, _("Show section numbers"));
   popupMenu->Check(popid_ToggleTOCshowsSectionNumbers,
-                   (*m_configuration)->TocShowsSectionNumbers());
+                   m_configuration->TocShowsSectionNumbers());
 
   // create menu if we have any items
   if (popupMenu->GetMenuItemCount() > 0)

@@ -122,12 +122,12 @@ Worksheet::Worksheet(wxWindow *parent, int id, Worksheet* &observer, wxPoint pos
   m_recalculateStart = NULL;
   m_mouseMotionWas = false;
   m_rectToRefresh = wxRect(-1,-1,-1,-1);
-  m_configuration->SetContext(m_dc);
-  m_configuration->SetWorkSheet(this);
-  m_configuration->ReadConfig();
-  SetBackgroundColour(m_configuration->DefaultBackgroundColor());
-  m_configuration->SetBackgroundBrush(
-    *(wxTheBrushList->FindOrCreateBrush(m_configuration->DefaultBackgroundColor(),
+  m_configuration.SetContext(m_dc);
+  m_configuration.SetWorkSheet(this);
+  m_configuration.ReadConfig();
+  SetBackgroundColour(m_configuration.DefaultBackgroundColor());
+  m_configuration.SetBackgroundBrush(
+    *(wxTheBrushList->FindOrCreateBrush(m_configuration.DefaultBackgroundColor(),
                                         wxBRUSHSTYLE_SOLID)));  
   m_redrawStart = NULL;
   m_redrawRequested = false;
@@ -265,7 +265,7 @@ bool Worksheet::RedrawIfRequested()
         }
       }
 
-      if ((m_configuration->HideBrackets()) && (oldGroupCellUnderPointer != m_cellPointers.m_groupCellUnderPointer))
+      if ((m_configuration.HideBrackets()) && (oldGroupCellUnderPointer != m_cellPointers.m_groupCellUnderPointer))
       {
         if (oldGroupCellUnderPointer)
         {
@@ -273,7 +273,7 @@ bool Worksheet::RedrawIfRequested()
             wxRect(
               0,
               oldGroupCellUnderPointer->GetRect().GetTop(),
-              m_configuration->GetIndent() - 1,
+              m_configuration.GetIndent() - 1,
               oldGroupCellUnderPointer->GetRect().GetBottom()
               )
             );
@@ -284,7 +284,7 @@ bool Worksheet::RedrawIfRequested()
             wxRect(
               0,
               m_cellPointers.m_groupCellUnderPointer->GetRect().GetTop(),
-              m_configuration->GetIndent() -1,
+              m_configuration.GetIndent() -1,
               m_cellPointers.m_groupCellUnderPointer->GetRect().GetBottom()
               )
             );
@@ -399,7 +399,6 @@ Worksheet::~Worksheet()
   m_mainToolBar = NULL;
 
   ClearDocument();
-  m_configuration = NULL;
   m_observer = nullptr;
   if((m_helpfileanchorsThread) && (m_helpfileanchorsThread->joinable()))
     m_helpfileanchorsThread->join();
@@ -435,9 +434,9 @@ Worksheet::~Worksheet()
 
 void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
 {
-  m_configuration->ClearAndEnableRedrawTracing();
-  m_configuration->SetBackgroundBrush(
-    *(wxTheBrushList->FindOrCreateBrush(m_configuration->DefaultBackgroundColor(),
+  m_configuration.ClearAndEnableRedrawTracing();
+  m_configuration.SetBackgroundBrush(
+    *(wxTheBrushList->FindOrCreateBrush(m_configuration.DefaultBackgroundColor(),
                                         wxBRUSHSTYLE_SOLID)));
   wxAutoBufferedPaintDC dc(this);
   if(!dc.IsOk())
@@ -454,7 +453,7 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   #endif
   // Don't attempt to refresh the screen while we are trying to output the
   // worksheet on paper, on a bitmap or similar.
-  if ((!m_configuration->ClipToDrawRegion()) || (m_configuration->GetPrinting()))
+  if ((!m_configuration.ClipToDrawRegion()) || (m_configuration.GetPrinting()))
   {
     wxLogMessage(_("Suppressing a redraw during printing/export"));
     RequestRedraw();
@@ -480,14 +479,14 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   updateRegion.SetRight(xend);
   updateRegion.SetTop(top);
   updateRegion.SetBottom(bottom);
-  m_configuration->SetUpdateRegion(updateRegion);
+  m_configuration.SetUpdateRegion(updateRegion);
 
   // Don't draw into a window of the size 0.
   if ((sz.x < 1) || (sz.y < 1))
     return;
   
 #ifdef WORKING_AUTO_BUFFER
-  m_configuration->SetContext(dc);
+  m_configuration.SetContext(dc);
 
   // We might be triggered after someone changed the worksheet and before the idle
   // loop caused it to be recalculated => Ensure all sizes and positions to be known
@@ -511,18 +510,18 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   #endif
   if(!m_memory.IsOk())
   {
-    m_configuration->SetContext(m_dc);
+    m_configuration.SetContext(m_dc);
     return;
   }
   dcm.SetUserScale(wxWindow::GetContentScaleFactor(),wxWindow::GetContentScaleFactor());
   dcm.SelectObject(m_memory);
   if(!dcm.IsOk())
   {
-    m_configuration->SetContext(m_dc);
+    m_configuration.SetContext(m_dc);
     return;
   }
   DoPrepareDC(dcm);
-  m_configuration->SetContext(dcm);
+  m_configuration.SetContext(dcm);
   // Create a graphics context that supports antialiasing, but on MSW
   // only supports fonts that come in the Right Format.
   wxGCDC antiAliassingDC(dcm);
@@ -533,25 +532,25 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
 #ifdef ANTIALIASSING_DC_NOT_CORRECTLY_SCROLLED
     PrepareDC(antiAliassingDC);
 #endif    
-    m_configuration->SetAntialiassingDC(antiAliassingDC);
+    m_configuration.SetAntialiassingDC(antiAliassingDC);
   }
   
 
-  SetBackgroundColour(m_configuration->DefaultBackgroundColor());
+  SetBackgroundColour(m_configuration.DefaultBackgroundColor());
 
   // Don't fill the text background with the background color
-  m_configuration->GetDC()->SetMapMode(wxMM_TEXT);
-  m_configuration->GetDC()->SetBackgroundMode(wxTRANSPARENT);
-  m_configuration->GetDC()->SetBackground(m_configuration->GetBackgroundBrush());
-  m_configuration->GetDC()->SetBrush(m_configuration->GetBackgroundBrush());
-  m_configuration->GetDC()->SetPen(*wxTRANSPARENT_PEN);
-  m_configuration->GetDC()->SetLogicalFunction(wxCOPY);
+  m_configuration.GetDC()->SetMapMode(wxMM_TEXT);
+  m_configuration.GetDC()->SetBackgroundMode(wxTRANSPARENT);
+  m_configuration.GetDC()->SetBackground(m_configuration.GetBackgroundBrush());
+  m_configuration.GetDC()->SetBrush(m_configuration.GetBackgroundBrush());
+  m_configuration.GetDC()->SetPen(*wxTRANSPARENT_PEN);
+  m_configuration.GetDC()->SetLogicalFunction(wxCOPY);
 
   // Clear the drawing area
 #if WORKING_DC_CLEAR
-  m_configuration->GetDC()->Clear();
+  m_configuration.GetDC()->Clear();
 #else
-  m_configuration->GetDC()->DrawRectangle(updateRegion);
+  m_configuration.GetDC()->DrawRectangle(updateRegion);
 #endif
 
   //
@@ -563,38 +562,38 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
       (m_hasFocus) &&
       (m_hCaretPosition != NULL))
   {
-    m_configuration->GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration->GetColor(TS_CURSOR), 1, wxPENSTYLE_SOLID)));
-    m_configuration->GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration->GetColor(TS_CURSOR), wxBRUSHSTYLE_SOLID)));
+    m_configuration.GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration.GetColor(TS_CURSOR), 1, wxPENSTYLE_SOLID)));
+    m_configuration.GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration.GetColor(TS_CURSOR), wxBRUSHSTYLE_SOLID)));
     
     wxRect currentGCRect = m_hCaretPosition->GetRect();
-    int caretY = ((int) m_configuration->GetGroupSkip()) / 2 + currentGCRect.GetBottom() + 1;
-    m_configuration->GetDC()->DrawRectangle(xstart + m_configuration->GetBaseIndent(),
-                     caretY - m_configuration->GetCursorWidth() / 2,
-                     MC_HCARET_WIDTH, m_configuration->GetCursorWidth());
+    int caretY = ((int) m_configuration.GetGroupSkip()) / 2 + currentGCRect.GetBottom() + 1;
+    m_configuration.GetDC()->DrawRectangle(xstart + m_configuration.GetBaseIndent(),
+                     caretY - m_configuration.GetCursorWidth() / 2,
+                     MC_HCARET_WIDTH, m_configuration.GetCursorWidth());
   }
   
   if ((m_hCaretActive) && (m_hCaretPositionStart == NULL) && (m_hasFocus) && (m_hCaretPosition == NULL))
   {
     if (!m_hCaretBlinkVisible)
     {
-      m_configuration->GetDC()->SetBrush(m_configuration->GetBackgroundBrush());
-      m_configuration->GetDC()->SetPen(*wxThePenList->FindOrCreatePen(GetBackgroundColour(), m_configuration->Scale_Px(1)));
+      m_configuration.GetDC()->SetBrush(m_configuration.GetBackgroundBrush());
+      m_configuration.GetDC()->SetPen(*wxThePenList->FindOrCreatePen(GetBackgroundColour(), m_configuration.Scale_Px(1)));
     }
     else
     {
-      m_configuration->GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration->GetColor(TS_CURSOR), m_configuration->Scale_Px(1), wxPENSTYLE_SOLID)));
-      m_configuration->GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration->GetColor(TS_CURSOR), wxBRUSHSTYLE_SOLID)));
+      m_configuration.GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration.GetColor(TS_CURSOR), m_configuration.Scale_Px(1), wxPENSTYLE_SOLID)));
+      m_configuration.GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration.GetColor(TS_CURSOR), wxBRUSHSTYLE_SOLID)));
     }
     
-    wxRect cursor = wxRect(xstart + m_configuration->GetCellBracketWidth(),
-                           (m_configuration->GetBaseIndent() - m_configuration->GetCursorWidth()) / 2,
-                           MC_HCARET_WIDTH, m_configuration->GetCursorWidth());
-    m_configuration->GetDC()->DrawRectangle(cursor);
+    wxRect cursor = wxRect(xstart + m_configuration.GetCellBracketWidth(),
+                           (m_configuration.GetBaseIndent() - m_configuration.GetCursorWidth()) / 2,
+                           MC_HCARET_WIDTH, m_configuration.GetCursorWidth());
+    m_configuration.GetDC()->DrawRectangle(cursor);
   }
   
   if (GetTree() == NULL)
   {
-    m_configuration->SetContext(m_dc);
+    m_configuration.SetContext(m_dc);
     return;
   }
   
@@ -603,8 +602,8 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   //
   if (HasCellsSelected() && m_cellPointers.m_selectionStart->GetType() != MC_TYPE_GROUP)
   {
-    m_configuration->GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration->GetColor(TS_SELECTION), 1, wxPENSTYLE_SOLID)));
-    m_configuration->GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration->GetColor(TS_SELECTION))));
+    m_configuration.GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration.GetColor(TS_SELECTION), 1, wxPENSTYLE_SOLID)));
+    m_configuration.GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration.GetColor(TS_SELECTION))));
     
     // Draw the marker that tells us which output cells are selected -
     // if output cells are selected, that is.
@@ -621,12 +620,12 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   // Draw the cell contents
   //
   wxPoint point;
-  point.x = m_configuration->GetIndent();
-  point.y = m_configuration->GetBaseIndent() + GetTree()->GetCenterList();
+  point.x = m_configuration.GetIndent();
+  point.y = m_configuration.GetBaseIndent() + GetTree()->GetCenterList();
 
   // Draw tree
-  m_configuration->GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration->GetColor(TS_DEFAULT), 1, wxPENSTYLE_SOLID)));
-  m_configuration->GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration->GetColor(TS_DEFAULT))));
+  m_configuration.GetDC()->SetPen(*(wxThePenList->FindOrCreatePen(m_configuration.GetColor(TS_DEFAULT), 1, wxPENSTYLE_SOLID)));
+  m_configuration.GetDC()->SetBrush(*(wxTheBrushList->FindOrCreateBrush(m_configuration.GetColor(TS_DEFAULT))));
   
   bool atStart = true;
   for (auto &tmp : OnList(GetTree()))
@@ -647,9 +646,9 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
     wxPoint upperLeftScreenCorner;
     CalcScrolledPosition(0, 0,
                          &upperLeftScreenCorner.x, &upperLeftScreenCorner.y);
-    m_configuration->SetVisibleRegion(wxRect(upperLeftScreenCorner,
+    m_configuration.SetVisibleRegion(wxRect(upperLeftScreenCorner,
                                              upperLeftScreenCorner + wxPoint(width,height)));
-    m_configuration->SetWorksheetPosition(GetPosition());
+    m_configuration.SetWorksheetPosition(GetPosition());
     // Clear the image cache of all cells above or below the viewport.
     if (cellRect.GetTop() >= bottom || cellRect.GetBottom() <= top)
     {
@@ -679,12 +678,12 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
           0, rect.GetTop());
   #endif
   
-  m_configuration->SetContext(m_dc);
-  m_configuration->UnsetAntialiassingDC();
+  m_configuration.SetContext(m_dc);
+  m_configuration.UnsetAntialiassingDC();
   m_lastTop = top;
   m_lastBottom = bottom;
 
-  m_configuration->ReportMultipleRedraws();
+  m_configuration.ReportMultipleRedraws();
 }
 
 GroupCell *Worksheet::InsertGroupCells(std::unique_ptr<GroupCell> &&cells, GroupCell *where)
@@ -705,7 +704,7 @@ GroupCell *Worksheet::InsertGroupCells(std::unique_ptr<GroupCell> &&cells, Group
   if (where && where->GetNext())
     worksheetSizeHasChanged = false;
 
-  m_configuration->AdjustWorksheetSize(true);
+  m_configuration.AdjustWorksheetSize(true);
   bool renumbersections = false; // only renumber when true
 
   // TODO What we have here is an iteration through all the cells to see if they
@@ -779,7 +778,7 @@ GroupCell *Worksheet::UpdateMLast()
   if (m_last)
     m_last = m_last->last();
   if (m_last)
-    m_configuration->AdjustWorksheetSize(true);
+    m_configuration.AdjustWorksheetSize(true);
   return m_last;
 }
 
@@ -881,18 +880,18 @@ void Worksheet::SetZoomFactor(double newzoom, bool recalc)
   // Restrict zoom factors to tenths
   newzoom = round (newzoom * 10) / 10.0;
 
-  if(newzoom < m_configuration->GetMinZoomFactor())
-    newzoom = m_configuration->GetMinZoomFactor();
-  if(newzoom > m_configuration->GetMaxZoomFactor())
-    newzoom = m_configuration->GetMaxZoomFactor();
+  if(newzoom < m_configuration.GetMinZoomFactor())
+    newzoom = m_configuration.GetMinZoomFactor();
+  if(newzoom > m_configuration.GetMaxZoomFactor())
+    newzoom = m_configuration.GetMaxZoomFactor();
 
   // If the zoom factor hasn't changed return. We don't test for equality with zero
   // since in this case that might probably work. But testing floats for equality
   // is a bad habit.
-  if(fabs(m_configuration->GetZoomFactor() - newzoom) < .00005)
+  if(fabs(m_configuration.GetZoomFactor() - newzoom) < .00005)
     return;
 
-  m_configuration->SetZoomFactor(newzoom);
+  m_configuration.SetZoomFactor(newzoom);
   // Determine if we have a sane thing we can scroll to.
   Cell *cellToScrollTo = NULL;
   if (CaretVisibleIs())
@@ -924,17 +923,17 @@ void Worksheet::SetZoomFactor(double newzoom, bool recalc)
 
 bool Worksheet::RecalculateIfNeeded()
 {
-  if(m_configuration->GetClientWidth()<1)
+  if(m_configuration.GetClientWidth()<1)
     return(false);
 
   if (!m_recalculateStart || !GetTree())
   {
     m_recalculateStart = {};
-    m_configuration->AdjustWorksheetSize(false);
-    if(m_configuration->AdjustWorksheetSize())
+    m_configuration.AdjustWorksheetSize(false);
+    if(m_configuration.AdjustWorksheetSize())
     {
       AdjustSize();
-      m_configuration->AdjustWorksheetSize(false);
+      m_configuration.AdjustWorksheetSize(false);
     }
     return false;
   }
@@ -949,9 +948,9 @@ bool Worksheet::RecalculateIfNeeded()
   wxPoint upperLeftScreenCorner;
   CalcScrolledPosition(0, 0,
                        &upperLeftScreenCorner.x, &upperLeftScreenCorner.y);
-  m_configuration->SetVisibleRegion(wxRect(upperLeftScreenCorner,
+  m_configuration.SetVisibleRegion(wxRect(upperLeftScreenCorner,
                                            upperLeftScreenCorner + wxPoint(width,height)));
-  m_configuration->SetWorksheetPosition(GetPosition());
+  m_configuration.SetWorksheetPosition(GetPosition());
 
   for (auto &tmp : OnList(m_recalculateStart))
   {
@@ -959,9 +958,9 @@ bool Worksheet::RecalculateIfNeeded()
   }
   
   m_recalculateStart = {};
-  if(m_configuration->AdjustWorksheetSize())
+  if(m_configuration.AdjustWorksheetSize())
     AdjustSize();
-  m_configuration->AdjustWorksheetSize(false);
+  m_configuration.AdjustWorksheetSize(false);
 
 
   return true;
@@ -1008,7 +1007,7 @@ void Worksheet::Recalculate(Cell *start)
 void Worksheet::OnSize(wxSizeEvent& WXUNUSED(event))
 {
   // Inform all cells how wide our display is now
-  m_configuration->SetCanvasSize(GetClientSize());
+  m_configuration.SetCanvasSize(GetClientSize());
 
   // Determine if we have a sane thing we can scroll to.
   Cell *CellToScrollTo = {};
@@ -1044,16 +1043,16 @@ void Worksheet::OnSize(wxSizeEvent& WXUNUSED(event))
     tmp.OnSize();
 
     if (!prev)
-      tmp.SetCurrentPoint(m_configuration->GetIndent(),
-                          m_configuration->GetBaseIndent() + tmp.GetCenterList());
+      tmp.SetCurrentPoint(m_configuration.GetIndent(),
+                          m_configuration.GetBaseIndent() + tmp.GetCenterList());
     else
-      tmp.SetCurrentPoint(m_configuration->GetIndent(),
+      tmp.SetCurrentPoint(m_configuration.GetIndent(),
                           prev->GetCurrentPoint().y + prev->GetMaxDrop() + tmp.GetCenterList() +
-                            m_configuration->GetGroupSkip());
+                            m_configuration.GetGroupSkip());
     prev = &tmp;
   }
 
-  m_configuration->AdjustWorksheetSize(true);
+  m_configuration.AdjustWorksheetSize(true);
   RequestRedraw();
   if (CellToScrollTo)
     ScheduleScrollToCell(CellToScrollTo, false);
@@ -1265,7 +1264,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
     // SELECTION OF GROUPCELLS
     if (m_cellPointers.m_selectionStart->GetType() == MC_TYPE_GROUP)
     { //a selection of groups
-      if (downx <= m_configuration->GetCellBracketWidth() + 3)
+      if (downx <= m_configuration.GetCellBracketWidth() + 3)
       {
         wxRect rectStart = m_cellPointers.m_selectionStart->GetRect();
         wxRect rectEnd = m_cellPointers.m_selectionEnd->GetRect();
@@ -1440,7 +1439,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
           popupMenu.Check(popid_auto_answer, group->AutoAnswer());
           popupMenu.AppendCheckItem(popid_never_autoanswer, _("Never offer known answers"),
                                     _("wxMaxma remembers answers from the last run and is able to offer them as the default answer"));
-          popupMenu.Check(popid_never_autoanswer, !m_configuration->OfferKnownAnswers());
+          popupMenu.Check(popid_never_autoanswer, !m_configuration.OfferKnownAnswers());
         }
         if (group->GetGroupType() == GC_TYPE_IMAGE)
         {
@@ -1500,7 +1499,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
             popid_special_constant_percent, _("Show \"%\" in special constants"),
             wxEmptyString);
           popupMenu.Check(popid_special_constant_percent,
-                          m_configuration->CheckKeepPercent());
+                          m_configuration.CheckKeepPercent());
         }
         if(
           (GetSelectionStart() != NULL) &&
@@ -1514,12 +1513,12 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
             popid_hideasterisk, _("Hide multiplication dots"),
             wxEmptyString);
           popupMenu.Check(popid_hideasterisk,
-                          m_configuration->HidemultiplicationSign());
+                          m_configuration.HidemultiplicationSign());
           popupMenu.AppendCheckItem(
             popid_changeasterisk, _("Show * as multiplication dot"),
             wxEmptyString);
           popupMenu.Check(popid_changeasterisk,
-                          m_configuration->GetChangeAsterisk());
+                          m_configuration.GetChangeAsterisk());
         }
         if (
           (GetSelectionStart() != NULL) &&
@@ -1575,13 +1574,13 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
         popupMenu.AppendRadioItem(popid_labels_useronly, _("User labels only"));
         popupMenu.AppendRadioItem(popid_labels_disable, _("Don't show labels"));
         popupMenu.Check(popid_labels_autogenerated,
-                         m_configuration->GetLabelChoice() == Configuration::labels_automatic);
+                         m_configuration.GetLabelChoice() == Configuration::labels_automatic);
         popupMenu.Check(popid_labels_user,
-                         m_configuration->GetLabelChoice() == Configuration::labels_prefer_user);
+                         m_configuration.GetLabelChoice() == Configuration::labels_prefer_user);
         popupMenu.Check(popid_labels_useronly,
-                         m_configuration->GetLabelChoice() == Configuration::labels_useronly);
+                         m_configuration.GetLabelChoice() == Configuration::labels_useronly);
         popupMenu.Check(popid_labels_disable,
-                         m_configuration->GetLabelChoice() == Configuration::labels_none);
+                         m_configuration.GetLabelChoice() == Configuration::labels_none);
         wxMenu *labelWidthMenu = new wxMenu();
         labelWidthMenu->AppendRadioItem(popid_labelwidth3, wxT("3 em"));
         labelWidthMenu->AppendRadioItem(popid_labelwidth4, wxT("4 em"));
@@ -1591,7 +1590,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
         labelWidthMenu->AppendRadioItem(popid_labelwidth8, wxT("8 em"));
         labelWidthMenu->AppendRadioItem(popid_labelwidth9, wxT("9 em"));
         labelWidthMenu->AppendRadioItem(popid_labelwidth10, wxT("10 em"));
-        labelWidthMenu->Check(popid_labelwidth3 + m_configuration->LabelWidth() - 3, true);
+        labelWidthMenu->Check(popid_labelwidth3 + m_configuration.LabelWidth() - 3, true);
         popupMenu.Append(popid_labelwidth, _("Label width"), labelWidthMenu);
       }
     }
@@ -1747,7 +1746,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
             popupMenu.Check(popid_auto_answer, group->AutoAnswer());
             popupMenu.AppendCheckItem(popid_never_autoanswer, _("Never offer known answers"),
                                       _("wxMaxma remembers answers from the last run and is able to offer them as the default answer"));
-            popupMenu.Check(popid_never_autoanswer, !m_configuration->OfferKnownAnswers());
+            popupMenu.Check(popid_never_autoanswer, !m_configuration.OfferKnownAnswers());
           }
           break;
       case GC_TYPE_TITLE:
@@ -1833,7 +1832,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
                                   _("Hide yellow tooltip marker for this message type"),
                                   _("Don't mark this message text in yellow"));
         popupMenu.Check(popid_hide_tooltipMarkerForThisMessage,
-                        m_configuration->HideMarkerForThisMessage(toolTip));
+                        m_configuration.HideMarkerForThisMessage(toolTip));
       }
     } 
   }
@@ -1856,7 +1855,7 @@ void Worksheet::OnMouseRightDown(wxMouseEvent &event)
                                 _("Hide yellow tooltip marker for this message type"),
                                 _("Don't mark this message text in yellow"));
       popupMenu.Check(popid_hide_tooltipMarkerForThisMessage,
-                      m_configuration->HideMarkerForThisMessage(toolTip));
+                      m_configuration.HideMarkerForThisMessage(toolTip));
     }
   }
   // create menu if we have any items
@@ -1928,7 +1927,7 @@ void Worksheet::OnMouseLeftInGcCell(wxMouseEvent &WXUNUSED(event), GroupCell *cl
     wxRect rect = editor->GetRect();
     if (
       (m_down.y >= rect.GetTop() && m_down.y <= rect.GetBottom()) &&
-      (m_configuration->ShowCodeCells() ||
+      (m_configuration.ShowCodeCells() ||
        editor->GetType() != MC_TYPE_INPUT || !clickedInGC->GetOutput())
       )
     {
@@ -1970,7 +1969,7 @@ void Worksheet::OnMouseLeftInGc(wxMouseEvent &event, GroupCell *clickedInGC)
   // evaluation any more.
   ScrolledAwayFromEvaluation(true);
 
-  if (m_down.x <= m_configuration->GetIndent())
+  if (m_down.x <= m_configuration.GetIndent())
     OnMouseLeftInGcLeft(event, clickedInGC);
   else
     OnMouseLeftInGcCell(event, clickedInGC);
@@ -2302,8 +2301,8 @@ void Worksheet::ClickNDrag(wxPoint down, wxPoint up)
 
   if((m_cellPointers.m_cellMouseSelectionStartedIn)
      && (!m_cellPointers.m_cellMouseSelectionStartedIn->GetRect().Inflate(
-           m_configuration->GetGroupSkip(),
-           m_configuration->GetGroupSkip()).Contains(up)))
+           m_configuration.GetGroupSkip(),
+           m_configuration.GetGroupSkip()).Contains(up)))
   {
     SelectGroupCells(up,down);
     if (GetActiveCell())
@@ -2445,7 +2444,7 @@ bool Worksheet::Copy(bool astext)
 
     std::unique_ptr<Cell> tmp(CopySelection());
 
-    if(m_configuration->CopyMathML())
+    if(m_configuration.CopyMathML())
     {
       // Add a mathML representation of the data to the clipboard
       s = ConvertSelectionToMathML();
@@ -2456,7 +2455,7 @@ bool Worksheet::Copy(bool astext)
         // makes much sense.
         data->Add(new MathMLDataObject(s), true);
         data->Add(new MathMLDataObject2(s), true);
-        if(m_configuration->CopyMathMLHTML())
+        if(m_configuration.CopyMathMLHTML())
           data->Add(new wxHTMLDataObject(s), true);
         // wxMathML is a HTML5 flavour, as well.
         // See https://github.com/fred-wang/Mathzilla/blob/master/mathml-copy/lib/copy-mathml.js#L21
@@ -2468,7 +2467,7 @@ bool Worksheet::Copy(bool astext)
       }
     }
 
-    if(m_configuration->CopyRTF())
+    if(m_configuration.CopyRTF())
     {
       // Add a RTF representation of the currently selected text
       // to the clipboard: For some reason Libreoffice likes RTF more than
@@ -2483,12 +2482,12 @@ bool Worksheet::Copy(bool astext)
     s = tmp->ListToString();
     data->Add(new wxTextDataObject(s));
 
-    if(m_configuration->CopyBitmap())
+    if(m_configuration.CopyBitmap())
     {
       // Try to fill bmp with a high-res version of the cells
       BitmapOut output(&m_configuration, std::move(tmp),
-                       m_configuration->BitmapScale(),
-                       1000000*m_configuration->MaxClipbrdBitmapMegabytes());
+                       m_configuration.BitmapScale(),
+                       1000000*m_configuration.MaxClipbrdBitmapMegabytes());
       if (output.IsOk())
         data->Add(output.GetDataObject().release());
     }
@@ -2627,7 +2626,7 @@ bool Worksheet::CopyTeX()
 
   if (start->GetType() != MC_TYPE_GROUP)
   {
-    inMath = m_configuration->WrapLatexMath();
+    inMath = m_configuration.WrapLatexMath();
     if (inMath)
       s = wxT("\\[");
   }
@@ -2708,7 +2707,7 @@ bool Worksheet::CopyCells()
       str += tmp.ToString();
       firstcell = false;
 
-      if (m_configuration->CopyRTF())
+      if (m_configuration.CopyRTF())
         rtf += tmp.ToRTF();
       wxm += Format::TreeToWXM(&tmp);
 
@@ -2718,7 +2717,7 @@ bool Worksheet::CopyCells()
 
     rtf += wxT("\\par") + RTFEnd();
 
-    if (m_configuration->CopyRTF())
+    if (m_configuration.CopyRTF())
     {
       data->Add(new RtfDataObject(rtf), true);
       data->Add(new RtfDataObject2(rtf));
@@ -2726,24 +2725,24 @@ bool Worksheet::CopyCells()
     data->Add(new wxTextDataObject(str));
     data->Add(new wxmDataObject(wxm));
 
-    if (m_configuration->CopyBitmap())
+    if (m_configuration.CopyBitmap())
     {
       BitmapOut output(&m_configuration, CopySelection(),
-                       m_configuration->BitmapScale(),
-                       1000000*m_configuration->MaxClipbrdBitmapMegabytes());
+                       m_configuration.BitmapScale(),
+                       1000000*m_configuration.MaxClipbrdBitmapMegabytes());
       if (output.IsOk())
         data->Add(output.GetDataObject().release());
     }
 
 #if wxUSE_ENH_METAFILE
-    if (m_configuration->CopyEMF())
+    if (m_configuration.CopyEMF())
     {
       Emfout emf(&m_configuration, CopySelection());
       if (emf.IsOk())
         data->Add(emf.GetDataObject().release());
     }
 #endif
-    if (m_configuration->CopySVG())
+    if (m_configuration.CopySVG())
     {
       Svgout svg(&m_configuration, CopySelection());
       if (svg.IsOk())
@@ -3107,9 +3106,9 @@ void Worksheet::OpenHCaret(const wxString &txt, GroupType type)
       SetHCaret(result);
     }
   }
-  if (type == GC_TYPE_CODE && !m_configuration->ShowCodeCells())
+  if (type == GC_TYPE_CODE && !m_configuration.ShowCodeCells())
   {
-    m_configuration->ShowCodeCells(true);
+    m_configuration.ShowCodeCells(true);
     CodeCellVisibilityChanged();
   }
 
@@ -3142,7 +3141,7 @@ void Worksheet::Evaluate()
 void Worksheet::OnKeyDown(wxKeyEvent &event)
 {
   m_updateControls = true;
-  m_configuration->AdjustWorksheetSize(true);
+  m_configuration.AdjustWorksheetSize(true);
   ClearNotification();
   // Track the activity of the keyboard. Setting the keyboard
   // to inactive again is done in wxMaxima.cpp
@@ -3228,7 +3227,7 @@ void Worksheet::OnKeyDown(wxKeyEvent &event)
       break;
 
     case WXK_NUMPAD_ENTER:
-      if(m_configuration->NumpadEnterEvaluates())
+      if(m_configuration.NumpadEnterEvaluates())
       {
         Evaluate();
         break;
@@ -3340,10 +3339,10 @@ GroupCell *Worksheet::EndOfSectioningUnit(GroupCell *start)
 
 void Worksheet::UpdateConfigurationClientSize()
 {
-  m_configuration->SetClientWidth(GetClientSize().GetWidth() -
-                                  m_configuration->GetCellBracketWidth() -
-                                  m_configuration->GetBaseIndent());
-  m_configuration->SetClientHeight(GetClientSize().GetHeight());
+  m_configuration.SetClientWidth(GetClientSize().GetWidth() -
+                                  m_configuration.GetCellBracketWidth() -
+                                  m_configuration.GetBaseIndent());
+  m_configuration.SetClientHeight(GetClientSize().GetHeight());
 }
 
 /****
@@ -3532,14 +3531,14 @@ void Worksheet::OnCharInActive(wxKeyEvent &event)
     SetSaved(false);
 
     int height = activeCell->GetHeight();
-    //   int fontsize = m_configuration->GetDefaultFontSize();
-    auto fontsize = m_configuration->GetDefaultFontSize();
+    //   int fontsize = m_configuration.GetDefaultFontSize();
+    auto fontsize = m_configuration.GetDefaultFontSize();
 
     GetActiveCell()->Recalculate(wxMax(fontsize, MC_MIN_SIZE));
 
     if (height != GetActiveCell()->GetHeight() ||
         GetActiveCell()->GetWidth() + GetActiveCell()->GetCurrentPoint().x >=
-        GetClientSize().GetWidth() - m_configuration->GetCellBracketWidth() - m_configuration->GetBaseIndent())
+        GetClientSize().GetWidth() - m_configuration.GetCellBracketWidth() - m_configuration.GetBaseIndent())
       needRecalculate = true;
   }
 
@@ -3579,7 +3578,7 @@ void Worksheet::OnCharInActive(wxKeyEvent &event)
         rect = GetActiveCell()->GetRect();
         rect.width = GetVirtualSize().x;
       }
-      rect.x -= m_configuration->GetCursorWidth() / 2;
+      rect.x -= m_configuration.GetCursorWidth() / 2;
       RequestRedraw(rect);
     }
   }
@@ -3696,7 +3695,7 @@ void Worksheet::SelectWithChar(int ccode)
 void Worksheet::SelectEditable(EditorCell *editor, bool up)
 {
   if (editor && (
-        m_configuration->ShowCodeCells() || editor->GetType() != MC_TYPE_INPUT))
+        m_configuration.ShowCodeCells() || editor->GetType() != MC_TYPE_INPUT))
   {
     SetActiveCell(editor, false);
     m_hCaretActive = false;
@@ -4131,7 +4130,7 @@ void Worksheet::SetNotification(const wxString &message, int flags)
  */
 void Worksheet::OnChar(wxKeyEvent &event)
 {
-  m_configuration->AdjustWorksheetSize(true);
+  m_configuration.AdjustWorksheetSize(true);
   // Alt+Up and Alt+Down are hotkeys. In order for the main application to realize
   // them they need to be passed to it using the event's Skip() function.
   if(event.AltDown())
@@ -4222,16 +4221,16 @@ void Worksheet::OnChar(wxKeyEvent &event)
  */
 void Worksheet::GetMaxPoint(int *width, int *height)
 {
-  int currentHeight = m_configuration->GetIndent();
-  *width = m_configuration->GetBaseIndent();
+  int currentHeight = m_configuration.GetIndent();
+  *width = m_configuration.GetBaseIndent();
 
   for (Cell const &tmp : OnList(GetTree()))
   {
     currentHeight += tmp.GetHeightList();
-    currentHeight += m_configuration->GetGroupSkip();
-    int currentWidth = m_configuration->Scale_Px(m_configuration->GetIndent() + m_configuration->GetDefaultFontSize())
+    currentHeight += m_configuration.GetGroupSkip();
+    int currentWidth = m_configuration.Scale_Px(m_configuration.GetIndent() + m_configuration.GetDefaultFontSize())
                        + tmp.GetWidth()
-                       + m_configuration->Scale_Px(m_configuration->GetIndent() + m_configuration->GetDefaultFontSize());
+                       + m_configuration.Scale_Px(m_configuration.GetIndent() + m_configuration.GetDefaultFontSize());
     *width = wxMax(currentWidth, *width);
   }
   *height = currentHeight;
@@ -4248,7 +4247,7 @@ void Worksheet::AdjustSize()
   GetClientSize(&clientWidth, &clientHeight);
   if (GetTree())
   {
-    width = m_configuration->GetBaseIndent();
+    width = m_configuration.GetBaseIndent();
     height = width;
 
     GetMaxPoint(&width, &height);
@@ -4274,7 +4273,7 @@ void Worksheet::AdjustSize()
     
     SetScrollRate(m_scrollUnit, m_scrollUnit);
   }
-  m_configuration->AdjustWorksheetSize(false);
+  m_configuration.AdjustWorksheetSize(false);
 }
 
 /***
@@ -4293,7 +4292,7 @@ void Worksheet::OnMouseExit(wxMouseEvent &event)
   // If only the bracket of the cell under the mouse pointer is shown perhaps it
   // is logical to stop displaying it if the mouse pointer is outside the window.
   // If this isn't the case I'm not against the following block being deleted.
-  if(m_configuration->HideBrackets())
+  if(m_configuration.HideBrackets())
   {
     if (GetTree())
       GetTree()->CellUnderPointer(NULL);
@@ -4305,7 +4304,7 @@ void Worksheet::OnMouseExit(wxMouseEvent &event)
 void Worksheet::OnZoom(wxZoomGestureEvent &event)
 {
   if (event.IsGestureStart())
-    m_zoomAtGestureStart = m_configuration->GetZoomFactor();
+    m_zoomAtGestureStart = m_configuration.GetZoomFactor();
 
   SetZoomFactor(m_zoomAtGestureStart*event.GetZoomFactor());
 }
@@ -4391,18 +4390,18 @@ void Worksheet::OnTimer(wxTimerEvent &event)
           if (!m_hCaretPosition)
           {
             rect.SetTop(0);
-            rect.SetBottom(m_configuration->GetGroupSkip());
+            rect.SetBottom(m_configuration.GetGroupSkip());
           }
           else
           {
             rect = m_hCaretPosition->GetRect();
-            int caretY = ((int) m_configuration->GetGroupSkip()) / 2 + rect.GetBottom() + 1;
-            rect.SetTop(caretY - m_configuration->GetCursorWidth() / 2);
-            rect.SetBottom(caretY + (m_configuration->GetCursorWidth() + 1) / 2);
+            int caretY = ((int) m_configuration.GetGroupSkip()) / 2 + rect.GetBottom() + 1;
+            rect.SetTop(caretY - m_configuration.GetCursorWidth() / 2);
+            rect.SetBottom(caretY + (m_configuration.GetCursorWidth() + 1) / 2);
           }
         }
         rect.SetLeft(0);
-        rect.SetRight(virtualsize_x + m_configuration->Scale_Px(10));
+        rect.SetRight(virtualsize_x + m_configuration.Scale_Px(10));
         RequestRedraw(rect);
       }
 
@@ -4431,7 +4430,7 @@ void Worksheet::OnTimer(wxTimerEvent &event)
         slideshow->SetDisplayedIndex(pos);
 
         // Refresh the displayed bitmap
-        if (!m_configuration->ClipToDrawRegion())
+        if (!m_configuration.ClipToDrawRegion())
           slideshow->ReloadTimer();
         else
         {
@@ -4479,7 +4478,7 @@ std::unique_ptr<GroupCell> Worksheet::CopyTree() const
 bool Worksheet::CopyBitmap()
 {
   BitmapOut bitmap(&m_configuration, CopySelection(), 1,
-                   1000000*m_configuration->MaxClipbrdBitmapMegabytes());
+                   1000000*m_configuration.MaxClipbrdBitmapMegabytes());
   bool retval = bitmap.ToClipboard();
   Recalculate();
   return retval;
@@ -4736,7 +4735,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
   wxConfigBase *config = wxConfig::Get();
 
   int count = 0;
-  MarkDownHTML MarkDown(m_configuration);
+  MarkDownHTML MarkDown(&m_configuration);
 
   wxFileName::SplitPath(file, &path, &filename, &ext);
   imgDir_rel = filename + wxT("_htmlimg");
@@ -4763,7 +4762,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
   wxString output;
   
 
-  m_configuration->ClipToDrawRegion(false);
+  m_configuration.ClipToDrawRegion(false);
   output << wxT("<!DOCTYPE html>\n");
   output << wxT("<html lang=\"\">\n"); // We do not know the language of the exported document.
   output << wxT(" <head>\n");
@@ -4775,8 +4774,8 @@ bool Worksheet::ExportToHTML(const wxString &file)
 // Write styles
 //////////////////////////////////////////////
 
-  if ((m_configuration->HTMLequationFormat() == Configuration::mathML_mathJaX) ||
-      (m_configuration->HTMLequationFormat() == Configuration::mathJaX_TeX))
+  if ((m_configuration.HTMLequationFormat() == Configuration::mathML_mathJaX) ||
+      (m_configuration.HTMLequationFormat() == Configuration::mathJaX_TeX))
   {
     output << wxT("<script type=\"text/x-mathjax-config\">\n");
     output << wxT("  MathJax.Hub.Config({\n");
@@ -4785,7 +4784,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
     output << wxT("    TeX: {TagSide: \"left\"}\n");
     output << wxT("  })\n");
     output << wxT("</script>\n");
-    output << wxT("<script src=\"") + m_configuration->MathJaXURL() + wxT("\" async=\"async\">\n");
+    output << wxT("<script src=\"") + m_configuration.MathJaXURL() + wxT("\" async=\"async\">\n");
     // prevent optimizing <script src="..."><script> to <script src=..."/>
     output << wxT("  // A comment that hinders wxWidgets from optimizing this tag too much.\n");
     output << wxT("</script>\n");
@@ -5263,8 +5262,8 @@ bool Worksheet::ExportToHTML(const wxString &file)
   output << wxT("<!-- *        ") + versionString + wxT("       * -->\n");
   output << wxT("<!-- *********") + versionPad    + wxT("******** -->\n");
 
-  if ((m_configuration->HTMLequationFormat() != Configuration::bitmap) &&
-      (m_configuration->HTMLequationFormat() != Configuration::svg))
+  if ((m_configuration.HTMLequationFormat() != Configuration::bitmap) &&
+      (m_configuration.HTMLequationFormat() != Configuration::svg))
   {
     // Tell users that have disabled JavaScript why they don't get 2d maths.
     output << wxT("<noscript>");
@@ -5294,11 +5293,11 @@ bool Worksheet::ExportToHTML(const wxString &file)
       // Handle the label
       Cell *out = tmp.GetLabel();
 
-      if (out || (m_configuration->ShowCodeCells()))
+      if (out || (m_configuration.ShowCodeCells()))
         output << wxT("\n\n<!-- Code cell -->\n\n\n");
 
       // Handle the input
-      if (m_configuration->ShowCodeCells())
+      if (m_configuration.ShowCodeCells())
       {
         Cell *prompt = tmp.GetPrompt();
         output << wxT("<table><tr><td>\n");
@@ -5366,7 +5365,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
           }
           else if (chunk->GetType() != MC_TYPE_IMAGE)
           {
-            switch(m_configuration->HTMLequationFormat())
+            switch(m_configuration.HTMLequationFormat())
             {
             case Configuration::mathJaX_TeX:
             {
@@ -5412,7 +5411,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
               wxSize size;
               size = CopyToFile(imgDir + wxT("/") + filename + wxString::Format(wxT("_%d.png"), count),
                                 &(*chunk),
-                                NULL, true, m_configuration->BitmapScale());
+                                NULL, true, m_configuration.BitmapScale());
               int borderwidth = 0;
               wxString alttext = EditorCell::EscapeHTMLChars(chunk->ListToString());
               borderwidth = chunk->GetImageBorderWidth();
@@ -5420,7 +5419,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
               wxString line = wxT("  <img src=\"") +
                 filename_encoded + wxT("_htmlimg/") + filename_encoded +
                 wxString::Format(wxT("_%d%s\" width=\"%i\" style=\"max-width:90%%;\" loading=\"lazy\" alt=\" "),
-                                 count, ext.utf8_str(), size.x / m_configuration->BitmapScale() - 2 * borderwidth) +
+                                 count, ext.utf8_str(), size.x / m_configuration.BitmapScale() - 2 * borderwidth) +
                 alttext +
                 wxT("\" /><br/>\n");
 
@@ -5578,7 +5577,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
                         "wxMaxima</a>.</small></p>\n");
   output << wxEmptyString;
 
-  if (m_configuration->ExportContainsWXMX())
+  if (m_configuration.ExportContainsWXMX())
   {
     wxString wxmxfileName_rel = imgDir_rel + wxT("/") + filename + wxT(".wxmx");
     wxString wxmxfileName = path + wxT("/") + wxmxfileName_rel;
@@ -5593,7 +5592,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
   output << wxT(" </body>\n");
   output << wxT("</html>\n");
 
-  m_configuration->ClipToDrawRegion(true);
+  m_configuration.ClipToDrawRegion(true);
 
   // Indent the document and test it for validity.
   wxXmlDocument doc;
@@ -5634,7 +5633,7 @@ bool Worksheet::ExportToHTML(const wxString &file)
   outfile.Close();
   cssfile.Close();
 
-  m_configuration->ClipToDrawRegion(true);
+  m_configuration.ClipToDrawRegion(true);
   RecalculateForce();
   return outfileOK && cssOK;
 }
@@ -5644,7 +5643,7 @@ void Worksheet::CodeCellVisibilityChanged()
   // Move the cursor out of the currently active cell if we are about to
   // hide it
   if (GetActiveCell() && GetActiveCell()->GetType() == MC_TYPE_INPUT
-      && !m_configuration->ShowCodeCells()
+      && !m_configuration.ShowCodeCells()
       )
     SetHCaret(GetActiveCell()->GetGroup());
   RecalculateForce();
@@ -5674,13 +5673,13 @@ bool Worksheet::ExportToTeX(const wxString &file)
 
   wxTextOutputStream output(outfile);
 
-  if(m_configuration->DocumentclassOptions().IsEmpty())
+  if(m_configuration.DocumentclassOptions().IsEmpty())
     output << "\\documentclass{" +
-      m_configuration->Documentclass() +
+      m_configuration.Documentclass() +
       "}\n\n";
   else
-    output << "\\documentclass["+ m_configuration->DocumentclassOptions() +"]{" +
-      m_configuration->Documentclass() +
+    output << "\\documentclass["+ m_configuration.DocumentclassOptions() +"]{" +
+      m_configuration.Documentclass() +
       "}\n\n";
   output << wxT("%% Created with wxMaxima "
                         GITVERSION
@@ -5743,7 +5742,7 @@ bool Worksheet::ExportToTeX(const wxString &file)
   output << wxT("\n");
 
   // Add an eventual preamble requested by the user.
-  wxString texPreamble = m_configuration->TexPreamble();
+  wxString texPreamble = m_configuration.TexPreamble();
   if (!texPreamble.IsEmpty())
     output << texPreamble << wxT("\n\n");
 
@@ -6094,12 +6093,12 @@ wxString Worksheet::GetMaximaHelpFile2()
   if(wxFileExists(headerFile))
     return headerFile;
 
-  headerFile = m_configuration->MaximaShareDir() + wxT("/../doc/html/maxima_singlepage.html");
+  headerFile = m_configuration.MaximaShareDir() + wxT("/../doc/html/maxima_singlepage.html");
   wxLogMessage(wxString::Format(searchText, headerFile.utf8_str()));
   if(wxFileExists(headerFile))
     return headerFile;
 
-  headerFile = m_configuration->MaximaShareDir() + wxT("/doc/html/maxima_singlepage.html");
+  headerFile = m_configuration.MaximaShareDir() + wxT("/doc/html/maxima_singlepage.html");
   wxLogMessage(wxString::Format(searchText, headerFile.utf8_str()));
   if(wxFileExists(headerFile))
     return headerFile;
@@ -6117,7 +6116,7 @@ wxString Worksheet::UnicodeToMaxima(wxString s)
 
   wxString retval;
   
-  for (auto const &tok : MaximaTokenizer(s, m_configuration).PopTokens())
+  for (auto const &tok : MaximaTokenizer(s, &m_configuration).PopTokens())
   {
     auto &tokenString = tok.GetText();
     switch(tok.GetStyle())
@@ -6247,7 +6246,7 @@ bool Worksheet::ExportToMAC(const wxString &file)
     AddLineToFile(backupfile, wxT("/* [ Created with wxMaxima version ") + version + wxT(" ] */"));
   }
 
-  bool fixReorderedIndices = m_configuration->FixReorderedIndices();
+  bool fixReorderedIndices = m_configuration.FixReorderedIndices();
   std::vector<int> cellMap;
   if (fixReorderedIndices)
   {
@@ -6398,7 +6397,7 @@ bool Worksheet::ExportToWXMX(const wxString &file, bool markAsSaved)
         xmlText << wxT("\n<wxMaximaDocument version=\"");
         xmlText << DOCUMENT_VERSION_MAJOR << wxT(".");
         xmlText << DOCUMENT_VERSION_MINOR << wxT("\" zoom=\"");
-        xmlText << int(100.0 * m_configuration->GetZoomFactor()) << wxT("\"");
+        xmlText << int(100.0 * m_configuration.GetZoomFactor()) << wxT("\"");
 
         // **************************************************************************
         // Find out the number of the cell the cursor is at and save this information
@@ -6993,7 +6992,7 @@ void Worksheet::Undo()
 
 void Worksheet::TreeUndo_LimitUndoBuffer()
 {
-  long undoLimit = m_configuration->UndoLimit();
+  long undoLimit = m_configuration.UndoLimit();
 
   if (undoLimit == 0)
     return;
@@ -7251,10 +7250,10 @@ void Worksheet::SetActiveCell(EditorCell *cell, bool callRefresh)
   if (callRefresh) // = true default
     RequestRedraw();
 
-  if (cell && !m_configuration->ShowCodeCells() && GetActiveCell()
+  if (cell && !m_configuration.ShowCodeCells() && GetActiveCell()
       && GetActiveCell()->GetType() == MC_TYPE_INPUT)
   {
-    m_configuration->ShowCodeCells(true);
+    m_configuration.ShowCodeCells(true);
     CodeCellVisibilityChanged();
   }
   if (scrollneeded && cell)
@@ -7337,8 +7336,7 @@ void Worksheet::ShowPoint(wxPoint point)
   height -= wxSystemSettings::GetMetric(wxSYS_VTHUMB_Y);
   width -= wxSystemSettings::GetMetric(wxSYS_HTHUMB_X);
 
-  Configuration *configuration = m_configuration;
-  int fontsize_px = configuration->GetZoomFactor() * configuration->GetDefaultFontSize();
+  int fontsize_px = m_configuration.GetZoomFactor() * m_configuration.GetDefaultFontSize();
   if (
           (point.y - fontsize_px < view_y) ||
           (point.y + fontsize_px > view_y + height - 20)
@@ -7837,7 +7835,7 @@ void Worksheet::RemoveAllOutput(GroupCell *cell)
     if (sub)
       RemoveAllOutput(sub);
   }
-  m_configuration->AdjustWorksheetSize(true);
+  m_configuration.AdjustWorksheetSize(true);
   Recalculate();
 }
 
@@ -8371,7 +8369,7 @@ bool Worksheet::Autocomplete(AutoComplete::autoCompletionType type)
     wxASSERT((pos.x>=0) && (pos.y >=0));
     CalcScrolledPosition(pos.x, pos.y, &pos.x, &pos.y);
     // The popup menu appears half a character too high.
-    pos.y += m_configuration->Scale_Px(m_configuration->GetFontSize(TS_TEXT)).Get();
+    pos.y += m_configuration.Scale_Px(m_configuration.GetFontSize(TS_TEXT)).Get();
     wxASSERT(!m_autocompletePopup);
     m_autocompletePopup = new AutocompletePopup(this,editor,&m_autocomplete,type,&m_autocompletePopup);
 
@@ -8601,7 +8599,7 @@ wxString Worksheet::RTFStart() const
   document += wxT("{\\colortbl;\n");
   for (int i = 1; i < NUMBEROFSTYLES; i++)
   {
-    wxColor color = wxColor(m_configuration->GetColor((TextStyle) i));
+    wxColor color = m_configuration.GetColor(TextStyle);
     if (color.IsOk())
       document += wxString::Format(wxT("\\red%i\\green%i\\blue%i;\n"), color.Red(), color.Green(), color.Blue());
     else

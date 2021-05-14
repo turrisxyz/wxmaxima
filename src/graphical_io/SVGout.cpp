@@ -35,7 +35,7 @@
 #include <wx/config.h>
 #include <wx/clipbrd.h>
 
-Svgout::Svgout(Configuration **configuration, const wxString &filename, double scale) :
+Svgout::Svgout(Configuration *configuration, const wxString &filename, double scale) :
     m_cmn(configuration, filename, 500, scale), // Note: old SVGout code had this also at 500
     m_recalculationDc(m_cmn.GetTempFilename(), 700*scale, 50000*scale, 20*scale),
     m_CWD(wxGetCwd())
@@ -54,7 +54,7 @@ Svgout::Svgout(Configuration **configuration, const wxString &filename, double s
   config.SetClientWidth(700*scale);
 }
 
-Svgout::Svgout(Configuration **configuration, std::unique_ptr<Cell> &&tree, const wxString &filename, double scale) :
+Svgout::Svgout(Configuration *configuration, std::unique_ptr<Cell> &&tree, const wxString &filename, double scale) :
     Svgout(configuration, filename, scale)
 {
   Render(std::move(tree));

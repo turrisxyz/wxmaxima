@@ -30,7 +30,7 @@
 
 /* Renders portions of the work sheet (including 2D maths) as svg.
 
-   This is used for exporting HTML with embedded maths as a scalable vector
+   This is used for exporting sHTML with embedded maths as a scalable vector
    graphics and for them on the clipboard
  */
 class Svgout final
@@ -38,8 +38,8 @@ class Svgout final
 public:
   /*! The constructor.
   */
-  explicit Svgout(Configuration **configuration, const wxString &filename = {}, double scale = 1.0);
-  explicit Svgout(Configuration **configuration, std::unique_ptr<Cell> &&tree,
+  explicit Svgout(Configuration *configuration, const wxString &filename = {}, double scale = 1.0);
+  explicit Svgout(Configuration *configuration, std::unique_ptr<Cell> &&tree,
                   const wxString &filename = {}, double scale = 1.0);
   ~Svgout();
   

@@ -40,9 +40,9 @@ public:
     \param configuration A pointer to the pointer to this worksheet's configuration
            storage
   */
-  explicit BitmapOut(Configuration **configuration, double scale = 1);
+  explicit BitmapOut(Configuration *configuration, double scale = 1);
   //! Constructs and renders the bitmap, setting the IsOK() status accordingly.
-  explicit BitmapOut(Configuration **configuration, std::unique_ptr<Cell> &&tree, double scale = 1, long maxSize = -1);
+  explicit BitmapOut(Configuration *configuration, std::unique_ptr<Cell> &&tree, double scale = 1, long maxSize = -1);
   ~BitmapOut();
 
   /*! Renders tree as bitmap

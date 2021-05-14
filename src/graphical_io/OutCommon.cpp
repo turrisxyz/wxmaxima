@@ -34,7 +34,7 @@ static wxString MakeTempFilename()
   return wxFileName::CreateTempFileName(wxT("wxmaxima_size_"));
 }
 
-OutCommon::OutCommon(Configuration **configuration, const wxString &filename, int fullWidth, double scale) :
+OutCommon::OutCommon(Configuration *configuration, const wxString &filename, int fullWidth, double scale) :
     m_tempFilename(MakeTempFilename()),
     m_filename(filename.empty() ? wxFileName::CreateTempFileName(wxT("wxmaxima_")) : filename),
     m_configuration(configuration),
@@ -42,7 +42,7 @@ OutCommon::OutCommon(Configuration **configuration, const wxString &filename, in
     m_fullWidth(fullWidth)
 {
   m_thisconfig.ShowCodeCells(m_oldconfig->ShowCodeCells());
-  *m_configuration = &m_thisconfig;
+  *m_configuration = m_thisconfig;
   m_thisconfig.SetZoomFactor_temporarily(1);
   m_thisconfig.FontChanged();
   
@@ -54,7 +54,7 @@ OutCommon::OutCommon(Configuration **configuration, const wxString &filename, in
   m_thisconfig.ClipToDrawRegion(false);
 }
 
-OutCommon::OutCommon(Configuration **configuration, int fullWidth, double scale) :
+OutCommon::OutCommon(Configuration *configuration, int fullWidth, double scale) :
     OutCommon(configuration, {}, fullWidth, scale)
 {}
 
@@ -69,7 +69,7 @@ OutCommon::~OutCommon()
     if (!wxRemoveFile(m_tempFilename))
       wxLogMessage(_("Cannot remove the file %s"),m_tempFilename.utf8_str());
   }
-  *m_configuration = m_oldconfig;
+  m_configuration = m_oldconfig;
   (*m_configuration)->FontChanged();
 }
 

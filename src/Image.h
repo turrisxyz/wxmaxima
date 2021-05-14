@@ -69,17 +69,17 @@ class Image final
 {
 public:
   //! A constructor that generates an empty image. See LoadImage()
-  explicit Image(Configuration **config);
+  explicit Image(Configuration *config);
 
   //! A constructor that loads the compressed file from a wxMemoryBuffer
-  Image(Configuration **config, wxMemoryBuffer image, wxString type);
+  Image(Configuration *config, wxMemoryBuffer image, wxString type);
 
   /*! A constructor that loads a bitmap
 
     This constructor actually has to do some compression since we got
     the bitmap in an uncompressed form.
    */
-  Image(Configuration **config, const wxBitmap &bitmap);
+  Image(Configuration *config, const wxBitmap &bitmap);
 
   /*! A constructor that loads an image
 
@@ -88,7 +88,7 @@ public:
     \param filesystem The filesystem to load it from
     \param remove true = Delete the file after loading it
    */
-  Image(Configuration **config, wxString image, std::shared_ptr<wxFileSystem> filesystem, bool remove = true);
+  Image(Configuration *config, wxString image, std::shared_ptr<wxFileSystem> filesystem, bool remove = true);
 
   Image(const Image &image);
 
@@ -227,7 +227,7 @@ private:
   void LoadImage(wxString image, std::shared_ptr<wxFileSystem> filesystem, bool remove = true);
   //! Reads the compressed image into a memory buffer
   static wxMemoryBuffer ReadCompressedImage(wxInputStream *data);
-  Configuration **m_configuration;
+  Configuration *m_configuration;
   //! The upper width limit for displaying this image
   double m_maxWidth;
   //! The upper height limit for displaying this image

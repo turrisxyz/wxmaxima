@@ -245,7 +245,7 @@ wxMaximaFrame::wxMaximaFrame(wxWindow *parent, int id, const wxString &title,
                             Left());
   wxWindowUpdateLocker statBlocker(statPane);
 
-  wxPanel *greekPane = new GreekPane(this, m_worksheet->m_configuration, m_worksheet);
+  wxPanel *greekPane = new GreekPane(this, &m_worksheet->m_configuration, m_worksheet);
   wxWindowUpdateLocker greekBlocker(greekPane);
   m_manager.AddPane(greekPane,
                     wxAuiPaneInfo().Name(wxT("greek")).
@@ -305,7 +305,7 @@ wxMaximaFrame::wxMaximaFrame(wxWindow *parent, int id, const wxString &title,
                             FloatingSize(m_worksheet->m_variablesPane->GetEffectiveMinSize()).
                             Bottom());
 
-  m_symbolsPane = new SymbolsPane(this, m_worksheet->m_configuration, m_worksheet);
+  m_symbolsPane = new SymbolsPane(this, &m_worksheet->m_configuration, m_worksheet);
   wxWindowUpdateLocker symbolsBlocker(m_symbolsPane);
   m_manager.AddPane(m_symbolsPane,
                     wxAuiPaneInfo().Name(wxT("symbols")).             
@@ -833,7 +833,7 @@ void wxMaximaFrame::SetupMenu()
   m_Maxima_Panes_Sub->AppendSeparator();
   m_Maxima_Panes_Sub->AppendCheckItem(menu_invertWorksheetBackground, _("Invert worksheet brightness"));
   m_Maxima_Panes_Sub->Check(menu_invertWorksheetBackground,
-                    m_worksheet->m_configuration->InvertBackground());
+                    m_worksheet->m_configuration.InvertBackground());
 
   
   m_MenuBar->Append(m_Maxima_Panes_Sub, _("View"));

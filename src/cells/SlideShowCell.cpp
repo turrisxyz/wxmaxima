@@ -257,7 +257,7 @@ void SlideShow::SetDisplayedIndex(int ind)
 
 void SlideShow::Recalculate(AFontSize fontsize)
 {
-  Configuration *configuration = *m_configuration;
+  Configuration *configuration = m_configuration;
 
   // Assuming a minimum size maybe isn't that bad.
   m_height = m_width = 10;
