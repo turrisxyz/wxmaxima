@@ -451,7 +451,7 @@
     (if (null x) r
       (do ((nl))
 	  ((null (cdr x))
-	   (setq nl (nconc nl (wxxml (car x) l r 'mparen 'mparen)))
+	   (setq nl (nconc nl (list itemstart) (wxxml (car x) l (nconc (list itemend) r) 'mparen 'mparen) ))
 	   nl)
 	  (setq nl (nconc nl (list itemstart) (wxxml (car x) l (list itemend sym ) 'mparen 'mparen))
 		x (cdr x)
