@@ -507,6 +507,9 @@
 
   (defprop mabs wxxml-matchfix wxxml)
   (defprop mabs (("<mrow><a>")"</a></mrow>") wxxmlsym)
+  
+  (defprop $interval wxxml-matchfix wxxml)
+  (defprop $interval (("<fn interval=\"true\"><fnm>interval</fnm>")"</fn>") wxxmlsym)
 
   (defprop $conjugate wxxml-matchfix wxxml)
   (defprop $conjugate (("<mrow><cj>")"</cj></mrow>") wxxmlsym)

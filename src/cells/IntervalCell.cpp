@@ -32,13 +32,19 @@
 IntervalCell::IntervalCell(GroupCell *group, Configuration **config,
                            std::unique_ptr<Cell> &&start, std::unique_ptr<Cell> &&end) :
     Cell(group, config),
+    m_leftBracketOpensLeft(start->ToString() == wxT("-inf")),
+    m_rightBracketOpensRight(end->ToString() == wxT("inf")),
     m_open(std::make_unique<TextCell>(group, config, wxT("interval("))),
-    m_openBracket(std::make_unique<TextCell>(group, config, wxT("["))),
+    m_openBracket(std::make_unique<TextCell>(group, config,
+                                             m_leftBracketOpensLeft ?
+                                             wxT("]") : wxT("["))),
     m_start(std::move(start)),
     m_comma(std::make_unique<TextCell>(group, config, wxT(","))),
     m_ellipsis(std::make_unique<TextCell>(group, config, wxT("\u2026"))),
     m_stop(std::move(end)),
-    m_closeBracket(std::make_unique<TextCell>(group, config, wxT("]"))),
+    m_closeBracket(std::make_unique<TextCell>(group, config,
+                                              m_rightBracketOpensRight ?
+                                              wxT("[") : wxT("]"))),
     m_close(std::make_unique<TextCell>(group, config, wxT(")")))
 {
   InitBitFields();
@@ -46,7 +52,7 @@ IntervalCell::IntervalCell(GroupCell *group, Configuration **config,
 
   // Tell the first of our inner cells not to begin with a multiplication dot.
   m_start->SetSuppressMultiplicationDot(true);
-
+  m_ellipsis->SetAltCopyText(wxT(","));
   m_open->SetStyle(TS_FUNCTION);
   m_close->SetStyle(TS_FUNCTION);
 }
@@ -143,8 +149,8 @@ void IntervalCell::Draw(wxPoint point)
       point.x += m_openBracket->GetFullWidth();
       m_start->DrawList(point);
       point.x += m_start->GetFullWidth();
-      m_comma->DrawList(point);
-      point.x += m_comma->GetFullWidth();
+      m_ellipsis->DrawList(point);
+      point.x += m_ellipsis->GetFullWidth();
       m_stop->DrawList(point);
       point.x += m_stop->GetFullWidth();
       m_closeBracket->DrawList(point);
@@ -158,41 +164,59 @@ void IntervalCell::Draw(wxPoint point)
       innerCellPos.x = point.x + m_signWidth;
 
       // Left bracket
-      const wxPoint pointsL[4] = {
-        {point.x - Scale_Px(1) + signWidth,
-         point.y - m_center + Scale_Px(4)},
-        {point.x + Scale_Px(1),
-         point.y - m_center + Scale_Px(4)},
-        {point.x + Scale_Px(1),
-         point.y + m_center - Scale_Px(4)},
-        {point.x - Scale_Px(1) + signWidth,
-         point.y + m_center - Scale_Px(4)}
-      };
-      adc->DrawLines(4, pointsL);
+      if(m_leftBracketOpensLeft)
+        DrawBigRightOpenBracket(adc, point);
+      else
+        DrawBigLeftOpenBracket(adc, point);
 
+      wxPoint rightBracketPos(point);
+      rightBracketPos.x += m_width - m_signWidth;
       // Right bracket
-      const wxPoint pointsR[4] = {
-        {point.x + m_width + Scale_Px(1) - signWidth,
-         point.y - m_center + Scale_Px(4)},
-        {point.x + m_width - Scale_Px(1),
-         point.y - m_center + Scale_Px(4)},
-        {point.x + m_width - Scale_Px(1),
-         point.y + m_center - Scale_Px(4)},
-        {point.x + m_width + Scale_Px(1) - signWidth,
-         point.y + m_center - Scale_Px(4)}
-      };
-      adc->DrawLines(4, pointsR);
+      if(m_rightBracketOpensRight)
+        DrawBigLeftOpenBracket(adc, rightBracketPos);
+      else
+        DrawBigRightOpenBracket(adc, rightBracketPos);
+
+      wxPoint startCellPos(innerCellPos);
+      startCellPos.y += (m_start->GetCenterList() - m_start->GetHeightList() /2);
+      m_start->DrawList(startCellPos);
+      innerCellPos.x += m_start->GetFullWidth();
+      m_ellipsis->DrawList(innerCellPos);
+      innerCellPos.x += m_ellipsis->GetWidth();
+      wxPoint stopCellPos(innerCellPos);
+      stopCellPos.y += (m_stop->GetCenterList() - m_stop->GetHeightList() /2);
+      m_stop->DrawList(stopCellPos);
     }
-    wxPoint startCellPos(innerCellPos);
-    startCellPos.y += (m_start->GetCenterList() - m_start->GetHeightList() /2);
-    m_start->DrawList(startCellPos);
-    innerCellPos.x += m_start->GetFullWidth();
-    m_comma->DrawList(innerCellPos);
-    innerCellPos.x += m_comma->GetFullWidth();
-    wxPoint stopCellPos(innerCellPos);
-    stopCellPos.y += (m_stop->GetCenterList() - m_stop->GetHeightList() /2);
-    m_stop->DrawList(stopCellPos);
   }
+}
+
+void IntervalCell::DrawBigLeftOpenBracket(wxDC *dc, wxPoint point)
+{
+  const wxPoint pointsL[4] = {
+    {point.x - Scale_Px(1) + m_signWidth,
+     point.y - m_center + Scale_Px(4)},
+    {point.x + Scale_Px(1),
+     point.y - m_center + Scale_Px(4)},
+    {point.x + Scale_Px(1),
+     point.y + m_center - Scale_Px(4)},
+    {point.x - Scale_Px(1) + m_signWidth,
+     point.y + m_center - Scale_Px(4)}
+  };
+  dc->DrawLines(4, pointsL);
+}
+void IntervalCell::DrawBigRightOpenBracket(wxDC *dc, wxPoint point)
+{
+  const wxPoint pointsR[4] = {
+    {point.x +  Scale_Px(1),
+     point.y - m_center + Scale_Px(4)},
+    {point.x + Scale_Px(1) + m_signWidth,
+     point.y - m_center + Scale_Px(4)},
+    {point.x + Scale_Px(1) + m_signWidth,
+     point.y + m_center - Scale_Px(4)},
+    {point.x + Scale_Px(1),
+     point.y + m_center - Scale_Px(4)}
+  };
+  dc->DrawLines(4, pointsR);
 }
 
 wxString IntervalCell::ToString() const
@@ -236,30 +260,53 @@ wxString IntervalCell::ToTeX() const
 
 wxString IntervalCell::ToOMML() const
 {
-  return wxT("<m:d><m:dPr m:begChr=\"[\"\" m:endChr=\"]\" m:grow=\"1\"></m:dPr><m:e>") +
-    m_start->ListToOMML() + wxT("\u2026") + m_stop->ListToOMML() + wxT("</m:e></m:d>");
+  wxString open = m_openBracket->ToString();
+  wxString close = m_closeBracket->ToString();
+  wxString retval = wxString(wxT("<m:d>")) +
+    wxT("<m:dPr m:begChr=\"") + open + wxT("\" m:endChr=\"") +close + wxT("]\" m:grow=\"1\"></m:dPr>") +
+    wxT("<m:e>") + m_start->ListToOMML() + wxT("\u2026") + m_stop->ListToOMML() + wxT("</m:e>") +
+    wxT("</m:d>");
+  wxLogMessage("ToOOML:" + retval);
+  return retval;
 }
 
 wxString IntervalCell::ToMathML() const
 {
-  wxString open = m_open->ToString();
-  wxString close = m_close->ToString();
-  return (
-          wxT("<mrow><mo>[</mo>") +
-          m_start->ListToMathML() +
-          wxT(","),
-          m_stop->ListToMathML() +
-          wxT("<mo>]</mo></mrow>\n")
-  );
+  wxString open = m_openBracket->ToString();
+  wxString close = m_closeBracket->ToString();
+  wxString retval = wxString(wxT("<mrow>")) +
+    wxT("<mo>")+open+wxT("</mo>") +
+    m_start->ListToMathML() +
+    wxT(",") +
+    m_stop->ListToMathML() +
+    wxT("<mo>") + close + wxT("</mo>") +
+    wxT("</mrow>\n")
+    ;
+  wxLogMessage("ToMathML:" + retval);
+  
+  return (retval);
 }
 
 wxString IntervalCell::ToXML() const
 {
-  wxString s = m_start->ListToXML() + wxT(",") + m_stop->ListToXML();
-  wxString flags;
+  wxString flags = wxT("interval=\"true\"");
   if (HasHardLineBreak())
     flags += wxT(" breakline=\"true\"");
-  return (wxT("<r list=\"true\"") + flags + wxT("><t listdelim=\"true\">[</t>") + s + wxT("<t listdelim=\"true\">]</t></r>"));
+  if (m_leftBracketOpensLeft)
+    flags += wxT(" leftBracketOpensLeft=\"true\"");
+  else
+    flags += wxT(" leftBracketOpensLeft=\"false\"");
+  if (m_rightBracketOpensRight)
+    flags += wxT(" rightBracketOpensRight=\"true\"");
+  else
+    flags += wxT(" rightBracketOpensRight=\"false\"");
+
+  return wxT("<fn") + flags + wxT("><fnm>interval</fnm>") +
+    wxT("<r>") +
+    m_start->ListToMathML() +
+    wxT("</r><r>,</r><r>") +
+    m_stop->ListToMathML() +
+    wxT("</r>") + wxT("</fn>");
 }
 
 bool IntervalCell::BreakUp()

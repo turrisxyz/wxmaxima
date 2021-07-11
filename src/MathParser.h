@@ -118,6 +118,9 @@ private:
    */
   wxXmlNode *GetNextTag(wxXmlNode *node);
 
+  /*! Counts the number of non-whitespace children od a node */
+  int CountChildren(wxXmlNode *node);
+
   /*! Returns node - or (if node is a whitespace-only text node) the next one.
 
     If we encounter a non-whitespace text node where we shouldn't we raise an 
@@ -174,6 +177,8 @@ private:
   std::unique_ptr<Cell> ParseOperatorNameTag(wxXmlNode *node){return ParseText(node->GetChildren(), TS_FUNCTION);}
   //! Parse a miscellaneous text tag to a Cell. 
   std::unique_ptr<Cell> ParseMiscTextTag(wxXmlNode *node);
+  //! Parse a interval tag to a Cell. 
+  std::unique_ptr<Cell> ParseIntervalTag(wxXmlNode *node);
   //! Parse a number tag to a Cell. 
   std::unique_ptr<Cell> ParseNumberTag(wxXmlNode *node){return ParseText(node->GetChildren(), TS_NUMBER);}
   //! Parse a hidden operator tag to a Cell. 

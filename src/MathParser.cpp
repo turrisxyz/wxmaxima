@@ -48,6 +48,7 @@
 #include "DiffCell.h"
 #include "SumCell.h"
 #include "IntCell.h"
+#include "IntervalCell.h"
 #include "FunCell.h"
 #include "ImgCell.h"
 #include "LabelCell.h"
@@ -101,6 +102,7 @@ MathParser::MathParser(Configuration **cfg, const wxString &zipfile)
     m_innerTags[wxT("v")] = &MathParser::ParseVariableNameTag;
     m_innerTags[wxT("mi")] = &MathParser::ParseVariableNameTag;
     m_innerTags[wxT("mo")] = &MathParser::ParseOperatorNameTag;
+    m_innerTags[wxT("interval")] = &MathParser::ParseIntervalTag;
     m_innerTags[wxT("t")] = &MathParser::ParseMiscTextTag;
     m_innerTags[wxT("n")] = &MathParser::ParseNumberTag;
     m_innerTags[wxT("mn")] = &MathParser::ParseNumberTag;
@@ -185,6 +187,21 @@ std::unique_ptr<Cell> MathParser::ParseMtdTag(wxXmlNode *node)
 {
   wxXmlNode *children = node->GetChildren();
   return children ? ParseTag(children) : nullptr;
+}
+
+int MathParser::CountChildren(wxXmlNode *node)
+{
+  wxXmlNode *children = node->GetChildren();
+  int num = 0;
+  if(children)
+    children = SkipWhitespaceNode(children);
+
+  while(children)
+  {
+    num++;
+    children = GetNextTag(children);
+  }
+  return num;
 }
 
 std::unique_ptr<Cell> MathParser::ParseRowTag(wxXmlNode *node)
@@ -628,6 +645,21 @@ std::unique_ptr<Cell>MathParser::ParseFracTag(wxXmlNode *node)
   return frac;
 }
 
+std::unique_ptr<Cell>MathParser::ParseIntervalTag(wxXmlNode *node)
+{
+  wxXmlNode *child = node->GetChildren();
+  child = SkipWhitespaceNode(child);
+  child = GetNextTag(child);
+  auto start = HandleNullPointer(ParseTag(child, false));
+  child = GetNextTag(child);
+  child = GetNextTag(child);
+  auto end = HandleNullPointer(ParseTag(child, false));
+  
+  auto interval = std::make_unique<IntervalCell>(m_group, m_configuration, std::move(start), std::move(end));
+  ParseCommonAttrs(node, interval);
+  return interval;
+}
+
 std::unique_ptr<Cell>MathParser::ParseDiffTag(wxXmlNode *node)
 {
   std::unique_ptr<DiffCell> diff;
@@ -795,6 +827,10 @@ std::unique_ptr<Cell> MathParser::ParseAtTag(wxXmlNode *node)
 
 std::unique_ptr<Cell> MathParser::ParseFunTag(wxXmlNode *node)
 {
+  if((node->GetAttribute(wxT("interval"), wxT("false")) == wxT("true")) &&
+     (CountChildren(node) == 4))
+    return ParseIntervalTag(node);
+
   wxXmlNode *child = node->GetChildren();
   child = SkipWhitespaceNode(child);
 
