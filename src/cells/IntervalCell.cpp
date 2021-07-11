@@ -32,8 +32,8 @@
 IntervalCell::IntervalCell(GroupCell *group, Configuration **config,
                            std::unique_ptr<Cell> &&start, std::unique_ptr<Cell> &&end) :
     Cell(group, config),
-    m_leftBracketOpensLeft(start->ToString() == wxT("-inf")),
-    m_rightBracketOpensRight(end->ToString() == wxT("inf")),
+    m_leftBracketOpensLeft(start->ListToString() == wxT("-inf")),
+    m_rightBracketOpensRight(end->ListToString() == wxT("inf")),
     m_open(std::make_unique<TextCell>(group, config, wxT("interval("))),
     m_openBracket(std::make_unique<TextCell>(group, config,
                                              m_leftBracketOpensLeft ?
@@ -47,6 +47,7 @@ IntervalCell::IntervalCell(GroupCell *group, Configuration **config,
                                               wxT("[") : wxT("]"))),
     m_close(std::make_unique<TextCell>(group, config, wxT(")")))
 {
+  wxLogMessage(m_start->ToString());
   InitBitFields();
   SetStyle(TS_VARIABLE);
 
