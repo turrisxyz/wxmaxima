@@ -289,7 +289,7 @@ wxString IntervalCell::ToMathML() const
 
 wxString IntervalCell::ToXML() const
 {
-  wxString flags = wxT("interval=\"true\"");
+  wxString flags = wxT(" interval=\"true\"");
   if (HasHardLineBreak())
     flags += wxT(" breakline=\"true\"");
   if (m_leftBracketOpensLeft)
