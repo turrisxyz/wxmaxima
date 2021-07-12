@@ -47,7 +47,6 @@ IntervalCell::IntervalCell(GroupCell *group, Configuration **config,
                                               wxT("[") : wxT("]"))),
     m_close(std::make_unique<TextCell>(group, config, wxT(")")))
 {
-  wxLogMessage(m_start->ToString());
   InitBitFields();
   SetStyle(TS_VARIABLE);
 
@@ -267,7 +266,6 @@ wxString IntervalCell::ToOMML() const
     wxT("<m:dPr m:begChr=\"") + open + wxT("\" m:endChr=\"") +close + wxT("]\" m:grow=\"1\"></m:dPr>") +
     wxT("<m:e>") + m_start->ListToOMML() + wxT("\u2026") + m_stop->ListToOMML() + wxT("</m:e>") +
     wxT("</m:d>");
-  wxLogMessage("ToOOML:" + retval);
   return retval;
 }
 
@@ -281,9 +279,7 @@ wxString IntervalCell::ToMathML() const
     wxT(",") +
     m_stop->ListToMathML() +
     wxT("<mo>") + close + wxT("</mo>") +
-    wxT("</mrow>\n")
-    ;
-  wxLogMessage("ToMathML:" + retval);
+    wxT("</mrow>\n");
   
   return (retval);
 }
@@ -303,11 +299,11 @@ wxString IntervalCell::ToXML() const
     flags += wxT(" rightBracketOpensRight=\"false\"");
 
   return wxT("<fn") + flags + wxT("><fnm>interval</fnm>") +
-    wxT("<r>") +
+    wxT("<r><p><r>") +
     m_start->ListToMathML() +
     wxT("</r><r>,</r><r>") +
     m_stop->ListToMathML() +
-    wxT("</r>") + wxT("</fn>");
+    wxT("</r></p></r>") + wxT("</fn>");
 }
 
 bool IntervalCell::BreakUp()

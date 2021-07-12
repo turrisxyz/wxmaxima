@@ -102,7 +102,6 @@ MathParser::MathParser(Configuration **cfg, const wxString &zipfile)
     m_innerTags[wxT("v")] = &MathParser::ParseVariableNameTag;
     m_innerTags[wxT("mi")] = &MathParser::ParseVariableNameTag;
     m_innerTags[wxT("mo")] = &MathParser::ParseOperatorNameTag;
-    m_innerTags[wxT("interval")] = &MathParser::ParseIntervalTag;
     m_innerTags[wxT("t")] = &MathParser::ParseMiscTextTag;
     m_innerTags[wxT("n")] = &MathParser::ParseNumberTag;
     m_innerTags[wxT("mn")] = &MathParser::ParseNumberTag;
@@ -645,21 +644,6 @@ std::unique_ptr<Cell>MathParser::ParseFracTag(wxXmlNode *node)
   return frac;
 }
 
-std::unique_ptr<Cell>MathParser::ParseIntervalTag(wxXmlNode *node)
-{
-  wxXmlNode *child = node->GetChildren();
-  child = SkipWhitespaceNode(child);
-  child = GetNextTag(child);
-  auto start = HandleNullPointer(ParseTag(child, false));
-  child = GetNextTag(child);
-  child = GetNextTag(child);
-  auto end = HandleNullPointer(ParseTag(child, false));
-  
-  auto interval = std::make_unique<IntervalCell>(m_group, m_configuration, std::move(start), std::move(end));
-  ParseCommonAttrs(node, interval);
-  return interval;
-}
-
 std::unique_ptr<Cell>MathParser::ParseDiffTag(wxXmlNode *node)
 {
   std::unique_ptr<DiffCell> diff;
@@ -827,10 +811,31 @@ std::unique_ptr<Cell> MathParser::ParseAtTag(wxXmlNode *node)
 
 std::unique_ptr<Cell> MathParser::ParseFunTag(wxXmlNode *node)
 {
-  if((node->GetAttribute(wxT("interval"), wxT("false")) == wxT("true")) &&
-     (CountChildren(node) == 4))
-    return ParseIntervalTag(node);
-
+  if(node->GetAttribute(wxT("interval")) == wxT("true"))
+  {
+    wxXmlNode *fnm = node->GetChildren();
+    fnm = SkipWhitespaceNode(fnm);
+    wxXmlNode *mrow = GetNextTag(fnm);
+    if(mrow != NULL)
+    {
+      wxXmlNode *parenthesis = mrow->GetChildren();
+      parenthesis = SkipWhitespaceNode(parenthesis);
+      if(CountChildren(parenthesis) == 3)
+      {
+        wxXmlNode *child = parenthesis->GetChildren();
+        child = SkipWhitespaceNode(child);
+        auto start = HandleNullPointer(ParseTag(child, false));
+        child = GetNextTag(child);
+        // Skip the comma
+        child = GetNextTayg(child);
+        auto end = HandleNullPointer(ParseTag(child, false));
+        
+        auto interval = std::make_unique<IntervalCell>(m_group, m_configuration, std::move(start), std::move(end));
+        ParseCommonAttrs(node, interval);
+        return interval;
+      }
+    }
+  }
   wxXmlNode *child = node->GetChildren();
   child = SkipWhitespaceNode(child);
 
