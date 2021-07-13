@@ -316,6 +316,7 @@ bool IntervalCell::BreakUp()
   m_comma->SetNextToDraw(m_stop);
   m_start->last()->SetNextToDraw(m_comma);
   m_open->SetNextToDraw(m_start);
+  m_close->SetNextToDraw(m_nextToDraw);
   m_nextToDraw = m_open;
 
   ResetCellListSizes();

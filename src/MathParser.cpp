@@ -827,7 +827,7 @@ std::unique_ptr<Cell> MathParser::ParseFunTag(wxXmlNode *node)
         auto start = HandleNullPointer(ParseTag(child, false));
         child = GetNextTag(child);
         // Skip the comma
-        child = GetNextTayg(child);
+        child = GetNextTag(child);
         auto end = HandleNullPointer(ParseTag(child, false));
         
         auto interval = std::make_unique<IntervalCell>(m_group, m_configuration, std::move(start), std::move(end));
