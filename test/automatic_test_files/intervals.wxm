@@ -1,5 +1,5 @@
 /* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
-/* [ Created with wxMaxima version 21.02.0-DevelopmentSnapshot ] */
+/* [ Created with wxMaxima version 21.05.2-DevelopmentSnapshot ] */
 /* [wxMaxima: input   start ] */
 interval(-∞,1);
 interval(1,2);
@@ -21,13 +21,6 @@ interval(1/212122121321132321213321231233211322313213212313213213212313123212312
 /* [wxMaxima: input   end   ] */
 
 
-/* [wxMaxima: input   start ] */
-interval(-∞,1/2,5);
-interval(1/2,2/3,7);
-interval(1/2,7,∞);
-/* [wxMaxima: input   end   ] */
-
-
 
 /* Old versions of Maxima abort on loading files that end in a comment. */
-"Created with wxMaxima 21.02.0-DevelopmentSnapshot"$
+"Created with wxMaxima 21.05.2-DevelopmentSnapshot"$
