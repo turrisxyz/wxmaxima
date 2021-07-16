@@ -93,7 +93,7 @@
 
   ;; Generates an alt-copy-text from a command
   (defun wxxml-generate-alt-text (x)
-    (wxxml-fix-string (format nil "~a" (mstring x))))
+    (wxxml-fix-string (format nil "~{~a~}" (mstring x))))
     
   ;; Allow the user to communicate what to display in the statusbar whilst
   ;; the current program is running
