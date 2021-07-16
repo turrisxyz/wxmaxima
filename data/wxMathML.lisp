@@ -67,19 +67,34 @@
   (defvar $wxplot_pngcairo nil "Use gnuplot's pngcairo terminal for new plots?")
   (defmvar $wxplot_old_gnuplot nil)
 
+  (defun wxxml-string-substitute (newstring oldchar x &aux matchpos)
+    (setq matchpos (position oldchar x))
+    (if (null matchpos) x
+      (concatenate 'string
+		   (subseq x 0 matchpos)
+		   newstring
+		   (wxxml-string-substitute newstring oldchar
+				      (subseq x (1+ matchpos))))))
+  
+
 
   ;; Escape all chars that need escaping in XML
   (defun wxxml-fix-string (x)
     (if (stringp x)
-	(let* ((tmp-x (string-substitute "&amp;" #\& x))
-	       (tmp-x (string-substitute "&lt;" #\< tmp-x))
-	       (tmp-x (string-substitute "&gt;" #\> tmp-x))
-	       (tmp-x (string-substitute "&#13;" #\Return tmp-x))
-	       (tmp-x (string-substitute "&#13;" #\Linefeed tmp-x))
-	       (tmp-x (string-substitute "&#13;" #\Newline tmp-x)))
+	(let* ((tmp-x (wxxml-string-substitute "&amp;" #\& x))
+	       (tmp-x (wxxml-string-substitute "&lt;" #\< tmp-x))
+	       (tmp-x (wxxml-string-substitute "&gt;" #\> tmp-x))
+	       (tmp-x (wxxml-string-substitute "&#13;" #\Return tmp-x))
+	       (tmp-x (wxxml-string-substitute "&#13;" #\Linefeed tmp-x))
+	       (tmp-x (wxxml-string-substitute "&#13;" #\Newline tmp-x))
+	       (tmp-x (wxxml-string-substitute "&quot;" #\" tmp-x)))
 	  tmp-x)
       x))
 
+  ;; Generates an alt-copy-text from a command
+  (defun wxxml-generate-alt-text (x)
+    (wxxml-fix-string (format nil "~a" (mstring x))))
+    
   ;; Allow the user to communicate what to display in the statusbar whilst
   ;; the current program is running
   (defun $wxstatusbar (&rest status)
@@ -186,7 +201,7 @@
        (post-subscripts-xml (if post-subscripts (wxxml-list post-subscripts (list "<mrow>") mrow-terminate separator-xml) (list "<none/>")))
        (post-superscripts-xml (if post-superscripts (wxxml-list post-superscripts (list "<mrow>") mrow-terminate separator-xml) (list "<none/>")))
        (mmultiscripts-xml       
-	(append l (list (format nil "<mmultiscripts altCopy=\"~{~a~}\">" (mstring x)))
+	(append l (list (format nil "<mmultiscripts altCopy=\"~A\">" (wxxml-generate-alt-text x)))
 			(wxxml base-symbol nil nil 'mparen 'mparen)
 			post-subscripts-xml post-superscripts-xml
 			(list (concatenate
@@ -217,15 +232,6 @@
 
   (defun $wxxmltag (val tag)
     (make-tag ($sconcat val) ($sconcat tag)))
-
-  (defun string-substitute (newstring oldchar x &aux matchpos)
-    (setq matchpos (position oldchar x))
-    (if (null matchpos) x
-      (concatenate 'string
-		   (subseq x 0 matchpos)
-		   newstring
-		   (string-substitute newstring oldchar
-				      (subseq x (1+ matchpos))))))
 
 ;;; First we have the functions which are called directly by wxxml and its
 ;;; descendants
