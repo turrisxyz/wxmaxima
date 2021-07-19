@@ -93,7 +93,6 @@
 
   (defun wx-defprop (sym val indic)
     (setf (get sym indic) val))
-  
   ;; Generates an alt-copy-text from a command
   (defun wxxml-alt-copy-text (x)
     (wxxml-fix-string (format nil "~{~a~}" (mstring x))))
