@@ -1126,13 +1126,19 @@ wxWindow *ConfigDialogue::CreateOptionsPanel()
                                                              devOpts_sizer->GetStaticBox(),
                                                              _("wxMathml.lisp location"));
   m_automaticWxMathML = new wxRadioButton(wxMathmlLoc_sizer->GetStaticBox(), -1, _("Built-in"));
-  wxFlexGridSizer *wxmathmlLocGrid_sizer = new wxFlexGridSizer(9, 2, 5, 5);
+  wxFlexGridSizer *wxmathmlLocGrid_sizer = new wxFlexGridSizer(9, 3, 5, 5);
   wxmathmlLocGrid_sizer->Add(m_automaticWxMathML, wxSizerFlags());
+  wxmathmlLocGrid_sizer->Add(0, 0, wxSizerFlags());
   wxmathmlLocGrid_sizer->Add(0, 0, wxSizerFlags());
   m_userWxMathML = new wxRadioButton(wxMathmlLoc_sizer->GetStaticBox(), -1, _("User-specified file:"));
   wxmathmlLocGrid_sizer->Add(m_userWxMathML, wxSizerFlags());
   m_wxMathMLLocation = new wxTextCtrl(wxMathmlLoc_sizer->GetStaticBox(), -1, wxEmptyString, wxDefaultPosition, wxSize(350*GetContentScaleFactor(), wxDefaultSize.GetY()));
   wxmathmlLocGrid_sizer->Add(m_wxMathMLLocation, wxSizerFlags().Expand());
+  m_mpBrowse = new wxButton(wxMathmlLoc_sizer->GetStaticBox(), wxID_OPEN, _("Open"));
+  m_mpBrowse->Connect(wxEVT_BUTTON, wxCommandEventHandler(
+                        ConfigDialogue::OnwxMathMLBrowse), NULL, this);
+  wxmathmlLocGrid_sizer->Add(m_mpBrowse, wxSizerFlags());
+
   wxMathmlLoc_sizer->Add(wxmathmlLocGrid_sizer, wxSizerFlags().Expand().
                      Border(wxALL, 5*GetContentScaleFactor()));
   devOpts_sizer->Add(wxMathmlLoc_sizer, wxSizerFlags().Expand().
@@ -1840,6 +1846,22 @@ void ConfigDialogue::WriteSettings()
   }
   config->Write(wxT("ConfigDialogTab"), m_notebook->GetSelection());
 }
+
+void ConfigDialogue::OnwxMathMLBrowse(wxCommandEvent&  WXUNUSED(event))
+{
+  wxConfigBase *config = wxConfig::Get();
+  wxString dd;
+  config->Read(wxT("maxima"), &dd);
+  wxString file = wxFileSelector(_("Select wxMathml.lisp location"),
+                                 wxPathOnly(dd), wxFileNameFromPath(dd),
+                                 wxEmptyString,
+                                 _("Lisp files (*.lisp)|*.lisp|All|*"),
+                                 wxFD_OPEN);
+
+  if (file.Length())
+    m_wxMathMLLocation->SetValue(file);
+}
+
 
 void ConfigDialogue::OnMpBrowse(wxCommandEvent&  WXUNUSED(event))
 {
