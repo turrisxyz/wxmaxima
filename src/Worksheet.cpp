@@ -427,13 +427,6 @@ Worksheet::~Worksheet()
 #endif
 #endif
 
-#ifdef __WXGTK__
-#if wxCHECK_VERSION(3, 1, 0)
-#else
-#define ANTIALIASSING_DC_NOT_CORRECTLY_SCROLLED 1
-#endif
-#endif
-
 #define WORKING_AUTO_BUFFER 1
 
 void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
@@ -513,30 +506,8 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   // Don't fill the text background with the background color
   m_configuration->GetDC()->SetMapMode(wxMM_TEXT);
 
-  // Set line pen and fill brushes
-  SetBackgroundColour(m_configuration->DefaultBackgroundColor());    
-  m_configuration->GetDC()->SetBackgroundMode(wxTRANSPARENT);
-  m_configuration->GetDC()->SetBackground(m_configuration->GetBackgroundBrush());
-  m_configuration->GetDC()->SetBrush(m_configuration->GetBackgroundBrush());
-  m_configuration->GetDC()->SetPen(*wxTRANSPARENT_PEN);
-  m_configuration->GetDC()->SetLogicalFunction(wxCOPY);
-
-  // Clear the drawing area even if wxDC::Clear() happens to be broken
-#if WORKING_DC_CLEAR
-  GetDC().Clear();
-#else
-  m_configuration->GetDC()->DrawRectangle(0,0,
-                                          GetClientSize().x*GetContentScaleFactor(),
-                                          GetClientSize().y*GetContentScaleFactor());
-#endif
-
   if(antiAliassingDC.IsOk())
-  {
-#ifdef ANTIALIASSING_DC_NOT_CORRECTLY_SCROLLED
-    PrepareDC(antiAliassingDC);
-#endif
     m_configuration->SetAntialiassingDC(antiAliassingDC);
-  }
 
   // Now iterate over all single parts of the region we need to redraw and redraw
   // the worksheet
@@ -549,6 +520,14 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
     if ((rect.GetWidth() < 1) || (rect.GetHeight() < 1))
       continue;
 
+    // Set line pen and fill brushes
+    SetBackgroundColour(m_configuration->DefaultBackgroundColor());    
+    m_configuration->GetDC()->SetBackgroundMode(wxTRANSPARENT);
+    m_configuration->GetDC()->SetBackground(m_configuration->GetBackgroundBrush());
+    m_configuration->GetDC()->SetBrush(m_configuration->GetBackgroundBrush());
+    m_configuration->GetDC()->SetPen(*wxTRANSPARENT_PEN);
+    m_configuration->GetDC()->SetLogicalFunction(wxCOPY);
+        
     // Tell the configuration where to crop in this redraw
     int xstart, xend, top, bottom;
     CalcUnscrolledPosition(rect.GetLeft(), rect.GetTop(), &xstart, &top);
@@ -559,6 +538,9 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
     unscrolledRect.SetTop(top);
     unscrolledRect.SetBottom(bottom);
     m_configuration->SetUpdateRegion(unscrolledRect);
+
+    // Clear the drawing area
+    m_configuration->GetDC()->DrawRectangle(unscrolledRect);
 
     //
     // Draw the cell contents
