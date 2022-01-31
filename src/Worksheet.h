@@ -1191,10 +1191,20 @@ public:
   bool ActivatePrevInput() { return ActivateInput(-1); }
   bool ActivateNextInput() { return ActivateInput(+1); }
   wxString GetStatusText() const{return m_statusText;}
+  bool StatusTextChangedHas(){
+    bool retval = m_statusTextHas && (m_statusText != m_statusText_old);
+    m_statusText_old = m_statusText;
+    m_statusTextHas_old = m_statusTextHas;
+    return retval;
+  }
+  bool StatusTextHas(){return m_statusTextHas;}
 private:
   wxString m_statusText;
-  void StatusText(wxString text){m_statusText = text;}
-  void UnsetStatusText(){m_statusText.clear();}
+  wxString m_statusText_old;
+  bool m_statusTextHas = false;
+  bool m_statusTextHas_old = false;
+  void StatusText(wxString text){m_statusText = text;m_statusTextHas = true;}
+  void UnsetStatusText(){m_statusTextHas = false;}
   bool ActivateInput(int direction);
 
 public:
