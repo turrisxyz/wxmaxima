@@ -245,6 +245,7 @@ wxSize Worksheet::DoGetBestClientSize() const
 bool Worksheet::RedrawIfRequested()
 {
   bool redrawIssued = false;
+  UnsetStatusText();
   RecalculateIfNeeded();
 
   if(m_mouseMotionWas)
@@ -296,6 +297,10 @@ bool Worksheet::RedrawIfRequested()
 
     if (m_cellPointers.m_groupCellUnderPointer)
     {
+      // Update the worksheet's ToolTip: wxWidgets doesn't allow us to specify a
+      // separate tooltip for every worksheet element, but it does allow us to
+      // set the worksheet's tooltip to the appropriate one for the worksheet
+      // element the pointer points to.
       if (m_cellPointers.m_groupCellUnderPointer->GetOutputRect().Contains(wxPoint(m_pointer_x, m_pointer_y)))
       {
         m_cellPointers.m_cellUnderPointer = nullptr;
@@ -318,17 +323,40 @@ bool Worksheet::RedrawIfRequested()
         }
         else
           UnsetToolTip();
+
+        if(m_cellPointers.m_cellUnderPointer)
+        {
+          if(m_cellPointers.m_cellUnderPointer->GetType() == MC_TYPE_IMAGE)
+          {
+            ImgCell *image = dynamic_cast<ImgCell *>(m_cellPointers.m_cellUnderPointer.get());
+            StatusText(
+              wxString::Format(_("%s image, %li×%li, %li ppi"),
+                               image->GetExtension().c_str(),
+                               image->GetOriginalWidth(),
+                               image->GetOriginalWidth(),
+                               image->GetPPI())
+              );
+          }
+          if(m_cellPointers.m_cellUnderPointer->GetType() == MC_TYPE_SLIDE)
+          {
+            SlideShow *image = dynamic_cast<SlideShow *>(m_cellPointers.m_cellUnderPointer.get());
+            StatusText(
+              wxString::Format(_("%s image, %li×%li, %li ppi"),
+                               image->GetExtension().c_str(),
+                               image->GetOriginalWidth(),
+                               image->GetOriginalWidth(),
+                               image->GetPPI())
+              );
+          }
+        }
       }
       else
         UnsetToolTip();
     }
     else
     {
-      if (m_cellPointers.m_cellUnderPointer)
-      {
-        UnsetToolTip();
-        m_cellPointers.m_cellUnderPointer = nullptr;
-      }
+      UnsetToolTip();
+      m_cellPointers.m_cellUnderPointer = nullptr;
     }
     m_mouseMotionWas = false;
     redrawIssued = true;

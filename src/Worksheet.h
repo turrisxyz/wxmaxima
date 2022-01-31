@@ -1190,7 +1190,11 @@ public:
 
   bool ActivatePrevInput() { return ActivateInput(-1); }
   bool ActivateNextInput() { return ActivateInput(+1); }
+  wxString GetStatusText() const{return m_statusText;}
 private:
+  wxString m_statusText;
+  void StatusText(wxString text){m_statusText = text;}
+  void UnsetStatusText(){m_statusText.clear();}
   bool ActivateInput(int direction);
 
 public:
