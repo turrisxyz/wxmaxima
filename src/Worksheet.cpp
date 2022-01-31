@@ -245,11 +245,11 @@ wxSize Worksheet::DoGetBestClientSize() const
 bool Worksheet::RedrawIfRequested()
 {
   bool redrawIssued = false;
-  UnsetStatusText();
   RecalculateIfNeeded();
 
   if(m_mouseMotionWas)
   {
+    UnsetStatusText();
     if (!m_cellPointers.m_groupCellUnderPointer ||
         (m_pointer_y < m_cellPointers.m_groupCellUnderPointer->GetRect().GetTop()) ||
         (m_pointer_y > m_cellPointers.m_groupCellUnderPointer->GetRect().GetBottom())
@@ -332,9 +332,9 @@ bool Worksheet::RedrawIfRequested()
             StatusText(
               wxString::Format(_("%s image, %li×%li, %li ppi"),
                                image->GetExtension().c_str(),
-                               image->GetOriginalWidth(),
-                               image->GetOriginalWidth(),
-                               image->GetPPI())
+                               (long)image->GetOriginalWidth(),
+                               (long)image->GetOriginalWidth(),
+                               (long)image->GetPPI())
               );
           }
           if(m_cellPointers.m_cellUnderPointer->GetType() == MC_TYPE_SLIDE)
@@ -343,9 +343,9 @@ bool Worksheet::RedrawIfRequested()
             StatusText(
               wxString::Format(_("%s image, %li×%li, %li ppi"),
                                image->GetExtension().c_str(),
-                               image->GetOriginalWidth(),
-                               image->GetOriginalWidth(),
-                               image->GetPPI())
+                               (long)image->GetOriginalWidth(),
+                               (long)image->GetOriginalWidth(),
+                               (long)image->GetPPI())
               );
           }
         }

@@ -4387,14 +4387,19 @@ void wxMaxima::OnIdle(wxIdleEvent &event)
 
   if(m_worksheet->StatusTextChangedHas())
   {
+    std::cerr<<"1\n";
     if(m_worksheet->StatusTextHas())
     {
+      std::cerr<<"2\n";
       SetStatusText(m_worksheet->GetStatusText(), 1);
       event.RequestMore();
       return;
     }
     else
+    {
       m_newRightStatusText = true;
+      std::cerr<<"3\n";
+    }
   }
 
   if((m_newLeftStatusText) || (m_newRightStatusText))

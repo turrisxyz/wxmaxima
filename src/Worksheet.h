@@ -1192,7 +1192,8 @@ public:
   bool ActivateNextInput() { return ActivateInput(+1); }
   wxString GetStatusText() const{return m_statusText;}
   bool StatusTextChangedHas(){
-    bool retval = m_statusTextHas && (m_statusText != m_statusText_old);
+    bool retval = (m_statusTextHas != m_statusTextHas_old) ||
+      (m_statusText != m_statusText_old);
     m_statusText_old = m_statusText;
     m_statusTextHas_old = m_statusTextHas;
     return retval;
