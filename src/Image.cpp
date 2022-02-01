@@ -920,6 +920,7 @@ void Image::LoadImage_Backgroundtask(wxString image, std::shared_ptr<wxFileSyste
 
 void Image::Recalculate(double scale)
 {
+  std::cerr<<"ImgRecalcStart\n";
   int width = m_originalWidth;
   int height = m_originalHeight;
   Configuration *configuration = (*m_configuration);
@@ -982,7 +983,7 @@ void Image::Recalculate(double scale)
   if (m_scaledBitmap.GetWidth() != m_width)
     ClearCache();
 
-  std::cerr<<"scale="<<scale<<", ImgPPI="<<m_ppi<<", dcPPI="<<(*m_configuration)->GetDC()->GetPPI().x<<"\n";
+  std::cerr<<"this="<<this<<" scale="<<scale<<", ImgPPI="<<m_ppi<<", dcPPI="<<(*m_configuration)->GetDC()->GetPPI().x<<"\n";
 }
 
 const wxString &Image::GetBadImageToolTip()

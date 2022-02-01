@@ -479,6 +479,7 @@ void GroupCell::UpdateConfusableCharWarnings()
 
 void GroupCell::Recalculate()
 {
+  std::cerr<<"GCRecalc\n";
   if (NeedsRecalculation(EditorFontSize()))
   {
     Cell::Recalculate((*m_configuration)->GetDefaultFontSize());
