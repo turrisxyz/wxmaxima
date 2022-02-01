@@ -936,7 +936,7 @@ void Image::Recalculate(double scale)
   // pre-scale the image according to the current output's ppi and the image's ppi;
   scale *= (*m_configuration)->GetDC()->GetPPI().x;
   scale /= m_ppi;
-  
+
   if ((width < 1) || (height < 1))
   {
     m_width = 700;
@@ -981,6 +981,8 @@ void Image::Recalculate(double scale)
   // we need right now.
   if (m_scaledBitmap.GetWidth() != m_width)
     ClearCache();
+
+  std::cerr<<"scale="<<scale<<", ImgPPI="<<m_ppi<<", dcPPI="<<(*m_configuration)->GetDC()->GetPPI().x<<"\n";
 }
 
 const wxString &Image::GetBadImageToolTip()

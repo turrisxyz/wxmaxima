@@ -51,6 +51,7 @@ Printout::Printout(wxString title, GroupCell *tree, double scaleFactor) :
   m_configuration.SetWorkSheet(tree->GetConfiguration()->GetWorkSheet());
 
   m_configuration.ClipToDrawRegion(false);
+
   if(tree)
   {
     auto copy = tree->CopyList();
@@ -63,11 +64,13 @@ Printout::Printout(wxString title, GroupCell *tree, double scaleFactor) :
 
 Printout::~Printout()
 {
+    std::cerr<<"PrintoutEnd\n";
   DestroyTree();
 }
 
 bool Printout::HasPage(int num)
 {
+  std::cerr<<"HasPage_printPPI="<<GetDC()->GetPPI().x<<"\n";
   if (num > 0 && num <= m_pages.size())
     return true;
   return false;
@@ -75,6 +78,7 @@ bool Printout::HasPage(int num)
 
 bool Printout::OnPrintPage(int num)
 {
+  std::cerr<<"PrintPage_printPPI="<<GetDC()->GetPPI().x<<"\n";
   m_configuration.SetContext(*GetDC());
   if(num > m_pages.size())
     return false;
@@ -147,6 +151,7 @@ bool Printout::OnPrintPage(int num)
 
 bool Printout::OnBeginDocument(int startPage, int endPage)
 {
+  std::cerr<<"BeginDocument_printPPI="<<GetDC()->GetPPI().x<<"\n";
   m_configuration.SetContext(*GetDC());
   if (!wxPrintout::OnBeginDocument(startPage, endPage))
     return false;
@@ -155,6 +160,7 @@ bool Printout::OnBeginDocument(int startPage, int endPage)
 
 void Printout::BreakPages()
 {
+  std::cerr<<"BreakPages_printPPI="<<GetDC()->GetPPI().x<<"\n";
   m_configuration.SetContext(*GetDC());
   if (m_tree == NULL)
     return;
@@ -239,6 +245,7 @@ void Printout::BreakPages()
 
 void Printout::SetupData()
 {
+  std::cerr<<"SetupData_printPPI="<<GetDC()->GetPPI().x<<"\n";
   m_configuration.SetContext(*GetDC());
   //  SetUserScale(1/DCSCALE,
   //               1/DCSCALE);
@@ -306,18 +313,21 @@ void Printout::GetPageInfo(int *minPage, int *maxPage,
 
 void Printout::OnPreparePrinting()
 {
+  std::cerr<<"PreparePrinting_printPPI="<<GetDC()->GetPPI().x<<"\n";
   m_configuration.SetContext(*GetDC());
   SetupData();
 }
 
 void Printout::GetPageMargins(int *horizontal, int *vertical)
 {
+  std::cerr<<"GetPageMargins_printPPI="<<GetDC()->GetPPI().x<<"\n";
   *horizontal = (int) (m_configuration.Scale_Px(PRINT_MARGIN_HORIZONTAL));
   *vertical = (int) (m_configuration.Scale_Px(PRINT_MARGIN_VERTICAL));
 }
 
 int Printout::GetHeaderHeight()
 {
+  std::cerr<<"GetHeaderHeight_printPPI="<<GetDC()->GetPPI().x<<"\n";
   wxDC *dc = GetDC();
   int width, height;
 
@@ -328,6 +338,7 @@ int Printout::GetHeaderHeight()
 
 void Printout::PrintHeader(int pageNum, wxDC *dc)
 {
+  std::cerr<<"PrintHeader_printPPI="<<GetDC()->GetPPI().x<<"\n";
   int page_width, page_height;
   int title_width, title_height;
   int marginX, marginY;

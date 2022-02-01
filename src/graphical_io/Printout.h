@@ -74,6 +74,7 @@ public:
 private:
   wxString m_title;
   std::unique_ptr<GroupCell> m_tree;
+  std::unique_ptr<GroupCell> m_pageBreakTree;
   std::vector<Cell *> m_pages;
   Configuration m_configuration;
   Configuration *m_configPointer;
