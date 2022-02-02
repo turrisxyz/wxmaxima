@@ -935,7 +935,7 @@ void Image::Recalculate(double scale)
 
 
   // pre-scale the image according to the current output's ppi and the image's ppi;
-  scale *= (*m_configuration)->GetDC()->GetPPI().x;
+  scale *= (*m_configuration)->GetPPI().x;
   scale /= m_ppi;
 
   if ((width < 1) || (height < 1))
@@ -964,10 +964,10 @@ void Image::Recalculate(double scale)
   }
 
   // Shrink to be smaller than the maximum size.
-  if ((m_maxWidth > 0) && (scale * width > m_maxWidth * (*m_configuration)->GetDC()->GetPPI().x))
-    scale = m_maxWidth * (*m_configuration)->GetDC()->GetPPI().x / width;
-  if ((m_maxHeight > 0) && (scale * height > m_maxHeight * (*m_configuration)->GetDC()->GetPPI().y))
-    scale = m_maxHeight * (*m_configuration)->GetDC()->GetPPI().y / height;
+  if ((m_maxWidth > 0) && (scale * width > m_maxWidth * (*m_configuration)->GetPPI().x))
+    scale = m_maxWidth * (*m_configuration)->GetPPI().x / width;
+  if ((m_maxHeight > 0) && (scale * height > m_maxHeight * (*m_configuration)->GetPPI().y))
+    scale = m_maxHeight * (*m_configuration)->GetPPI().y / height;
   
   // Set the width of the scaled image
   m_height = (int) (scale * height);
@@ -983,7 +983,7 @@ void Image::Recalculate(double scale)
   if (m_scaledBitmap.GetWidth() != m_width)
     ClearCache();
 
-  std::cerr<<"this="<<this<<" scale="<<scale<<", ImgPPI="<<m_ppi<<", dcPPI="<<(*m_configuration)->GetDC()->GetPPI().x<<"\n";
+  std::cerr<<"this="<<this<<" scale="<<scale<<", ImgPPI="<<m_ppi<<", dcPPI="<<(*m_configuration)->GetPPI().x<<"\n";
 }
 
 const wxString &Image::GetBadImageToolTip()
