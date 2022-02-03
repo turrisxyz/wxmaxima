@@ -381,6 +381,7 @@ void Printout::Recalculate()
     group.Recalculate();
 
   m_tree->UpdateYPositionList();
+  std::cerr<<"PrintoutRecalcEnd\n";
 }
 
 void Printout::DestroyTree()

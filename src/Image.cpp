@@ -111,10 +111,10 @@ Image::Image(Configuration **config, wxString image, std::shared_ptr<wxFileSyste
   LoadImage(image, filesystem, remove);
 }
 
-Image::Image(const Image &image)
+Image::Image(Configuration **config, const Image &image)
 {
   m_svgImage = NULL;
-  m_configuration = image.m_configuration;
+  m_configuration = config;
   m_scaledBitmap.Create(1, 1);
   m_isOk = image.m_isOk;
   m_width = 1;
