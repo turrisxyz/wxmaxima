@@ -40,11 +40,11 @@ to both
 class ImgCellBase : public Cell
 {
 public:
-  ImgCellBase(GroupCell *group, Configuration **config):Cell(group,config){}
+  ImgCellBase(GroupCell *group, Configuration **config);
 
   virtual std::unique_ptr<Cell> Copy(GroupCell *group) const override = 0;
-  virtual const CellTypeInfo &GetInfo() override;
-  virtual ~ImgCellBase() override {};
+  virtual const CellTypeInfo &GetInfo() override = 0;
+  virtual ~ImgCellBase() override;
 
   //! This class can be derived from wxAccessible which has no copy constructor
   ImgCellBase &operator=(const ImgCellBase&) = delete;
