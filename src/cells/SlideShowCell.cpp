@@ -113,7 +113,7 @@ void SlideShow::SetConfiguration(Configuration **config)
 {
   m_configuration = config;
   for(std::vector<std::shared_ptr<Image>>::const_iterator i = m_images.begin(); i != m_images.end(); ++i)
-    i->SetConfiguration(config);
+    (*i)->SetConfiguration(config);
 }
 
 SlideShow::~SlideShow()
