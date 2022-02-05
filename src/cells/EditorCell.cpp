@@ -2485,7 +2485,7 @@ void EditorCell::FindMatchingParens()
     (charUnderCursor == wxT('{'))
     )
   {
-    unsigned int parenLevel = 1;
+    unsigned int parenLevel = 0;
     unsigned int pos = 0;
     for (auto const &tok : MaximaTokenizer(m_text, *m_configuration).PopTokens())
     {
@@ -2516,6 +2516,7 @@ void EditorCell::FindMatchingParens()
       }
       pos += tok.GetText().Length();
     }
+    return;
   }
   if(
     (charUnderCursor == wxT(')')) ||
@@ -2523,6 +2524,40 @@ void EditorCell::FindMatchingParens()
     (charUnderCursor == wxT(']'))
     )
   {
+    unsigned int parenLevel = 0;
+    unsigned int pos = m_text.Length()-1;
+    auto const tokens = MaximaTokenizer(m_text, *m_configuration).PopTokens();
+    for (auto tok = tokens.rbegin(); tok != tokens.rend(); ++tok)
+    {
+      if(pos <= m_positionOfCaret)
+      {
+        if(
+          (tok->GetText().StartsWith(wxT("("))) ||
+          (tok->GetText().StartsWith(wxT("["))) ||
+          (tok->GetText().StartsWith(wxT("{")))
+          )
+        {
+          parenLevel--;
+          if(parenLevel == 0)
+          {
+            m_paren1 = pos;
+            m_paren2 = m_positionOfCaret;
+          }
+        }
+        else
+        {
+          if(
+            (tok->GetText().StartsWith(wxT(")"))) ||
+            (tok->GetText().StartsWith(wxT("]"))) ||
+            (tok->GetText().StartsWith(wxT("}")))
+            )
+          {
+            parenLevel++;
+          }
+        }
+      }
+      pos -= tok->GetText().Length();
+    }
   }
 }
 
