@@ -2448,47 +2448,41 @@ bool EditorCell::FindMatchingQuotes()
     return false;
   }
 
-  if (pos > (long) m_text.Length())
-    pos = (long) m_text.Length();
-  if ((pos == (long) m_text.Length()) ||
-      (wxString(wxT("\"")).Find(m_text.GetChar(pos)) == -1))
+  long lastQuote = -1;
+  long posInString = 0;
+  for (auto const &tok : MaximaTokenizer(m_text, *m_configuration).PopTokens())
   {
-    pos--;
-    if (pos < 0 ||
-        wxString(wxT("\"")).Find(m_text.GetChar(pos)) == -1)
+    if((lastQuote > 0) &&
+       (posInString >= pos))
     {
-      m_paren1 = m_paren2 = -1;
-      return false;
+      m_paren1 = lastQuote;
+      m_paren2 = pos;
+      return true;
     }
-  }
 
-  decltype(m_text)::char_type prevCh = {};
-  int count = 0;
-  int i = 0;
-  for (auto ch : m_text) {
-    if (ch == '"' && prevCh != '\\')
+    if(tok.GetText().StartsWith(wxT("\"")))
     {
-      ++count;
-      if (count & 1)
+      if(pos > posInString)
       {
-        m_paren1 = i;  // open quote here
+        m_paren1 = pos;
+        m_paren2 = posInString;
+        return true;
       }
       else
       {
-        m_paren2 = i;  // close quote here
-        if (m_paren1 == pos || m_paren2 == pos)
+        if(lastQuote >= 0)
         {
-          // found the pair of quotes under the cursor
-          return true;
+          lastQuote = 0;
+        }
+        else          
+        {
+          lastQuote = posInString;
         }
       }
     }
-    ++i;
-    prevCh = ch;
+    posInString += tok.GetText().Length();
+    std::cerr<<"token="<<tok.GetText()<<"\n";
   }
-
-  // didn't find matching quotes; do not highlight quotes
-  m_paren1 = m_paren2 = -1;
   return false;
 }
 
