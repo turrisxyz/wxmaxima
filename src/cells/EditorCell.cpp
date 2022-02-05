@@ -2441,47 +2441,28 @@ bool EditorCell::HandleOrdinaryKey(wxKeyEvent &event)
  */
 bool EditorCell::FindMatchingQuotes()
 {
-  int pos = m_positionOfCaret;
-  if (pos < 0)
+  if (m_positionOfCaret < 0)
   {
     m_paren1 = m_paren2 = -1;
     return false;
   }
 
-  long lastQuote = -1;
-  long posInString = 0;
+  size_t pos = 0;
   for (auto const &tok : MaximaTokenizer(m_text, *m_configuration).PopTokens())
   {
-    if((lastQuote > 0) &&
-       (posInString >= pos))
+    if((tok.GetText().StartsWith(wxT("\""))) && (tok.GetText().EndsWith(wxT("\""))))
     {
-      m_paren1 = lastQuote;
-      m_paren2 = pos;
-      return true;
-    }
-
-    if(tok.GetText().StartsWith(wxT("\"")))
-    {
-      if(pos > posInString)
+      size_t tokenEnd = pos + tok.GetText().Length() - 1;
+      if ((m_positionOfCaret == tokenEnd) || (m_positionOfCaret == pos))
       {
         m_paren1 = pos;
-        m_paren2 = posInString;
+        m_paren2 = tokenEnd;
         return true;
       }
-      else
-      {
-        if(lastQuote >= 0)
-        {
-          lastQuote = 0;
-        }
-        else          
-        {
-          lastQuote = posInString;
-        }
-      }
     }
-    posInString += tok.GetText().Length();
-    std::cerr<<"token="<<tok.GetText()<<"\n";
+    if(pos > m_positionOfCaret)
+      return false;
+    pos += tok.GetText().Length();
   }
   return false;
 }
