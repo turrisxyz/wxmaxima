@@ -329,8 +329,17 @@ wxSize TextCell::CalculateTextSize(wxDC *const dc, const wxString &text, SizeCac
   if (text.empty())
     return {};
 
-  auto const size = dc->GetTextExtent(text);
-  return size;
+  auto cacheEntry = cache.find((int)(1000.0*fontSize.Get()));
+  if(cacheEntry == cache.end())
+    {
+      auto const size = dc->GetTextExtent(text);
+      cache[(int)(1000.0*fontSize.Get())] = new wxSize(size);
+      return size;
+    }
+  else
+  {
+    return(*(cacheEntry->second));
+  }
 }
 
 void TextCell::UpdateDisplayedText()
