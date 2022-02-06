@@ -62,6 +62,12 @@ private:
   //! Last few digits (also used for user defined label)
   wxString m_numEnd;
 
+  SizeCache m_numStartSizeCache;
+  SizeCache m_numEllipsisSizeCache;
+  SizeCache m_numEndSizeCache;
+
+  virtual void FontsChanged() override;
+  
   //** 4-byte objects (12 bytes)
   //**
   int m_numStartWidth = 0;

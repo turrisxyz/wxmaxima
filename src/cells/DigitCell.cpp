@@ -51,7 +51,7 @@ void DigitCell::Recalculate(AFontSize fontsize)
   {      
     Cell::Recalculate(fontsize);
     SetFont(m_fontSize_Scaled);
-    wxSize sz = CalculateTextSize((*m_configuration)->GetDC(), m_displayedText, cellText);
+    wxSize sz = CalculateTextSize((*m_configuration)->GetDC());
     m_width = sz.GetWidth();
     m_height = sz.GetHeight();
     m_height += 2 * MC_TEXT_PADDING;

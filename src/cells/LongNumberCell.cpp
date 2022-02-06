@@ -123,9 +123,9 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
         SetFont(m_fontSize_Scaled);
         Configuration *configuration = (*m_configuration);
         wxDC *dc = configuration->GetDC();
-        auto numStartSize = CalculateTextSize(dc, m_numStart, numberStart);
-        auto ellipsisSize = CalculateTextSize(dc, m_ellipsis, ellipsis);
-        auto numEndSize   = CalculateTextSize(dc, m_numEnd,   numberEnd);
+        auto numStartSize = CalculateTextSize(dc, m_numStart, m_numStartSizeCache);
+        auto ellipsisSize = CalculateTextSize(dc, m_ellipsis, m_numEllipsisSizeCache);
+        auto numEndSize   = CalculateTextSize(dc, m_numEnd, m_numEndSizeCache);
         m_numStartWidth = numStartSize.GetWidth();
         m_ellipsisWidth = ellipsisSize.GetWidth();
         m_width = m_numStartWidth + m_ellipsisWidth + numEndSize.GetWidth();
@@ -138,6 +138,14 @@ void LongNumberCell::Recalculate(AFontSize fontsize)
   m_displayedDigits_old = (*m_configuration)->GetDisplayedDigits();
   m_showAllDigits_old = (*m_configuration)->ShowAllDigits();
   m_linebreaksInLongLines_old = (*m_configuration)->LineBreaksInLongNums();
+}
+
+void LongNumberCell::FontsChanged()
+{
+  TextCell::FontsChanged();
+  m_numStartSizeCache.clear();
+  m_numEllipsisSizeCache.clear();
+  m_numEndSizeCache.clear();
 }
 
 void LongNumberCell::Draw(wxPoint point)

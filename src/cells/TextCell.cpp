@@ -323,14 +323,13 @@ bool TextCell::NeedsRecalculation(AFontSize fontSize) const
     (m_keepPercent_last != (*m_configuration)->CheckKeepPercent());
 }
 
-wxSize TextCell::CalculateTextSize(wxDC *const dc, const wxString &text, TextCell::TextIndex const index)
+wxSize TextCell::CalculateTextSize(wxDC *const dc, const wxString &text, SizeCache &cache)
 {
   AFontSize const fontSize = GetScaledTextSize();
   if (text.empty())
     return {};
 
   auto const size = dc->GetTextExtent(text);
-  m_sizeCache.emplace_back(size, fontSize, index);
   return size;
 }
 
@@ -393,7 +392,7 @@ void TextCell::Recalculate(AFontSize fontsize)
     SetFont(m_fontSize_Scaled);
 
 
-    wxSize sz = CalculateTextSize((*m_configuration)->GetDC(), m_displayedText, cellText);
+    wxSize sz = CalculateTextSize((*m_configuration)->GetDC());
     m_width = sz.GetWidth();
     m_height = sz.GetHeight();
     

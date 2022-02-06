@@ -98,7 +98,7 @@ protected:
   void UpdateToolTip();
   const wxString &GetAltCopyText() const override { return m_altCopyText; }
 
-  void FontsChanged() override
+  virtual void FontsChanged() override
   {
     ResetSize();
     ResetData();
@@ -117,17 +117,6 @@ protected:
     numberEnd    
   };
 
-  struct SizeEntry {
-    wxSize textSize;
-    AFontSize fontSize;
-    TextIndex index;
-    SizeEntry(wxSize textSize, AFontSize fontSize, TextIndex index) :
-      textSize(textSize), fontSize(fontSize), index(index) {}
-    SizeEntry() = default;
-  };
-
-  wxSize CalculateTextSize(wxDC *dc, const wxString &text, TextCell::TextIndex const index);
-
   static wxRegEx m_unescapeRegEx;
   static wxRegEx m_roundingErrorRegEx1;
   static wxRegEx m_roundingErrorRegEx2;
@@ -140,7 +129,12 @@ protected:
   wxString m_text;
   //! The text we display: We might want to convert some characters or do similar things
   wxString m_displayedText;
-  std::vector<SizeEntry> m_sizeCache;
+  
+  WX_DECLARE_HASH_MAP( int, wxSize*, wxIntegerHash, wxIntegerEqual, SizeCache );
+  SizeCache m_sizeCache;
+
+  wxSize CalculateTextSize(wxDC *dc) {return CalculateTextSize(dc, m_displayedText, m_sizeCache);}
+  wxSize CalculateTextSize(wxDC *dc, const wxString &text, SizeCache &cache);
 
 //** Bitfield objects (1 bytes)
 //**
