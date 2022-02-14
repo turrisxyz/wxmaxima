@@ -51,18 +51,18 @@ TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **confi
   SetSizer(box);
   FitInside();
   m_regex->Connect(REGEX_EVENT, wxCommandEventHandler(TableOfContents::OnRegExEvent), NULL, this);
-  Connect(wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TableOfContents::OnDragStart), NULL, this);
   Connect(wxEVT_SIZE, wxSizeEventHandler(TableOfContents::OnSize));
   Connect(wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TableOfContents::OnMouseRightDown));
-  Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TableOfContents::OnMouseUp), NULL, this);
-  Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost));
+  m_displayedItems->Connect(wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TableOfContents::OnDragStart), NULL, this);
+  m_displayedItems->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TableOfContents::OnMouseUp), NULL, this);
+  m_displayedItems->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost), NULL, this);
 }
 
 void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &WXUNUSED(event))
 {
   m_dragStart = -1;
-  if (HasCapture())
-    ReleaseMouse();
+  if (m_displayedItems->HasCapture())
+    m_displayedItems->ReleaseMouse();
 }
 
 void TableOfContents::OnDragStart(wxListEvent &evt)
@@ -71,15 +71,18 @@ void TableOfContents::OnDragStart(wxListEvent &evt)
   if(evt.GetIndex() >= 0)
   {
     // Tell the OS that until the drop event this control wants to receive all mouse events
-    if (!HasCapture())
-      CaptureMouse();
+    if (!m_displayedItems->HasCapture())
+      m_displayedItems->CaptureMouse();
   }
 }
 
 void TableOfContents::OnMouseUp(wxMouseEvent &evt)
 {
-  if (HasCapture())
-    ReleaseMouse();
+  if (m_displayedItems->HasCapture())
+    m_displayedItems->ReleaseMouse();
+  int flags;
+  long item = m_displayedItems->HitTest(evt.GetPosition(), flags, NULL);
+  std::cerr<<m_dragStart<<"->"<<item<<"\n";
   m_dragStart = -1;
 }
 
