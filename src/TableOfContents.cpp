@@ -51,8 +51,36 @@ TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **confi
   SetSizer(box);
   FitInside();
   m_regex->Connect(REGEX_EVENT, wxCommandEventHandler(TableOfContents::OnRegExEvent), NULL, this);
+  Connect(wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TableOfContents::OnDragStart), NULL, this);
   Connect(wxEVT_SIZE, wxSizeEventHandler(TableOfContents::OnSize));
   Connect(wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TableOfContents::OnMouseRightDown));
+  Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TableOfContents::OnMouseUp), NULL, this);
+  Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost));
+}
+
+void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &WXUNUSED(event))
+{
+  m_dragStart = -1;
+  if (HasCapture())
+    ReleaseMouse();
+}
+
+void TableOfContents::OnDragStart(wxListEvent &evt)
+{
+  m_dragStart = evt.GetIndex();
+  if(evt.GetIndex() >= 0)
+  {
+    // Tell the OS that until the drop event this control wants to receive all mouse events
+    if (!HasCapture())
+      CaptureMouse();
+  }
+}
+
+void TableOfContents::OnMouseUp(wxMouseEvent &evt)
+{
+  if (HasCapture())
+    ReleaseMouse();
+  m_dragStart = -1;
 }
 
 void TableOfContents::OnSize(wxSizeEvent &event)
@@ -63,6 +91,8 @@ void TableOfContents::OnSize(wxSizeEvent &event)
 
 TableOfContents::~TableOfContents()
 {
+  if (HasCapture())
+    ReleaseMouse();
 }
 
 void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)

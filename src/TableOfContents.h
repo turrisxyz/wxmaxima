@@ -92,9 +92,13 @@ public:
 
 protected:
   void OnSize(wxSizeEvent &event);
+  void OnDragStart(wxListEvent &evt);
+  void OnMouseUp(wxMouseEvent &evt);
+  void OnMouseCaptureLost(wxMouseCaptureLostEvent &event);
 
 private:
   GroupCell *m_cellRightClickedOn;
+  int m_dragStart = -1;
   //! The last selected item
   long m_lastSelection;
   
