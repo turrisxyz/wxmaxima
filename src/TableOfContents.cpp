@@ -30,7 +30,9 @@
 
 #include <wx/sizer.h>
 
-TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) : wxPanel(parent, id)
+TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) :
+  wxPanel(parent, id),
+  m_dragImage("Test")
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -58,6 +60,14 @@ TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **confi
   m_displayedItems->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost), NULL, this);
 }
 
+void TableOfContents::OnMouseMotion(wxMouseEvent &event)
+{
+  if(m_dragStart >= 0)
+  {
+    m_dragImage.Move(wxPoint(event.GetX(),event.GetY()));
+  }
+}
+
 void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &WXUNUSED(event))
 {
   m_dragStart = -1;
@@ -72,7 +82,9 @@ void TableOfContents::OnDragStart(wxListEvent &evt)
   {
     // Tell the OS that until the drop event this control wants to receive all mouse events
     if (!m_displayedItems->HasCapture())
-      m_displayedItems->CaptureMouse();
+      m_dragImage.BeginDrag (evt.GetPoint(),
+                             m_displayedItems, m_displayedItems);
+    m_dragImage.Show();
   }
 }
 
@@ -80,10 +92,18 @@ void TableOfContents::OnMouseUp(wxMouseEvent &evt)
 {
   if (m_displayedItems->HasCapture())
     m_displayedItems->ReleaseMouse();
+  if(m_dragStart >= 0)
+  {
+    m_dragImage.EndDrag();
+  }
   int flags;
   long item = m_displayedItems->HitTest(evt.GetPosition(), flags, NULL);
   std::cerr<<m_dragStart<<"->"<<item<<"\n";
   m_dragStart = -1;
+  if(m_dragStart >= 0)
+  {
+    
+  }
 }
 
 void TableOfContents::OnSize(wxSizeEvent &event)

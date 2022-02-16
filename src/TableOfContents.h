@@ -30,6 +30,7 @@
 #include "RegexCtrl.h"
 #include <wx/wx.h>
 #include <wx/listctrl.h>
+#include <wx/dragimag.h>
 #include <vector>
 #include "GroupCell.h"
 
@@ -95,8 +96,10 @@ protected:
   void OnDragStart(wxListEvent &evt);
   void OnMouseUp(wxMouseEvent &evt);
   void OnMouseCaptureLost(wxMouseCaptureLostEvent &event);
+  void OnMouseMotion(wxMouseEvent &event);
 
 private:
+  wxDragImage m_dragImage;
   GroupCell *m_cellRightClickedOn;
   int m_dragStart = -1;
   //! The last selected item
