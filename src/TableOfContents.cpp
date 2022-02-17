@@ -31,8 +31,7 @@
 #include <wx/sizer.h>
 
 TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) :
-  wxPanel(parent, id),
-  m_dragImage("Test")
+  wxPanel(parent, id)
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -57,53 +56,64 @@ TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **confi
   Connect(wxEVT_LIST_ITEM_RIGHT_CLICK, wxListEventHandler(TableOfContents::OnMouseRightDown));
   m_displayedItems->Connect(wxEVT_LIST_BEGIN_DRAG, wxListEventHandler(TableOfContents::OnDragStart), NULL, this);
   m_displayedItems->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TableOfContents::OnMouseUp), NULL, this);
+  m_displayedItems->Connect(wxEVT_MOTION, wxMouseEventHandler(TableOfContents::OnMouseMotion), NULL, this);
   m_displayedItems->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost), NULL, this);
 }
 
 void TableOfContents::OnMouseMotion(wxMouseEvent &event)
 {
-  if(m_dragStart >= 0)
+  if(m_dragImage != NULL)
   {
-    m_dragImage.Move(wxPoint(event.GetX(),event.GetY()));
+    m_dragImage->Hide();
+    m_dragImage->Move(wxPoint(event.GetX(),event.GetY()));
+    m_dragImage->Show();
   }
+  event.Skip();
 }
 
-void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &WXUNUSED(event))
+void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
 {
   m_dragStart = -1;
-  if (m_displayedItems->HasCapture())
-    m_displayedItems->ReleaseMouse();
+  event.Skip();
 }
 
 void TableOfContents::OnDragStart(wxListEvent &evt)
 {
   m_dragStart = evt.GetIndex();
-  if(evt.GetIndex() >= 0)
+  if(m_dragStart >= 0)
   {
     // Tell the OS that until the drop event this control wants to receive all mouse events
     if (!m_displayedItems->HasCapture())
-      m_dragImage.BeginDrag (evt.GetPoint(),
+    {
+      wxListItem *item;
+      wxString dragImageLabel = m_displayedItems->GetItemText(evt.GetIndex());
+      if(dragImageLabel.Length() > 15)
+        dragImageLabel = dragImageLabel.Left(12)+wxT("...");
+      m_dragImage = new wxDragImage(dragImageLabel);
+      m_dragImage->BeginDrag (evt.GetPoint(),
                              m_displayedItems, m_displayedItems);
-    m_dragImage.Show();
+    }
+    m_dragImage->Show();
   }
 }
 
 void TableOfContents::OnMouseUp(wxMouseEvent &evt)
 {
-  if (m_displayedItems->HasCapture())
-    m_displayedItems->ReleaseMouse();
-  if(m_dragStart >= 0)
+  if(m_dragImage != NULL)
   {
-    m_dragImage.EndDrag();
+    m_dragImage->Hide();
+    m_dragImage->EndDrag();
+    delete m_dragImage;
+    m_dragImage = NULL;
   }
   int flags;
   long item = m_displayedItems->HitTest(evt.GetPosition(), flags, NULL);
-  std::cerr<<m_dragStart<<"->"<<item<<"\n";
   m_dragStart = -1;
   if(m_dragStart >= 0)
   {
     
   }
+  evt.Skip();
 }
 
 void TableOfContents::OnSize(wxSizeEvent &event)
@@ -114,8 +124,11 @@ void TableOfContents::OnSize(wxSizeEvent &event)
 
 TableOfContents::~TableOfContents()
 {
-  if (HasCapture())
-    ReleaseMouse();
+  if(m_dragImage != NULL)
+  {
+    m_dragImage->EndDrag();
+    m_dragImage = NULL;
+  }
 }
 
 void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)

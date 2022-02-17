@@ -99,7 +99,7 @@ protected:
   void OnMouseMotion(wxMouseEvent &event);
 
 private:
-  wxDragImage m_dragImage;
+  wxDragImage *m_dragImage = NULL;
   GroupCell *m_cellRightClickedOn;
   int m_dragStart = -1;
   //! The last selected item
