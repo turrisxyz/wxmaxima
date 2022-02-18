@@ -64,9 +64,19 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
 {
   if(m_dragImage != NULL)
   {
-    m_dragImage->Hide();
+    int flags;
+    long item = m_displayedItems->HitTest(event.GetPosition(), flags, NULL);
+    
+    if(m_dragFeedback_Last != item)
+    {
+      m_dragImage->Hide();
+    }
     m_dragImage->Move(wxPoint(event.GetX(),event.GetY()));
-    m_dragImage->Show();
+    if(m_dragFeedback_Last != item)
+    {
+      m_dragImage->Show();
+      m_dragFeedback_Last = item;
+    }
   }
   event.Skip();
 }
@@ -80,20 +90,36 @@ void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
 void TableOfContents::OnDragStart(wxListEvent &evt)
 {
   m_dragStart = evt.GetIndex();
+  m_dragFeedback_Last = m_dragStart;
   if(m_dragStart >= 0)
   {
     // Tell the OS that until the drop event this control wants to receive all mouse events
     if (!m_displayedItems->HasCapture())
     {
-      wxListItem *item;
       wxString dragImageLabel = m_displayedItems->GetItemText(evt.GetIndex());
       if(dragImageLabel.Length() > 15)
         dragImageLabel = dragImageLabel.Left(12)+wxT("...");
       m_dragImage = new wxDragImage(dragImageLabel);
-      m_dragImage->BeginDrag (evt.GetPoint(),
-                             m_displayedItems, m_displayedItems);
+      m_dragImage->BeginDrag (wxPoint(0,0), m_displayedItems);
     }
     m_dragImage->Show();
+
+    // For the visual feedback: How many toc items does the user drag?
+    m_numberOfCaptionsDragged = 1;
+    GroupCell *tmp = m_displayedGroupCells[evt.GetIndex()];    
+    long index = evt.GetIndex() + 1;
+    tmp = tmp->GetNext();
+    while((tmp!= NULL) && (index <= m_displayedItems->GetItemCount()))
+    {
+      if(!tmp->IsLesserGCType(m_displayedGroupCells[evt.GetIndex()]->GetGroupType()))
+        break;
+      if(m_displayedGroupCells[index] == tmp)
+      {
+        index++;
+        m_numberOfCaptionsDragged++;
+      }
+      tmp = tmp->GetNext();
+    }
   }
 }
 
@@ -183,6 +209,7 @@ void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)
 
 void TableOfContents::UpdateDisplay()
 {
+  m_displayedGroupCells.clear();
   wxArrayString items;
 
   // Create a wxArrayString containing all section/chapter/... titles we want
@@ -258,7 +285,10 @@ void TableOfContents::UpdateDisplay()
     curr.Replace(wxT("\n"), wxT(" "));
 
     if (m_regex->Matches(curr))
+    {
       items.Add(curr);
+      m_displayedGroupCells.push_back(m_structure[i]);
+    }
   }
   
   // Work around a wxWidgets bug: items==m_items_old if items is empty and m_items_old isn't.
