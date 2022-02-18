@@ -31,7 +31,9 @@
 #include <wx/sizer.h>
 
 TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) :
-  wxPanel(parent, id)
+  wxPanel(parent, id),
+  m_scrollUpTimer(this, wxUP),
+  m_scrollDownTimer(this, wxDOWN)
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -58,6 +60,41 @@ TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **confi
   m_displayedItems->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(TableOfContents::OnMouseUp), NULL, this);
   m_displayedItems->Connect(wxEVT_MOTION, wxMouseEventHandler(TableOfContents::OnMouseMotion), NULL, this);
   m_displayedItems->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(TableOfContents::OnMouseCaptureLost), NULL, this);
+  Connect(wxEVT_TIMER, wxTimerEventHandler(TableOfContents::OnTimer));
+}
+
+void TableOfContents::OnTimer(wxTimerEvent &event)
+{
+  switch (event.GetId())
+  {
+  case wxUP:
+  {
+    if(m_displayedItems->GetItemCount() < 1)
+      return;
+    long item = m_displayedItems->GetTopItem() - 1;
+    if(item < 0)
+    {
+      item = 0;
+    }
+    m_displayedItems->EnsureVisible(item);
+    break;
+  }
+  case wxDOWN:
+  {
+    if(m_displayedItems->GetItemCount() < 1)
+      return;
+    long item = m_displayedItems->GetTopItem() + m_displayedItems->GetCountPerPage();
+    if(item >= m_displayedItems->GetItemCount())
+    {
+      item = m_displayedItems->GetItemCount() - 1;
+    }
+    m_displayedItems->EnsureVisible(item);
+    break;
+  }
+  default:
+  {
+  }
+  }
 }
 
 void TableOfContents::OnMouseMotion(wxMouseEvent &event)
@@ -66,7 +103,6 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
   {
     int flags;
     long item = m_displayedItems->HitTest(event.GetPosition(), flags, NULL);
-    
     if(m_dragFeedback_Last != item)
     {
       m_dragImage->Hide();
@@ -77,6 +113,24 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
       m_dragImage->Show();
       m_dragFeedback_Last = item;
     }
+    if(event.GetY() < 0)
+    {
+      if(!m_scrollUpTimer.IsRunning())
+      {
+        m_scrollUpTimer.Start(50);
+      }
+    }
+    else
+      m_scrollUpTimer.Stop();
+    if(event.GetY() > m_displayedItems->GetRect().GetHeight())
+    {
+      if(!m_scrollDownTimer.IsRunning())
+      {
+        m_scrollDownTimer.Start(50);
+      }
+    }
+    else
+      m_scrollDownTimer.Stop();
   }
   event.Skip();
 }
@@ -84,6 +138,8 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
 void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
 {
   m_dragStart = -1;
+  m_scrollUpTimer.Stop();
+  m_scrollDownTimer.Stop();
   event.Skip();
 }
 
@@ -125,6 +181,8 @@ void TableOfContents::OnDragStart(wxListEvent &evt)
 
 void TableOfContents::OnMouseUp(wxMouseEvent &evt)
 {
+  m_scrollUpTimer.Stop();
+  m_scrollDownTimer.Stop();
   if(m_dragImage != NULL)
   {
     m_dragImage->Hide();

@@ -29,6 +29,7 @@
 #include "Configuration.h"
 #include "RegexCtrl.h"
 #include <wx/wx.h>
+#include <wx/timer.h>
 #include <wx/listctrl.h>
 #include <wx/dragimag.h>
 #include <vector>
@@ -97,8 +98,11 @@ protected:
   void OnMouseUp(wxMouseEvent &evt);
   void OnMouseCaptureLost(wxMouseCaptureLostEvent &event);
   void OnMouseMotion(wxMouseEvent &event);
+  void OnTimer(wxTimerEvent &event);
 
 private:
+  wxTimer m_scrollUpTimer;
+  wxTimer m_scrollDownTimer;
   wxDragImage *m_dragImage = NULL;
   std::vector<GroupCell *> m_displayedGroupCells;
   //! How many toc items did the user drag at the same time?
