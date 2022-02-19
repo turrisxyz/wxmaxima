@@ -268,7 +268,6 @@ void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)
 void TableOfContents::UpdateDisplay()
 {
   m_displayedGroupCells.clear();
-  wxArrayString items;
 
   // Create a wxArrayString containing all section/chapter/... titles we want
   // to display
@@ -344,32 +343,41 @@ void TableOfContents::UpdateDisplay()
 
     if (m_regex->Matches(curr))
     {
-      items.Add(curr);
       m_displayedGroupCells.push_back(m_structure[i]);
     }
   }
-  
+
+  std::vector<GroupCell *> displayedCells_dndOrder;
+
+  displayedCells_dndOrder = m_displayedGroupCells;
+
+  wxArrayString items;
+  for(auto i : displayedCells_dndOrder)
+    items.Add(i->GetEditable()->ToString());
+
   // Work around a wxWidgets bug: items==m_items_old if items is empty and m_items_old isn't.
   if ((items != m_items_old) || (items.GetCount() == 0))
   {
+    // Delete superfluous items
+    for (unsigned int i = m_displayedItems->GetItemCount();
+         i > m_displayedGroupCells.size() ; i--)
+      m_displayedItems->DeleteItem(i - 1);
+
     // Update the name of all existing items and add new items, if necessary.
     // We don't just empty the item list and create a new one since on Windows this
     // causes excessive flickering.
     for (signed int i = 0; i < (signed)items.GetCount(); i++)
     {
       if ((i < m_displayedItems->GetItemCount()) && (m_displayedItems->GetItemCount() > 0))
-        m_displayedItems->SetItemText(i, items[i]);
+        m_displayedItems->SetItemText(i, m_displayedGroupCells[i]->GetEditable()->ToString());
       else
-        m_displayedItems->InsertItem(i, items[i]);
+        m_displayedItems->InsertItem(i, m_displayedGroupCells[i]->GetEditable()->ToString());
       
       if (m_structure[i]->GetHiddenTree())
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
       else
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
     }
-    // Delete superfluous items
-    for (unsigned int i = m_displayedItems->GetItemCount(); i > items.GetCount() ; i--)
-      m_displayedItems->DeleteItem(i - 1);
     m_items_old = items;
   }
 }
