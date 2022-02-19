@@ -102,16 +102,17 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
   if(m_dragImage != NULL)
   {
     int flags;
-    long item = m_displayedItems->HitTest(event.GetPosition(), flags, NULL);
-    if(m_dragFeedback_Last != item)
+    m_dragCurrentPos = m_displayedItems->HitTest(event.GetPosition(), flags, NULL);
+    if(m_dragFeedback_Last != m_dragCurrentPos)
     {
       m_dragImage->Hide();
+      UpdateDisplay();
     }
     m_dragImage->Move(wxPoint(event.GetX(),event.GetY()));
-    if(m_dragFeedback_Last != item)
+    if(m_dragFeedback_Last != m_dragCurrentPos)
     {
       m_dragImage->Show();
-      m_dragFeedback_Last = item;
+      m_dragFeedback_Last = m_dragCurrentPos;
     }
     if(event.GetY() < 0)
     {
@@ -140,6 +141,7 @@ void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
   m_dragStart = -1;
   m_scrollUpTimer.Stop();
   m_scrollDownTimer.Stop();
+  UpdateDisplay();
   event.Skip();
 }
 
@@ -156,7 +158,9 @@ void TableOfContents::OnDragStart(wxListEvent &evt)
       if(dragImageLabel.Length() > 15)
         dragImageLabel = dragImageLabel.Left(12)+wxT("...");
       m_dragImage = new wxDragImage(dragImageLabel);
-      m_dragImage->BeginDrag (wxPoint(0,0), m_displayedItems);
+      m_dragImage->BeginDrag (
+        wxPoint(-20 * GetContentScaleFactor(),-20 * GetContentScaleFactor()),
+        m_displayedItems);
     }
     m_dragImage->Show();
 
@@ -197,6 +201,7 @@ void TableOfContents::OnMouseUp(wxMouseEvent &evt)
   {
     
   }
+  UpdateDisplay();
   evt.Skip();
 }
 
@@ -349,8 +354,24 @@ void TableOfContents::UpdateDisplay()
 
   std::vector<GroupCell *> displayedCells_dndOrder;
 
-  displayedCells_dndOrder = m_displayedGroupCells;
-
+  if((m_dragStart < 0) || (m_dragCurrentPos < 0))
+    displayedCells_dndOrder = m_displayedGroupCells;
+  else
+  {
+    long index = 0;
+    for (long index = 0; index < m_structure.size(); index++)
+    {
+      if(index == m_dragCurrentPos)
+      {
+        for(auto o=0; o<m_numberOfCaptionsDragged; o++)
+          displayedCells_dndOrder.push_back(m_displayedGroupCells[o+m_dragStart]);
+      }
+      if(index == m_dragStart + 1)
+        index += m_numberOfCaptionsDragged;
+      if(index < m_structure.size())
+          displayedCells_dndOrder.push_back(m_displayedGroupCells[index]);
+    }
+  }
   wxArrayString items;
   for(auto i : displayedCells_dndOrder)
     items.Add(i->GetEditable()->ToString());
@@ -360,7 +381,7 @@ void TableOfContents::UpdateDisplay()
   {
     // Delete superfluous items
     for (unsigned int i = m_displayedItems->GetItemCount();
-         i > m_displayedGroupCells.size() ; i--)
+         i > displayedCells_dndOrder.size() ; i--)
       m_displayedItems->DeleteItem(i - 1);
 
     // Update the name of all existing items and add new items, if necessary.
@@ -369,9 +390,9 @@ void TableOfContents::UpdateDisplay()
     for (signed int i = 0; i < (signed)items.GetCount(); i++)
     {
       if ((i < m_displayedItems->GetItemCount()) && (m_displayedItems->GetItemCount() > 0))
-        m_displayedItems->SetItemText(i, m_displayedGroupCells[i]->GetEditable()->ToString());
+        m_displayedItems->SetItemText(i, displayedCells_dndOrder[i]->GetEditable()->ToString());
       else
-        m_displayedItems->InsertItem(i, m_displayedGroupCells[i]->GetEditable()->ToString());
+        m_displayedItems->InsertItem(i, displayedCells_dndOrder[i]->GetEditable()->ToString());
       
       if (m_structure[i]->GetHiddenTree())
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));

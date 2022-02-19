@@ -110,6 +110,7 @@ private:
   GroupCell *m_cellRightClickedOn;
   //! The item that was dragged away at the start of the current drag-and-drop
   int m_dragStart = -1;
+  long m_dragCurrentPos = -1;
   //! The position the dragged item was when we last displayed the reordered toc
   int m_dragFeedback_Last = -1;
   //! The last selected item
