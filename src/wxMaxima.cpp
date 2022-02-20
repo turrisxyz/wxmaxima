@@ -9006,6 +9006,16 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
   }
   case TableOfContents::popid_tocdnd:
   {
+    GroupCell *droppedRegionStart =  m_worksheet->m_tableOfContents->DNDStart();
+    GroupCell *droppedRegionend = droppedRegionStart;
+    if(droppedRegionend->GetNext())
+      droppedRegionend = droppedRegionend->GetNext();
+    while((droppedRegionend->GetNext() != NULL) && (droppedRegionend->IsLesserGCType(droppedRegionStart->GetGroupType())))
+      droppedRegionend = droppedRegionend->GetNext();
+    
+    auto droppedRegion = CellList::TearOut(droppedRegionStart, droppedRegionend);
+    auto cells = static_unique_ptr_cast<Cell>(std::move(droppedRegion.cellOwner));
+    CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
     break;
   }
   case Worksheet::popid_evaluate_section:
