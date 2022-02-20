@@ -29,6 +29,7 @@
 #include "TableOfContents.h"
 
 #include <wx/sizer.h>
+#include <list>
 
 TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) :
   wxPanel(parent, id),
@@ -103,6 +104,8 @@ void TableOfContents::OnMouseMotion(wxMouseEvent &event)
   {
     int flags;
     m_dragCurrentPos = m_displayedItems->HitTest(event.GetPosition(), flags, NULL);
+    if(m_dragCurrentPos >= m_displayedItems->GetItemCount() - m_numberOfCaptionsDragged)
+      m_dragCurrentPos = m_numberOfCaptionsDragged - 1;
     if(m_dragFeedback_Last != m_dragCurrentPos)
     {
       m_dragImage->Hide();
@@ -281,7 +284,6 @@ void TableOfContents::UpdateDisplay()
     // Indentation further reduces the screen real-estate. So it is to be used
     // sparingly. But we should perhaps add at least a little bit of it to make
     // the list more readable.
-    wxString curr;
     int tocDepth = 0;
     switch (m_structure[i]->GetGroupType())
     {
@@ -311,6 +313,7 @@ void TableOfContents::UpdateDisplay()
     if((*m_configuration)->TocDepth() <= tocDepth)
       continue;
     
+    wxString curr;
     if ((*m_configuration)->TocShowsSectionNumbers())
     {
       if(m_structure[i]->GetPrompt() != NULL)
@@ -354,28 +357,50 @@ void TableOfContents::UpdateDisplay()
 
   std::vector<GroupCell *> displayedCells_dndOrder;
 
-  if((m_dragStart < 0) || (m_dragCurrentPos < 0))
-    displayedCells_dndOrder = m_displayedGroupCells;
-  else
+  if((m_dragStart >= 0) && (m_dragCurrentPos >= 0) && (m_dragStart != m_dragCurrentPos))
   {
-    long index = 0;
-    for (long index = 0; index < m_structure.size(); index++)
+    std::list<GroupCell *> m_draggedCells;
+    std::list<GroupCell *> m_otherCells;
+    for (auto i = 0; i < m_structure.size(); i++)
     {
-      if(index == m_dragCurrentPos)
+      if((i >= m_dragStart) && (i < m_dragStart + m_numberOfCaptionsDragged))
+        m_draggedCells.push_back(m_displayedGroupCells[i]);
+      else
+        m_otherCells.push_back(m_displayedGroupCells[i]);
+    }
+
+    for (auto index = 0; index < m_structure.size(); index++)
+    {
+      if(index >= m_dragCurrentPos)
       {
-        for(auto o=0; o<m_numberOfCaptionsDragged; o++)
-          displayedCells_dndOrder.push_back(m_displayedGroupCells[o+m_dragStart]);
+        while(!m_draggedCells.empty())
+        {
+          displayedCells_dndOrder.push_back(m_draggedCells.front());
+          m_draggedCells.pop_front();
+        }
+        break;
       }
-      if(index == m_dragStart + 1)
-        index += m_numberOfCaptionsDragged;
-      if(index < m_structure.size())
-          displayedCells_dndOrder.push_back(m_displayedGroupCells[index]);
+      else
+      {
+        if(!m_otherCells.empty())
+        {
+          displayedCells_dndOrder.push_back(m_otherCells.front());
+          m_otherCells.pop_front();
+        }
+      }
+    }
+    while(!m_otherCells.empty())
+    {
+      displayedCells_dndOrder.push_back(m_otherCells.front());
+      m_otherCells.pop_front();
     }
   }
+  else
+    displayedCells_dndOrder = m_displayedGroupCells;
+
   wxArrayString items;
   for(auto i : displayedCells_dndOrder)
     items.Add(i->GetEditable()->ToString());
-
   // Work around a wxWidgets bug: items==m_items_old if items is empty and m_items_old isn't.
   if ((items != m_items_old) || (items.GetCount() == 0))
   {
@@ -394,7 +419,7 @@ void TableOfContents::UpdateDisplay()
       else
         m_displayedItems->InsertItem(i, displayedCells_dndOrder[i]->GetEditable()->ToString());
       
-      if (m_structure[i]->GetHiddenTree())
+      if (displayedCells_dndOrder[i]->GetHiddenTree())
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
       else
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT));
