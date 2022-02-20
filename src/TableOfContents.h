@@ -63,6 +63,7 @@ public:
     popid_tocLevel4,
     popid_tocLevel5,
     popid_tocLevel6,
+    popid_tocdnd
   };
 
   TableOfContents(wxWindow *parent, int id, Configuration **config);
@@ -92,6 +93,8 @@ public:
   GroupCell *RightClickedOn()
   { return m_cellRightClickedOn; }
 
+  GroupCell *DNDStart() {return m_dndStartCell;}
+  GroupCell *DNDEnd() {return m_dndEndCell;}
 protected:
   void OnSize(wxSizeEvent &event);
   void OnDragStart(wxListEvent &evt);
@@ -100,7 +103,10 @@ protected:
   void OnMouseMotion(wxMouseEvent &event);
   void OnTimer(wxTimerEvent &event);
 
+  wxString TocEntryString(GroupCell *cell);
 private:
+  GroupCell *m_dndStartCell;
+  GroupCell *m_dndEndCell;
   wxTimer m_scrollUpTimer;
   wxTimer m_scrollDownTimer;
   wxDragImage *m_dragImage = NULL;
@@ -110,6 +116,7 @@ private:
   GroupCell *m_cellRightClickedOn;
   //! The item that was dragged away at the start of the current drag-and-drop
   int m_dragStart = -1;
+  int m_dragStop = -1;
   long m_dragCurrentPos = -1;
   //! The position the dragged item was when we last displayed the reordered toc
   int m_dragFeedback_Last = -1;

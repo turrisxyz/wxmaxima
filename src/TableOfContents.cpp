@@ -198,11 +198,18 @@ void TableOfContents::OnMouseUp(wxMouseEvent &evt)
     m_dragImage = NULL;
   }
   int flags;
-  long item = m_displayedItems->HitTest(evt.GetPosition(), flags, NULL);
-  m_dragStart = -1;
-  if(m_dragStart >= 0)
+  m_dragStop = m_displayedItems->HitTest(evt.GetPosition(), flags, NULL);
+  if(m_dragStop >= m_displayedItems->GetItemCount() - m_numberOfCaptionsDragged)
+    m_dragStop = m_numberOfCaptionsDragged - 1;
+  if((m_dragStart >= 0) && (m_dragStop >= 0) && (m_dragStart != m_dragStop))
   {
-    
+    wxWindow *mainWin = this;
+    while(mainWin->GetParent() != NULL)
+      mainWin = mainWin->GetParent();
+    wxCommandEvent *tocEv = new wxCommandEvent;
+    tocEv->SetEventType(wxEVT_MENU);
+    tocEv->SetId(popid_tocdnd);
+    mainWin->GetEventHandler()->QueueEvent(tocEv);
   }
   UpdateDisplay();
   evt.Skip();
@@ -313,42 +320,8 @@ void TableOfContents::UpdateDisplay()
     if((*m_configuration)->TocDepth() <= tocDepth)
       continue;
     
-    wxString curr;
-    if ((*m_configuration)->TocShowsSectionNumbers())
-    {
-      if(m_structure[i]->GetPrompt() != NULL)
-        curr = m_structure[i]->GetPrompt() -> ToString() + wxT(" ");
-      curr.Trim(false);
-    }
-    else
-      switch (m_structure[i]->GetGroupType())
-      {
-      case GC_TYPE_TITLE:
-        break;
-      case GC_TYPE_SECTION:
-        curr = wxT("  ");
-        break;
-      case GC_TYPE_SUBSECTION:
-        curr = wxT("    ");
-        break;
-      case GC_TYPE_SUBSUBSECTION:
-        curr = wxT("      ");
-        break;
-      case GC_TYPE_HEADING5:
-        curr = wxT("        ");
-        break;
-      case GC_TYPE_HEADING6:
-        curr = wxT("          ");
-        break;
-      default:
-        break;
-      }
+    wxString curr = TocEntryString(m_structure[i]);
     
-    curr += m_structure[i]->GetEditable()->ToString(true);
-
-    // Respecting linebreaks doesn't make much sense here.
-    curr.Replace(wxT("\n"), wxT(" "));
-
     if (m_regex->Matches(curr))
     {
       m_displayedGroupCells.push_back(m_structure[i]);
@@ -359,6 +332,9 @@ void TableOfContents::UpdateDisplay()
 
   if((m_dragStart >= 0) && (m_dragCurrentPos >= 0) && (m_dragStart != m_dragCurrentPos))
   {
+    m_dndStartCell = m_displayedGroupCells[m_dragStart];
+    m_dndEndCell   = m_displayedGroupCells[m_dragCurrentPos];
+
     std::list<GroupCell *> m_draggedCells;
     std::list<GroupCell *> m_otherCells;
     for (auto i = 0; i < m_structure.size(); i++)
@@ -400,7 +376,7 @@ void TableOfContents::UpdateDisplay()
 
   wxArrayString items;
   for(auto i : displayedCells_dndOrder)
-    items.Add(i->GetEditable()->ToString());
+    items.Add(TocEntryString(&(*i)));
   // Work around a wxWidgets bug: items==m_items_old if items is empty and m_items_old isn't.
   if ((items != m_items_old) || (items.GetCount() == 0))
   {
@@ -415,9 +391,9 @@ void TableOfContents::UpdateDisplay()
     for (signed int i = 0; i < (signed)items.GetCount(); i++)
     {
       if ((i < m_displayedItems->GetItemCount()) && (m_displayedItems->GetItemCount() > 0))
-        m_displayedItems->SetItemText(i, displayedCells_dndOrder[i]->GetEditable()->ToString());
+        m_displayedItems->SetItemText(i, TocEntryString(displayedCells_dndOrder[i]));
       else
-        m_displayedItems->InsertItem(i, displayedCells_dndOrder[i]->GetEditable()->ToString());
+        m_displayedItems->InsertItem(i, TocEntryString(displayedCells_dndOrder[i]));
       
       if (displayedCells_dndOrder[i]->GetHiddenTree())
         m_displayedItems->SetItemTextColour(i, wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
@@ -430,56 +406,53 @@ void TableOfContents::UpdateDisplay()
 
 GroupCell *TableOfContents::GetCell(int index)
 {
-  int currentIndex = -1;
+  if(index > m_structure.size())
+    return NULL;
+  if(index < 0)
+    return NULL;
 
-  for (unsigned int i = 0; i < m_structure.size(); i++)
+  return m_displayedGroupCells[index]; 
+}
+
+wxString TableOfContents::TocEntryString(GroupCell *cell)
+{
+  wxString curr;
+  if(cell->GetEditable())
+    curr = cell->GetEditable()->ToString();
+  
+  if ((*m_configuration)->TocShowsSectionNumbers())
   {
-    wxString curr;
-    
-    if ((*m_configuration)->TocShowsSectionNumbers())
-    {
-      if(m_structure[i]->GetPrompt() != NULL)
-        curr = m_structure[i]->GetPrompt()->ToString() + wxT(" ");
-      curr.Trim(false);
-    }
-    else
-      switch (m_structure[i]->GetGroupType())
-      {
-      case GC_TYPE_TITLE:
-        break;
-      case GC_TYPE_SECTION:
-        curr = wxT("  ");
-        break;
-      case GC_TYPE_SUBSECTION:
-        curr = wxT("    ");
-        break;
-      case GC_TYPE_SUBSUBSECTION:
-        curr = wxT("      ");
-        break;
-      case GC_TYPE_HEADING5:
-        curr = wxT("        ");
-        break;
-      case GC_TYPE_HEADING6:
-        curr = wxT("          ");
-        break;
-      default:
-      {}
-    }
-    
-    curr += m_structure[i]->GetEditable()->ToString(true);
-
-    // Respecting linebreaks doesn't make much sense here.
-    curr.Replace(wxT("\n"), wxT(" "));
-
-    if (m_regex->Matches(curr))
-      currentIndex++;
-    
-    if (currentIndex == index)
-    {
-      return m_structure[i];
-    }
+    if(cell->GetPrompt() != NULL)
+      curr = cell->GetPrompt()->ToString() + wxT(" ") + curr;
+    curr.Trim(false);
   }
-  return NULL;
+  else
+    switch (cell->GetGroupType())
+    {
+    case GC_TYPE_TITLE:
+      break;
+    case GC_TYPE_SECTION:
+      curr = wxT("  ") + curr;
+      break;
+    case GC_TYPE_SUBSECTION:
+      curr = wxT("    ") + curr;
+      break;
+    case GC_TYPE_SUBSUBSECTION:
+      curr = wxT("      ") + curr;
+      break;
+    case GC_TYPE_HEADING5:
+      curr = wxT("        ") + curr;
+      break;
+    case GC_TYPE_HEADING6:
+      curr = wxT("          ") + curr;
+      break;
+    default:
+    {}
+    }
+
+  // Respecting linebreaks doesn't make much sense here.
+  curr.Replace(wxT("\n"), wxT(" "));
+  return curr;
 }
 
 void TableOfContents::OnRegExEvent(wxCommandEvent& WXUNUSED(ev))

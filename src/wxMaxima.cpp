@@ -950,6 +950,8 @@ wxMaxima::wxMaxima(wxWindow *parent, int id, wxLocale *locale, const wxString ti
           wxCommandEventHandler(wxMaxima::PopupMenu), NULL, this);
   Connect(TableOfContents::popid_tocLevel6, wxEVT_MENU,
           wxCommandEventHandler(wxMaxima::PopupMenu), NULL, this);
+  Connect(TableOfContents::popid_tocdnd, wxEVT_MENU,
+          wxCommandEventHandler(wxMaxima::PopupMenu), NULL, this);
   Connect(Worksheet::popid_fold, wxEVT_MENU,
           wxCommandEventHandler(wxMaxima::PopupMenu), NULL, this);
   Connect(Worksheet::popid_unfold, wxEVT_MENU,
@@ -9000,6 +9002,10 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
   {
     m_worksheet->m_configuration->TocDepth(255);
     m_worksheet->UpdateTableOfContents();
+    break;
+  }
+  case TableOfContents::popid_tocdnd:
+  {
     break;
   }
   case Worksheet::popid_evaluate_section:
