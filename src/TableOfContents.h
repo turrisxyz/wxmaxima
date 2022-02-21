@@ -105,6 +105,7 @@ protected:
 
   wxString TocEntryString(GroupCell *cell);
 private:
+  GroupCell *m_tree;
   GroupCell *m_dndStartCell;
   GroupCell *m_dndEndCell;
   wxTimer m_scrollUpTimer;

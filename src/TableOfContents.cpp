@@ -232,6 +232,7 @@ TableOfContents::~TableOfContents()
 
 void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)
 {
+  m_tree = tree;
   long selection = m_lastSelection;
   if (IsShown())
   {
@@ -333,8 +334,7 @@ void TableOfContents::UpdateDisplay()
   if((m_dragStart >= 0) && (m_dragCurrentPos >= 0) && (m_dragStart != m_dragCurrentPos))
   {
     m_dndStartCell = m_displayedGroupCells[m_dragStart];
-    m_dndEndCell   = m_displayedGroupCells[m_dragCurrentPos];
-
+    
     std::list<GroupCell *> m_draggedCells;
     std::list<GroupCell *> m_otherCells;
     for (auto i = 0; i < m_structure.size(); i++)
@@ -344,11 +344,21 @@ void TableOfContents::UpdateDisplay()
       else
         m_otherCells.push_back(m_displayedGroupCells[i]);
     }
+    
+    m_dndEndCell = NULL;
 
     for (auto index = 0; index < m_structure.size(); index++)
     {
       if(index >= m_dragCurrentPos)
       {
+        m_dndEndCell = m_tree;
+        while((m_dndEndCell != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
+          m_dndEndCell = m_dndEndCell->GetNext();
+        
+        if(!m_otherCells.empty())
+          m_dndEndCell = m_otherCells.front();
+        else
+ 
         while(!m_draggedCells.empty())
         {
           displayedCells_dndOrder.push_back(m_draggedCells.front());
@@ -365,6 +375,7 @@ void TableOfContents::UpdateDisplay()
         }
       }
     }
+
     while(!m_otherCells.empty())
     {
       displayedCells_dndOrder.push_back(m_otherCells.front());
