@@ -9014,9 +9014,14 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
       droppedRegionend = droppedRegionend->GetNext();
     
     auto droppedRegion = CellList::TearOut(droppedRegionStart, droppedRegionend);
-    auto cells = static_unique_ptr_cast<Cell>(std::move(droppedRegion.cellOwner));
-    CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
+      auto cells = static_unique_ptr_cast<GroupCell>(std::move(droppedRegion.cellOwner));
+    if(m_worksheet->m_tableOfContents->DNDEnd() != NULL)
+      CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
+    else
+      m_worksheet->InsertGroupCells(std::move(cells));
     break;
+    m_worksheet->RecalculateForce();
+    m_worksheet->RequestRedraw();    
   }
   case Worksheet::popid_evaluate_section:
   {
