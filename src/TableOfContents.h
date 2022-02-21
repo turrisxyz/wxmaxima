@@ -66,7 +66,7 @@ public:
     popid_tocdnd
   };
 
-  TableOfContents(wxWindow *parent, int id, Configuration **config);
+  TableOfContents(wxWindow *parent, int id, Configuration **config, std::unique_ptr<GroupCell> *tree);
 
   /* The destructor
    */
@@ -84,7 +84,7 @@ public:
       - we call it only on creation of a cell and on leaving it again
       - and we only traverse the tree if the pane is actually shown.
    */
-  void UpdateTableOfContents(GroupCell *tree, GroupCell *pos);
+  void UpdateTableOfContents(GroupCell *pos);
 
   //! Get the nth Cell in the table of contents.
   GroupCell *GetCell(int index);
@@ -105,7 +105,8 @@ protected:
 
   wxString TocEntryString(GroupCell *cell);
 private:
-  GroupCell *m_tree;
+  void UpdateStruct();
+  std::unique_ptr<GroupCell> *m_tree;
   GroupCell *m_dndStartCell;
   GroupCell *m_dndEndCell;
   wxTimer m_scrollUpTimer;

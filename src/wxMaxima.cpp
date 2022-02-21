@@ -4455,7 +4455,7 @@ void wxMaxima::OnIdle(wxIdleEvent &event)
         else
           cursorPos = m_worksheet->FirstVisibleGC();
       }
-      m_worksheet->m_tableOfContents->UpdateTableOfContents(m_worksheet->GetTree(), cursorPos);
+      m_worksheet->m_tableOfContents->UpdateTableOfContents(cursorPos);
     }
     m_worksheet->m_scheduleUpdateToc = false;
 
@@ -4963,7 +4963,7 @@ bool wxMaxima::OpenFile(const wxString &file, const wxString &command)
   if (m_worksheet->m_tableOfContents != NULL)
   {
     m_worksheet->m_scheduleUpdateToc = false;
-    m_worksheet->m_tableOfContents->UpdateTableOfContents(m_worksheet->GetTree(), m_worksheet->GetHCaret());
+    m_worksheet->m_tableOfContents->UpdateTableOfContents(m_worksheet->GetHCaret());
   }
 
   if(!retval)

@@ -31,10 +31,11 @@
 #include <wx/sizer.h>
 #include <list>
 
-TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config) :
+TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config, std::unique_ptr<GroupCell> *tree) :
   wxPanel(parent, id),
   m_scrollUpTimer(this, wxUP),
-  m_scrollDownTimer(this, wxDOWN)
+  m_scrollDownTimer(this, wxDOWN),
+  m_tree(tree)  
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -150,6 +151,7 @@ void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
 
 void TableOfContents::OnDragStart(wxListEvent &evt)
 {
+  UpdateStruct();
   m_dragStart = evt.GetIndex();
   m_dragFeedback_Last = m_dragStart;
   if(m_dragStart >= 0)
@@ -230,41 +232,48 @@ TableOfContents::~TableOfContents()
   }
 }
 
-void TableOfContents::UpdateTableOfContents(GroupCell *tree, GroupCell *pos)
+void TableOfContents::UpdateStruct()
 {
-  m_tree = tree;
+  m_structure.clear();
+
+  // Get the current list of tokens that should be in the Table Of Contents.
+  for (auto &cell : OnList(m_tree->get()))
+  {
+    int groupType = cell.GetGroupType();
+    if (
+      (groupType == GC_TYPE_TITLE) ||
+      (groupType == GC_TYPE_SECTION) ||
+      (groupType == GC_TYPE_SUBSECTION) ||
+      (groupType == GC_TYPE_SUBSUBSECTION) ||
+      (groupType == GC_TYPE_HEADING5) ||
+      (groupType == GC_TYPE_HEADING6)
+      )
+      m_structure.push_back(&cell);
+
+  }
+
+  long item = m_displayedItems->GetNextItem(-1,
+                                            wxLIST_NEXT_ALL,
+                                            wxLIST_STATE_SELECTED);
+}
+
+void TableOfContents::UpdateTableOfContents(GroupCell *pos)
+{
+  GroupCell *tree = (*m_tree).get();
   long selection = m_lastSelection;
   if (IsShown())
   {
-    m_structure.clear();
-
-    // Get the current list of tokens that should be in the Table Of Contents.
-    for (auto &cell : OnList(tree))
+    UpdateStruct();
+    // Select the cell with the cursor
+    for (auto &cell : OnList(m_tree->get()))
     {
-      int groupType = cell.GetGroupType();
-      if (
-              (groupType == GC_TYPE_TITLE) ||
-              (groupType == GC_TYPE_SECTION) ||
-              (groupType == GC_TYPE_SUBSECTION) ||
-              (groupType == GC_TYPE_SUBSUBSECTION) ||
-              (groupType == GC_TYPE_HEADING5) ||
-              (groupType == GC_TYPE_HEADING6)
-              )
-        m_structure.push_back(&cell);
-
-      // Select the cell with the cursor
       if (&cell == pos)
       {
         if (!m_structure.empty())
           selection = m_structure.size() - 1;
       }
-    }
-
-    long item = m_displayedItems->GetNextItem(-1,
-                                              wxLIST_NEXT_ALL,
-                                              wxLIST_STATE_SELECTED);
-
-    if ((selection >= 0) && (item != selection))
+    }      
+    if (selection >= 0)
     {
       if ((long) m_displayedItems->GetItemCount() < selection)
         selection = m_displayedItems->GetItemCount() - 1;
@@ -351,7 +360,7 @@ void TableOfContents::UpdateDisplay()
     {
       if(index >= m_dragCurrentPos)
       {
-        m_dndEndCell = m_tree;
+        m_dndEndCell = (*m_tree).get();
         while((m_dndEndCell != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
           m_dndEndCell = m_dndEndCell->GetNext();
         
