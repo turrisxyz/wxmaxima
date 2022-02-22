@@ -33,9 +33,9 @@
 
 TableOfContents::TableOfContents(wxWindow *parent, int id, Configuration **config, std::unique_ptr<GroupCell> *tree) :
   wxPanel(parent, id),
+  m_tree(tree),
   m_scrollUpTimer(this, wxUP),
-  m_scrollDownTimer(this, wxDOWN),
-  m_tree(tree)  
+  m_scrollDownTimer(this, wxDOWN)
 {
   m_configuration = config;
   m_displayedItems = new wxListCtrl(
@@ -151,7 +151,7 @@ void TableOfContents::OnMouseCaptureLost(wxMouseCaptureLostEvent &event)
 
 void TableOfContents::OnDragStart(wxListEvent &evt)
 {
-  UpdateStruct();
+//  UpdateStruct();
   m_dragStart = evt.GetIndex();
   m_dragFeedback_Last = m_dragStart;
   if(m_dragStart >= 0)
@@ -251,18 +251,16 @@ void TableOfContents::UpdateStruct()
       m_structure.push_back(&cell);
 
   }
-
-  long item = m_displayedItems->GetNextItem(-1,
-                                            wxLIST_NEXT_ALL,
-                                            wxLIST_STATE_SELECTED);
 }
 
 void TableOfContents::UpdateTableOfContents(GroupCell *pos)
 {
-  GroupCell *tree = (*m_tree).get();
   long selection = m_lastSelection;
   if (IsShown())
   {
+    long item = m_displayedItems->GetNextItem(-1,
+                                              wxLIST_NEXT_ALL,
+                                              wxLIST_STATE_SELECTED);
     UpdateStruct();
     // Select the cell with the cursor
     for (auto &cell : OnList(m_tree->get()))
@@ -273,7 +271,7 @@ void TableOfContents::UpdateTableOfContents(GroupCell *pos)
           selection = m_structure.size() - 1;
       }
     }      
-    if (selection >= 0)
+    if ((selection >= 0) && (item != selection))
     {
       if ((long) m_displayedItems->GetItemCount() < selection)
         selection = m_displayedItems->GetItemCount() - 1;
@@ -346,7 +344,7 @@ void TableOfContents::UpdateDisplay()
     
     std::list<GroupCell *> m_draggedCells;
     std::list<GroupCell *> m_otherCells;
-    for (auto i = 0; i < m_structure.size(); i++)
+    for (unsigned long i = 0; i < m_structure.size(); i++)
     {
       if((i >= m_dragStart) && (i < m_dragStart + m_numberOfCaptionsDragged))
         m_draggedCells.push_back(m_displayedGroupCells[i]);
@@ -356,18 +354,22 @@ void TableOfContents::UpdateDisplay()
     
     m_dndEndCell = NULL;
 
-    for (auto index = 0; index < m_structure.size(); index++)
+    for (unsigned long index = 0; index < m_structure.size(); index++)
     {
       if(index >= m_dragCurrentPos)
       {
-        m_dndEndCell = (*m_tree).get();
-        while((m_dndEndCell != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
-          m_dndEndCell = m_dndEndCell->GetNext();
-        
+        m_dndEndCell = m_dndStartCell;
         if(!m_otherCells.empty())
-          m_dndEndCell = m_otherCells.front();
+        {
+          while((m_dndEndCell->GetNext() != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
+            m_dndEndCell = m_dndEndCell->GetNext();
+        }
         else
- 
+        {
+          while(m_dndEndCell->GetNext() != NULL)
+            m_dndEndCell = m_dndEndCell->GetNext();          
+        }
+        
         while(!m_draggedCells.empty())
         {
           displayedCells_dndOrder.push_back(m_draggedCells.front());
@@ -424,9 +426,9 @@ void TableOfContents::UpdateDisplay()
   }
 }
 
-GroupCell *TableOfContents::GetCell(int index)
+GroupCell *TableOfContents::GetCell(long index)
 {
-  if(index > m_structure.size())
+  if((unsigned long) index > m_structure.size())
     return NULL;
   if(index < 0)
     return NULL;

@@ -87,7 +87,7 @@ public:
   void UpdateTableOfContents(GroupCell *pos);
 
   //! Get the nth Cell in the table of contents.
-  GroupCell *GetCell(int index);
+  GroupCell *GetCell(long index);
 
   //! Returns the cell that was last right-clicked on.
   GroupCell *RightClickedOn()
