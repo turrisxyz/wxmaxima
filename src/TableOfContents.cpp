@@ -358,18 +358,20 @@ void TableOfContents::UpdateDisplay()
     {
       if(index >= m_dragCurrentPos)
       {
-        m_dndEndCell = m_dndStartCell;
-        if(!m_otherCells.empty())
-        {
-          while((m_dndEndCell->GetNext() != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
-            m_dndEndCell = m_dndEndCell->GetNext();
-        }
-        else
+        m_dndEndCell = m_tree->get();
+        if(m_otherCells.empty())
         {
           while(m_dndEndCell->GetNext() != NULL)
             m_dndEndCell = m_dndEndCell->GetNext();          
         }
-        
+        else
+        {
+          while((m_dndEndCell->GetNext() != NULL) && (m_dndEndCell->GetNext() != m_otherCells.front()))
+            m_dndEndCell = m_dndEndCell->GetNext();
+          if(m_dndEndCell->GetNext() != m_otherCells.front())
+            m_dndEndCell = NULL;
+        }
+
         while(!m_draggedCells.empty())
         {
           displayedCells_dndOrder.push_back(m_draggedCells.front());
