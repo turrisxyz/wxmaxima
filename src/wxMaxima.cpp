@@ -9016,9 +9016,16 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
     auto droppedRegion = CellList::TearOut(droppedRegionStart, droppedRegionend);
       auto cells = static_unique_ptr_cast<GroupCell>(std::move(droppedRegion.cellOwner));
     if(m_worksheet->m_tableOfContents->DNDEnd() != NULL)
+    {
+      wxLogMessage(_"Drag and drop: Dropping cells after the cell reading %s.",
+                   m_worksheet->m_tableOfContents->DNDEnd().ToString().c_string());
       CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
+    }
     else
+    {
+      wxLogMessage(_"Drag and drop: Dropping cells at the beginning of the worksheet.");
       m_worksheet->InsertGroupCells(std::move(cells));
+    }
     break;
     m_worksheet->RecalculateForce();
     m_worksheet->RequestRedraw();    
