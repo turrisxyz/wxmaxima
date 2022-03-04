@@ -27,6 +27,9 @@
 #ifndef WXMATHML_H
 #define WXMATHML_H
 
+extern "C" unsigned char WXMATHML_LISP[];
+extern "C" size_t WXMATHML_LISP_SIZE;
+
 #include "precomp.h"
 #include "Configuration.h"
 #include <wx/string.h>
