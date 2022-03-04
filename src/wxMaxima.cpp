@@ -9017,18 +9017,19 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
       auto cells = static_unique_ptr_cast<GroupCell>(std::move(droppedRegion.cellOwner));
     if(m_worksheet->m_tableOfContents->DNDEnd() != NULL)
     {
-      wxLogMessage(_"Drag and drop: Dropping cells after the cell reading %s.",
-                   m_worksheet->m_tableOfContents->DNDEnd().ToString().c_string());
+      wxLogMessage(wxString::Format("Drag and drop: Dropping cells after the cell reading %s.",
+                                      m_worksheet->m_tableOfContents->DNDEnd()->ToString().c_str()));
       CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
     }
     else
     {
-      wxLogMessage(_"Drag and drop: Dropping cells at the beginning of the worksheet.");
+      wxLogMessage("Drag and drop: Dropping cells at the beginning of the worksheet.");
       m_worksheet->InsertGroupCells(std::move(cells));
     }
     break;
     m_worksheet->RecalculateForce();
-    m_worksheet->RequestRedraw();    
+    m_worksheet->RequestRedraw();
+    break;
   }
   case Worksheet::popid_evaluate_section:
   {
