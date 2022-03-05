@@ -312,6 +312,17 @@ public:
   //! @}
   bool IsMainInput(Cell *active) const;
 
+  //! Can this chapter/section/... be made a section/subsection/... changing its subheadings, too?
+  bool SectioningCanMoveIn() const;
+  //! Can this section/subsection/... be made a chapter/section/... changing its subheadings, too?
+  bool SectioningCanMoveOut() const;
+  //! Get the end of this section/subsection/...
+  GroupCell *SectioningUnitGetEndOf() const;
+  //! Make this chapter/section/... a section/subsection/... changing its subheadings, too.
+  bool SectioningMoveIn();
+  //! Make this section/subsection/... a chapter/section/... changing its subheadings, too.
+  bool SectioningMoveOut();
+  
   //!  Return this cell's section- or image number.
   void Number(int &section, int &subsection, int &subsubsection, int &heading5, int &heading6, int &image) const;
 
