@@ -1974,10 +1974,94 @@ bool GroupCell::SectioningCanMoveIn() const
     return false;
   for (auto const &tmp : OnList(this))
   {
-    if(tmp.IsLesserGCType(GetGroupType()))
+    if(!tmp.IsLesserGCType(GetGroupType()))
       break;
     if(tmp.GetGroupType() == GC_TYPE_HEADING6)
       return false;
+  }
+  return true;
+}
+
+bool GroupCell::SectioningMoveIn()
+{
+  if(!SectioningCanMoveIn())
+    return false;
+
+  GroupType type;
+  for (auto &tmp : OnList(this))
+  {
+    if((&tmp!=this) &&  (!tmp.IsLesserGCType(type)))
+      break;
+    if(IsHeading())
+    {
+      switch (m_groupType)
+      {
+      case GC_TYPE_HEADING6:
+        break;
+      case GC_TYPE_HEADING5:
+        tmp.SetGroupType(GC_TYPE_HEADING6);
+        break;
+      case GC_TYPE_SUBSUBSECTION:
+        tmp.SetGroupType(GC_TYPE_HEADING5);
+        break;
+      case GC_TYPE_SUBSECTION:
+        tmp.SetGroupType(GC_TYPE_SUBSUBSECTION);
+        break;
+      case GC_TYPE_SECTION:
+        tmp.SetGroupType(GC_TYPE_SUBSECTION);
+        break;
+      case GC_TYPE_TITLE:
+        tmp.SetGroupType(GC_TYPE_SECTION);
+        break;
+      default:
+        wxASSERT_MSG(false,
+          _("Bug: Encountered a heading I don't know how to move in one sectioning unit"));
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool GroupCell::SectioningMoveOut()
+{
+  if(!SectioningCanMoveOut())
+    return false;
+
+  GroupType type;
+  for (auto &tmp : OnList(this))
+  {
+    if((&tmp!=this) &&  (!tmp.IsLesserGCType(type)))
+      break;
+    if(IsHeading())
+    {
+      switch (m_groupType)
+      {
+      case GC_TYPE_HEADING6:
+        tmp.SetGroupType(GC_TYPE_HEADING5);
+        break;
+      case GC_TYPE_HEADING5:
+        tmp.SetGroupType(GC_TYPE_SUBSUBSECTION);
+        break;
+      case GC_TYPE_SUBSUBSECTION:
+        tmp.SetGroupType(GC_TYPE_SUBSECTION);
+        break;
+      case GC_TYPE_SUBSECTION:
+        tmp.SetGroupType(GC_TYPE_SECTION);
+        break;
+      case GC_TYPE_SECTION:
+        tmp.SetGroupType(GC_TYPE_TITLE);
+        break;
+      case GC_TYPE_TITLE:
+        wxASSERT_MSG(false,
+          _("Bug: Trying to move a title out by one sectioning unit"));        
+        break;
+      default:
+        wxASSERT_MSG(false,
+          _("Bug: Encountered a heading I don't know how to move out one sectioning unit"));
+        return false;
+      }
+    }
   }
   return true;
 }
