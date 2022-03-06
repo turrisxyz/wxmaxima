@@ -118,7 +118,7 @@ public:
   // general methods
   GroupType GetGroupType() const { return m_groupType; }
 
-  void SetGroupType(GroupType type) { m_groupType = type; }
+  void SetGroupType(GroupType type);
 
   // selection methods
   Range GetInnerCellsInRect(const wxRect &rect) const override;
@@ -312,10 +312,11 @@ public:
   //! @}
   bool IsMainInput(Cell *active) const;
 
+  bool IsHeading() const;
   //! Can this chapter/section/... be made a section/subsection/... changing its subheadings, too?
   bool SectioningCanMoveIn() const;
   //! Can this section/subsection/... be made a chapter/section/... changing its subheadings, too?
-  bool SectioningCanMoveOut() const;
+  bool SectioningCanMoveOut() const {return IsHeading() && (GetGroupType() != GC_TYPE_TITLE);}
   //! Get the end of this section/subsection/...
   GroupCell *SectioningUnitGetEndOf() const;
   //! Make this chapter/section/... a section/subsection/... changing its subheadings, too.
