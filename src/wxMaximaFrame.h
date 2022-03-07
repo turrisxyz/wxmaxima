@@ -775,8 +775,6 @@ private:
     Worksheet *m_worksheet;
   };
 
-  wxPanel *CreateSymbolsPane();
-
 protected:
   bool m_historyVisible;
   bool m_xmlMonitorVisible;
