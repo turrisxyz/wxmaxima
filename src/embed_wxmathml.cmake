@@ -6,8 +6,9 @@ file(WRITE "${HEADER_FILE}"
   "/** \\file wxMathML_lisp.cpp\n"
   " * This header file was generated from wxMathML.lisp.\n"
   " */\n"
-  " #include<wx/wx.h>\n"
-  " #include <cstddef>\n"
+  "#include<wx/wx.h>\n"
+  "#include <cstddef>\n"
+  "void dummy(){}\n"
   )
 get_filename_component(variableName ${HEADER_FILE} NAME)
 bin2h(SOURCE_FILE "${SRC}" HEADER_FILE ${HEADER_FILE} VARIABLE_NAME "wxMathML_lisp" APPEND NULL_TERMINATE)
