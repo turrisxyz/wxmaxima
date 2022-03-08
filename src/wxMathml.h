@@ -35,6 +35,7 @@
 
 extern "C" unsigned char WXMATHML_LISP[];
 extern "C" size_t WXMATHML_LISP_SIZE;
+extern "C" wxString wxMathML_h();
 
 class wxMathML
 {
