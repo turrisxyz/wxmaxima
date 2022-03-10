@@ -181,10 +181,10 @@ bool CharButton::FontDisplaysChar()
   referenceDC.SelectObject(referenceBitmap);
   characterDC.SetBrush(*wxWHITE_BRUSH);
   referenceDC.SetBrush(*wxWHITE_BRUSH);
+  characterDC.DrawRectangle(0,0,200,200);
+  referenceDC.DrawRectangle(0,0,200,200);
   characterDC.SetPen(*wxBLACK_PEN);
   referenceDC.SetPen(*wxBLACK_PEN);
-  characterDC.Clear();
-  referenceDC.Clear();
 
   // Now draw the character our button shows into one of these bitmaps and see
   // if that changed any aspect of the bitmap
@@ -207,6 +207,9 @@ bool CharButton::FontDisplaysChar()
     wxString::Format(
       wxT("Char '%s' seems not to be displayed in the default GUI font. Hiding the button that generates it."),
       wxString(m_char).c_str()));
+
+  // characterImage.SaveFile(wxString(m_char)+".png");
+  
   return false;
 }
 
@@ -228,10 +231,10 @@ bool CharButton::CharVisiblyDifferent(wxChar otherChar)
   referenceDC.SelectObject(referenceBitmap);
   characterDC.SetBrush(*wxWHITE_BRUSH);
   referenceDC.SetBrush(*wxWHITE_BRUSH);
+  characterDC.DrawRectangle(0,0,200,200);
+  referenceDC.DrawRectangle(0,0,200,200);
   characterDC.SetPen(*wxBLACK_PEN);
   referenceDC.SetPen(*wxBLACK_PEN);
-  characterDC.Clear();
-  referenceDC.Clear();
   characterDC.DrawText(wxString(m_char),
                        100,
                        100);
