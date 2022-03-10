@@ -193,8 +193,8 @@ bool CharButton::FontDisplaysChar()
                        100);
   wxImage characterImage = characterBitmap.ConvertToImage(); 
   wxImage referenceImage = referenceBitmap.ConvertToImage(); 
-  for(int x=0; x <= width; x++)
-    for(int y=0; y <= height; y++)
+  for(int x=0; x < width; x++)
+    for(int y=0; y < height; y++)
     {
       if(characterImage.GetRed(x,y) != referenceImage.GetRed(x,y))
         return true;
@@ -236,8 +236,8 @@ bool CharButton::CharVisiblyDifferent(wxChar otherChar)
                        100);
   wxImage characterImage = characterBitmap.ConvertToImage(); 
   wxImage referenceImage = referenceBitmap.ConvertToImage(); 
-  for(int x=0; x <= width; x++)
-    for(int y=0; y <= height; y++)
+  for(int x=0; x < width; x++)
+    for(int y=0; y < height; y++)
     {
       if(characterImage.GetRed(x,y) != referenceImage.GetRed(x,y))
         return true;
