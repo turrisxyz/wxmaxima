@@ -203,6 +203,10 @@ bool CharButton::FontDisplaysChar()
       if(characterImage.GetBlue(x,y) != referenceImage.GetBlue(x,y))
         return true;
     }
+  wxLogMessage(
+    wxString::Format(
+      wxT("Char '%s' seems not to be displayed in the default GUI font. Hiding the button that generates it."),
+      wxString(m_char).c_str()));
   return false;
 }
 
@@ -246,5 +250,10 @@ bool CharButton::CharVisiblyDifferent(wxChar otherChar)
       if(characterImage.GetBlue(x,y) != referenceImage.GetBlue(x,y))
         return true;
     }
+  wxLogMessage(
+    wxString::Format(
+      wxT("Char '%s' looks identical to '%s' in the default GUI font. Hiding the button that generates it."),
+      wxString(m_char).c_str(),
+      wxString(otherChar).c_str()));
   return false;
 }
