@@ -150,7 +150,12 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, const Definition &
   m_buttonText->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CharButton::MouseLeftText), NULL, this);
   m_buttonText->Connect(wxEVT_LEFT_UP, wxCommandEventHandler(CharButton::CharButtonPressed), NULL, this);
   m_buttonText->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(CharButton::ForwardToParent), NULL, this);
-  if(!(forceShow || FontDisplaysChar()))
+  if(!(forceShow ||
+       (FontDisplaysChar() &&
+        CharVisiblyDifferent(wxT('\1')) &&
+        CharVisiblyDifferent(wxT('\uF299')) &&
+        CharVisiblyDifferent(wxT('\uF000'))
+         )))
   {
     Hide();
   }
@@ -184,6 +189,49 @@ bool CharButton::FontDisplaysChar()
   // Now draw the character our button shows into one of these bitmaps and see
   // if that changed any aspect of the bitmap
   characterDC.DrawText(wxString(m_char),
+                       100,
+                       100);
+  wxImage characterImage = characterBitmap.ConvertToImage(); 
+  wxImage referenceImage = referenceBitmap.ConvertToImage(); 
+  for(int x=0; x <= width; x++)
+    for(int y=0; y <= height; y++)
+    {
+      if(characterImage.GetRed(x,y) != referenceImage.GetRed(x,y))
+        return true;
+      if(characterImage.GetGreen(x,y) != referenceImage.GetGreen(x,y))
+        return true;
+      if(characterImage.GetBlue(x,y) != referenceImage.GetBlue(x,y))
+        return true;
+    }
+  return false;
+}
+
+bool CharButton::CharVisiblyDifferent(wxChar otherChar)
+{
+  int width = 200;
+  int height = 200;
+
+  // Prepare two identical device contexts that create identical bitmaps
+  wxBitmap characterBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
+                                      wxBITMAP_SCREEN_DEPTH
+    );
+  wxBitmap referenceBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
+                                      wxBITMAP_SCREEN_DEPTH
+    );
+  wxMemoryDC characterDC;
+  wxMemoryDC referenceDC;
+  characterDC.SelectObject(characterBitmap);
+  referenceDC.SelectObject(referenceBitmap);
+  characterDC.SetBrush(*wxWHITE_BRUSH);
+  referenceDC.SetBrush(*wxWHITE_BRUSH);
+  characterDC.SetPen(*wxBLACK_PEN);
+  referenceDC.SetPen(*wxBLACK_PEN);
+  characterDC.Clear();
+  referenceDC.Clear();
+  characterDC.DrawText(wxString(m_char),
+                       100,
+                       100);
+  referenceDC.DrawText(wxString(otherChar),
                        100,
                        100);
   wxImage characterImage = characterBitmap.ConvertToImage(); 
