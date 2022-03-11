@@ -132,6 +132,7 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   wxPanel(parent, wxID_ANY),
   m_char(def.symbol),
   m_configuration(config),
+  m_description(def.description),
   m_worksheet(worksheet)
 {
   Connect(wxEVT_SIZE, wxSizeEventHandler(CharButton::OnSize));
@@ -161,8 +162,36 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   {
     Hide();
   }
-    
 
+  wxFont mathFont = m_configuration->GetStyle(TS_INPUT, AFontSize(10.0)).GetFont();
+  wxFont textFont = m_configuration->GetStyle(TS_DEFAULT, AFontSize(10.0)).GetFont();
+  if(
+    ((!mathFont.IsOk()) ||
+     (
+       CharVisiblyDifferent(wxT('\1'), mathFont) &&
+       CharVisiblyDifferent(wxT('\uF299'), mathFont) &&
+       CharVisiblyDifferent(wxT('\uF000'), mathFont) &&
+       FontDisplaysChar(mathFont)
+       )
+      )
+    ||
+    ((!textFont.IsOk()) ||
+     (
+       CharVisiblyDifferent(wxT('\1'), textFont) &&
+       CharVisiblyDifferent(wxT('\uF299'), textFont) &&
+       CharVisiblyDifferent(wxT('\uF000'), textFont) &&
+       FontDisplaysChar(textFont))
+      )
+    )
+    {
+      m_buttonText->SetForegroundColour(wxColor(128,128,128));
+      SetToolTip(m_description + wxT("\n") +
+                 _("(Might not be displayed correctly in at least one of the worksheet fonts)"));
+    }
+    else
+    {
+      SetToolTip(m_description);
+    }
 }
 
 bool CharButton::FontDisplaysChar(const wxFont &font)
