@@ -9021,37 +9021,7 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
   }
   case TableOfContents::popid_tocdnd:
   {
-
-    // Select the region that is to be moved
-    m_cellPointers.m_selectionStart =  m_worksheet->m_tableOfContents->DNDStart();
-    m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionStart;
-    if(m_cellPointers.m_selectionEnd->GetNext())
-      m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionEnd->GetNext();
-    while((m_cellPointers.m_selectionEnd != NULL) &&
-          (
-            (m_cellPointers.m_selectionEnd->GetNext() == NULL) ||
-            (m_cellPointers.m_selectionEnd->GetNext()->IsLesserGCType(m_cellPointers.m_selectionEnd->GetGroupType()))))
-      m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionEnd->GetNext();
-
-    // Copy the region we want to move
-    CellListBuilder<> copy;
-    for (auto &src : OnList(m_cellPointers.m_selectionStart))
-    {
-      copy.Append(src.Copy(group));
-      if(&src == m_cellPointers.m_selectionEnd)
-        break;
-    }
-
-    // Delete the region we just copied and tell the undo buffer that this
-    // is only half of the action we want to perform
-    m_worksheet->DeleteSelection();
-    m_worksheet->TreeUndo_AppendAction();
-
-    m_worksheet->InsertGroupCells(std::move(copy), m_worksheet->m_tableOfContents->DNDEnd());
-    m_worksheet->RecalculateForce();
-    m_worksheet->RequestRedraw();
-    m_worksheet->UpdateTableOfContents();
-    m_worksheet->NumberSections();
+    m_worksheet->TOCdnd();
     break;
   }
   case TableOfContents::popid_tocMoveIn:

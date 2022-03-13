@@ -1030,6 +1030,8 @@ public:
   */
   void DeleteSelection();
 
+  void TOCdnd();
+  
   //! Is it possible to delete the cells between start and end?
   bool CanDeleteRegion(GroupCell *start, GroupCell *end) const;
 
