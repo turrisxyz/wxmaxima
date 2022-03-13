@@ -9021,34 +9021,33 @@ void wxMaxima::PopupMenu(wxCommandEvent &event)
   }
   case TableOfContents::popid_tocdnd:
   {
-    GroupCell *droppedRegionStart =  m_worksheet->m_tableOfContents->DNDStart();
-    GroupCell *droppedRegionend = droppedRegionStart;
-    if(droppedRegionend->GetNext())
-      droppedRegionend = droppedRegionend->GetNext();
-    while((droppedRegionend != NULL) &&
+
+    // Select the region that is to be moved
+    m_cellPointers.m_selectionStart =  m_worksheet->m_tableOfContents->DNDStart();
+    m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionStart;
+    if(m_cellPointers.m_selectionEnd->GetNext())
+      m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionEnd->GetNext();
+    while((m_cellPointers.m_selectionEnd != NULL) &&
           (
-            (droppedRegionend->GetNext() == NULL) ||
-            (droppedRegionend->GetNext()->IsLesserGCType(droppedRegionStart->GetGroupType()))))
-      droppedRegionend = droppedRegionend->GetNext();
-    
-    auto droppedRegion = CellList::TearOut(droppedRegionStart, droppedRegionend);
-      auto cells = static_unique_ptr_cast<GroupCell>(std::move(droppedRegion.cellOwner));
-    if(m_worksheet->m_tableOfContents->DNDEnd() != NULL)
+            (m_cellPointers.m_selectionEnd->GetNext() == NULL) ||
+            (m_cellPointers.m_selectionEnd->GetNext()->IsLesserGCType(m_cellPointers.m_selectionEnd->GetGroupType()))))
+      m_cellPointers.m_selectionEnd = m_cellPointers.m_selectionEnd->GetNext();
+
+    // Copy the region we want to move
+    CellListBuilder<> copy;
+    for (auto &src : OnList(m_cellPointers.m_selectionStart))
     {
-      wxLogMessage(
-        wxString::Format(
-          _("Drag and drop: Dropping cells beginning with %s after the cell reading %s."),
-          m_worksheet->m_tableOfContents->DNDStart()->ToString().c_str(),
-          m_worksheet->m_tableOfContents->DNDEnd()->ToString().c_str()
-          ));
-      CellList::SpliceInAfter(m_worksheet->m_tableOfContents->DNDEnd(), std::move(cells));
+      copy.Append(src.Copy(group));
+      if(&src == m_cellPointers.m_selectionEnd)
+        break;
     }
-    else
-    {
-      wxLogMessage("Drag and drop: Dropping cells at the beginning of the worksheet.");
-      m_worksheet->InsertGroupCells(std::move(cells));
-    }
-    break;
+
+    // Delete the region we just copied and tell the undo buffer that this
+    // is only half of the action we want to perform
+    m_worksheet->DeleteSelection();
+    m_worksheet->TreeUndo_AppendAction();
+
+    m_worksheet->InsertGroupCells(std::move(copy), m_worksheet->m_tableOfContents->DNDEnd());
     m_worksheet->RecalculateForce();
     m_worksheet->RequestRedraw();
     m_worksheet->UpdateTableOfContents();
