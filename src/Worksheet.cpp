@@ -4644,7 +4644,9 @@ void Worksheet::TOCdnd()
     TreeUndo_AppendAction();
 
     std::unique_ptr<Cell> copiedCells = std::move(copy);
-    InsertGroupCells(std::move(copiedCells), m_tableOfContents->DNDEnd());
+    std::unique_ptr<GroupCell> copiedGroupCells =
+      std::move(unique_cast<Cell, GroupCell>(std::move(copiedCells)));
+    InsertGroupCells(std::move(copiedGroupCells), m_tableOfContents->DNDEnd());
     RecalculateForce();
     RequestRedraw();
     UpdateTableOfContents();
