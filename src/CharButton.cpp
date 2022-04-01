@@ -153,12 +153,7 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   m_buttonText->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CharButton::MouseLeftText), NULL, this);
   m_buttonText->Connect(wxEVT_LEFT_UP, wxCommandEventHandler(CharButton::CharButtonPressed), NULL, this);
   m_buttonText->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(CharButton::ForwardToParent), NULL, this);
-  if(!(forceShow ||
-       (FontDisplaysChar() &&
-        CharVisiblyDifferent(wxT('\1')) &&
-        CharVisiblyDifferent(wxT('\uF299')) &&
-        CharVisiblyDifferent(wxT('\uF000'))
-         )))
+  if(!(forceShow || FontRendersChar(m_char)))
   {
     Hide();
   }
@@ -167,22 +162,12 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   wxFont textFont = m_configuration->GetStyle(TS_DEFAULT, AFontSize(10.0)).GetFont();
   if(
     ((!mathFont.IsOk()) ||
-     (
-       CharVisiblyDifferent(wxT('\1'), mathFont) &&
-       CharVisiblyDifferent(wxT('\uF299'), mathFont) &&
-       CharVisiblyDifferent(wxT('\uF000'), mathFont) &&
-       FontDisplaysChar(mathFont)
-       )
+     FontRendersChar(m_char, mathFont)
       )
     ||
     ((!textFont.IsOk()) ||
-     (
-       CharVisiblyDifferent(wxT('\1'), textFont) &&
-       CharVisiblyDifferent(wxT('\uF299'), textFont) &&
-       CharVisiblyDifferent(wxT('\uF000'), textFont) &&
-       FontDisplaysChar(textFont))
-      )
-    )
+     FontRendersChar(m_char, textFont)
+      ))
     {
       SetToolTip(m_description);
     }
@@ -194,7 +179,16 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
     }
 }
 
-bool CharButton::FontDisplaysChar(const wxFont &font)
+bool CharButton::FontRendersChar(wxChar ch, const wxFont &font)
+{
+  return
+    FontDisplaysChar(ch, font) &&
+    CharVisiblyDifferent(ch, wxT('\1'), font) &&
+    CharVisiblyDifferent(ch, wxT('\uF299'), font) &&
+    CharVisiblyDifferent(ch, wxT('\uF000'), font);
+}
+
+bool CharButton::FontDisplaysChar(wxChar ch, const wxFont &font)
 {
   int width = 200;
   int height = 200;
@@ -221,7 +215,7 @@ bool CharButton::FontDisplaysChar(const wxFont &font)
 
   // Now draw the character our button shows into one of these bitmaps and see
   // if that changed any aspect of the bitmap
-  characterDC.DrawText(wxString(m_char),
+  characterDC.DrawText(wxString(ch),
                        100,
                        100);
   wxImage characterImage = characterBitmap.ConvertToImage(); 
@@ -239,14 +233,14 @@ bool CharButton::FontDisplaysChar(const wxFont &font)
   wxLogMessage(
     wxString::Format(
       wxT("Char '%s' seems not to be displayed."),
-      wxString(m_char).c_str()));
+      wxString(ch).c_str()));
 
   // characterImage.SaveFile(wxString(m_char)+".png");
   
   return false;
 }
 
-bool CharButton::CharVisiblyDifferent(wxChar otherChar, const wxFont &font)
+bool CharButton::CharVisiblyDifferent(wxChar ch, wxChar otherChar, const wxFont &font)
 {
   int width = 200;
   int height = 200;
@@ -270,7 +264,7 @@ bool CharButton::CharVisiblyDifferent(wxChar otherChar, const wxFont &font)
   referenceDC.DrawRectangle(0,0,200,200);
   characterDC.SetPen(*wxBLACK_PEN);
   referenceDC.SetPen(*wxBLACK_PEN);
-  characterDC.DrawText(wxString(m_char),
+  characterDC.DrawText(wxString(ch),
                        100,
                        100);
   referenceDC.DrawText(wxString(otherChar),
@@ -291,7 +285,7 @@ bool CharButton::CharVisiblyDifferent(wxChar otherChar, const wxFont &font)
   wxLogMessage(
     wxString::Format(
       wxT("Char '%s' looks identical to '%s'."),
-      wxString(m_char).c_str(),
+      wxString(ch).c_str(),
       wxString(otherChar).c_str()));
   return false;
 }

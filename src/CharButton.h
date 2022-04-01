@@ -72,10 +72,11 @@ protected:
 protected:
   void MouseOverTextIs(bool mouseOver = true);
   void MouseOverPanelIs(bool mouseOver = true);
+  bool FontRendersChar(wxChar ch, const wxFont &font = *wxNORMAL_FONT);
   //! True if drawing the char this button displays alters at least one pixel
-  bool FontDisplaysChar(const wxFont &font = *wxNORMAL_FONT);
+  bool FontDisplaysChar(wxChar ch, const wxFont &font = *wxNORMAL_FONT);
   //! True if drawing the char this button displays differs visibly from otherChar
-  bool CharVisiblyDifferent(wxChar otherChar, const wxFont &font = *wxNORMAL_FONT);
+  bool CharVisiblyDifferent(wxChar ch, wxChar otherChar, const wxFont &font = *wxNORMAL_FONT);
   wxString m_description;
 
 private:
