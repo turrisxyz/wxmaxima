@@ -76,6 +76,12 @@ Configuration::Configuration(wxDC *dc, InitOpt options) :
   m_maximaOperators[">="] = 1;
   m_maximaOperators["$BFLOAT"] = 1;
   m_maximaOperators["do"] = 1;
+  m_bttnChars_broken_DefaultFont.Clear();
+  m_bttnChars_working_DefaultFont.Clear();
+  m_bttnChars_broken_MathFont.Clear();
+  m_bttnChars_working_MathFont.Clear();
+  m_bttnChars_broken_GUIFont.Clear();
+  m_bttnChars_working_GUIFont.Clear();
   m_printing = false;
   m_clipToDrawRegion = true;
   m_inLispMode = false;
@@ -738,6 +744,109 @@ void Configuration::ReadConfig()
   config->Read(wxT("cursorJump"), &m_cursorJump);
 
   ReadStyles();
+
+  config->Read(wxT("bttnChars/GUIFont"), &m_bttnChars_GUIFont);
+  if(m_bttnChars_GUIFont != wxNORMAL_FONT->GetFaceName())
+  {
+    m_bttnChars_broken_GUIFont.clear();
+    m_bttnChars_working_GUIFont.clear();
+  }
+  else
+  {
+    config->Read(wxT("bttnChars/broken_GUIFont"), &m_bttnChars_broken_GUIFont);
+    config->Read(wxT("bttnChars/working_GUIFont"), &m_bttnChars_working_GUIFont);
+  }    
+  m_bttnChars_GUIFont = wxNORMAL_FONT->GetFaceName();
+  
+  config->Read(wxT("bttnCharsMathFont"), &m_bttnChars_MathFont);
+  if(m_bttnChars_MathFont != GetStyle(TS_INPUT, AFontSize(10.0)).GetFont().GetFaceName())
+  {
+    m_bttnChars_broken_MathFont.clear();
+    m_bttnChars_working_MathFont.clear();
+  }
+  else
+  {
+    config->Read(wxT("bttnChars/broken_MathFont"), &m_bttnChars_broken_MathFont);
+    config->Read(wxT("bttnChars/working_MathFont"), &m_bttnChars_working_MathFont);
+  }
+  m_bttnChars_MathFont = GetStyle(TS_INPUT, AFontSize(10.0)).GetFont().GetFaceName();
+
+  config->Read(wxT("bttnCharsDefaultFont"), &m_bttnChars_DefaultFont);
+  if(m_bttnChars_DefaultFont != GetStyle(TS_INPUT, AFontSize(10.0)).GetFont().GetFaceName())
+  {
+    m_bttnChars_broken_DefaultFont.clear();
+    m_bttnChars_working_DefaultFont.clear();
+  }
+  else
+  {
+    config->Read(wxT("bttnChars/broken_DefaultFont"), &m_bttnChars_broken_DefaultFont);
+    config->Read(wxT("bttnChars/working_DefaultFont"), &m_bttnChars_working_DefaultFont);
+  }
+  m_bttnChars_DefaultFont = GetStyle(TS_DEFAULT, AFontSize(10.0)).GetFont().GetFaceName();
+}
+
+Configuration::IsRenderable Configuration::IsRenderable_DefaultFont(wxChar ch)
+{
+  if(m_bttnChars_broken_DefaultFont.Contains(ch))
+    return No;
+  if(m_bttnChars_working_DefaultFont.Contains(ch))
+    return Yes;
+  return Probably;
+}
+Configuration::IsRenderable Configuration::IsRenderable_MathFont(wxChar ch)
+{
+  if(m_bttnChars_broken_MathFont.Contains(ch))
+    return No;
+  if(m_bttnChars_working_MathFont.Contains(ch))
+    return Yes;
+  return Probably;
+}
+Configuration::IsRenderable Configuration::IsRenderable_GUIFont(wxChar ch)
+{
+  if(m_bttnChars_broken_GUIFont.Contains(ch))
+    return No;
+  if(m_bttnChars_working_GUIFont.Contains(ch))
+    return Yes;
+  return Probably;
+}
+void Configuration::IsRenderable_DefaultFont(wxChar ch, bool renderable)
+{
+  if(renderable)
+  {
+    m_bttnChars_broken_DefaultFont.Replace(ch, "");
+    m_bttnChars_working_DefaultFont.Append(ch);
+  }
+  else
+  {
+    m_bttnChars_working_DefaultFont.Replace(ch, "");
+    m_bttnChars_broken_DefaultFont.Append(ch);
+  }
+}
+void Configuration::IsRenderable_MathFont(wxChar ch, bool renderable)
+{
+  if(renderable)
+  {
+    m_bttnChars_broken_MathFont.Replace(ch, "");
+    m_bttnChars_working_MathFont.Append(ch);
+  }
+  else
+  {
+    m_bttnChars_working_MathFont.Replace(ch, "");
+    m_bttnChars_broken_MathFont.Append(ch);
+  }
+}
+void Configuration::IsRenderable_GUIFont(wxChar ch, bool renderable)
+{
+  if(renderable)
+  {
+    m_bttnChars_broken_GUIFont.Replace(ch, "");
+    m_bttnChars_working_GUIFont.Append(ch);
+  }
+  else
+  {
+    m_bttnChars_working_GUIFont.Replace(ch, "");
+    m_bttnChars_broken_GUIFont.Append(ch);
+  }
 }
 
 bool Configuration::HideMarkerForThisMessage(wxString message)
@@ -1424,6 +1533,34 @@ void Configuration::WriteStyles(wxConfigBase *config)
   m_styles[TS_SELECTION].Write(config,wxT("Style/Selection/"));
   m_styles[TS_EQUALSSELECTION].Write(config,wxT("Style/EqualsSelection/"));
   m_styles[TS_OUTDATED].Write(config,wxT("Style/Outdated/"));
+
+  if(m_bttnChars_GUIFont != wxNORMAL_FONT->GetFaceName())
+  {
+    m_bttnChars_broken_GUIFont.clear();
+    m_bttnChars_working_GUIFont.clear();
+  }
+  config->Write(wxT("bttnChars/broken_GUIFont"), m_bttnChars_broken_GUIFont);
+  config->Write(wxT("bttnChars/working_GUIFont"), m_bttnChars_working_GUIFont);
+  config->Write(wxT("bttnChars/GUIFont"), m_bttnChars_GUIFont);
+  
+  if(m_bttnChars_MathFont != GetStyle(TS_INPUT, AFontSize(10.0)).GetFont().GetFaceName())
+  {
+    m_bttnChars_broken_MathFont.clear();
+    m_bttnChars_working_MathFont.clear();
+  }
+  config->Write(wxT("bttnChars/broken_MathFont"), m_bttnChars_broken_MathFont);
+  config->Write(wxT("bttnChars/working_MathFont"), m_bttnChars_working_MathFont);
+  config->Write(wxT("bttnChars/MathFont"), m_bttnChars_MathFont);
+
+  config->Read(wxT("bttnCharsDefaultFont"), &m_bttnChars_DefaultFont);
+  if(m_bttnChars_DefaultFont != GetStyle(TS_INPUT, AFontSize(10.0)).GetFont().GetFaceName())
+  {
+    m_bttnChars_broken_DefaultFont.clear();
+    m_bttnChars_working_DefaultFont.clear();
+  }
+  config->Write(wxT("bttnChars/broken_DefaultFont"), m_bttnChars_broken_DefaultFont);
+  config->Write(wxT("bttnChars/working_DefaultFont"), m_bttnChars_working_DefaultFont);
+  config->Write(wxT("bttnChars/DefaultFont"), m_bttnChars_DefaultFont);
 }
 
 //! Saves the style settings to a file.

@@ -25,6 +25,7 @@
 #include "precomp.h"
 #include <wx/wx.h>
 #include <wx/config.h>
+#include <wx/font.h>
 #include <wx/display.h>
 #include <wx/fontenum.h>
 #include <wx/hashmap.h>
@@ -865,7 +866,24 @@ wxString DocumentclassOptions() const {return m_documentclassOptions;}
   Style m_styles[NUMBEROFSTYLES];
   //! Initialize the text styles on construction.
   void InitStyles();
+  enum IsRenderable {
+    No,Probably,Yes};
+  IsRenderable IsRenderable_DefaultFont(wxChar ch);
+  IsRenderable IsRenderable_MathFont(wxChar ch);
+  IsRenderable IsRenderable_GUIFont(wxChar ch);
+  void IsRenderable_DefaultFont(wxChar ch, bool renderable);
+  void IsRenderable_MathFont(wxChar ch, bool renderable);
+  void IsRenderable_GUIFont(wxChar ch, bool renderable);
 private:
+  wxString m_bttnChars_DefaultFont;
+  wxString m_bttnChars_MathFont;
+  wxString m_bttnChars_GUIFont;
+  wxString m_bttnChars_broken_DefaultFont;
+  wxString m_bttnChars_working_DefaultFont;
+  wxString m_bttnChars_broken_MathFont;
+  wxString m_bttnChars_working_MathFont;
+  wxString m_bttnChars_broken_GUIFont;
+  wxString m_bttnChars_working_GUIFont;
   //! The ppi rate if we don't have a worksheet that provides a current ppi rate
   wxSize m_ppi = wxSize(-1, -1);
   mathDisplayMode m_displayMode = display_2d;
