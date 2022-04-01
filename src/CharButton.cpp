@@ -153,7 +153,7 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   m_buttonText->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CharButton::MouseLeftText), NULL, this);
   m_buttonText->Connect(wxEVT_LEFT_UP, wxCommandEventHandler(CharButton::CharButtonPressed), NULL, this);
   m_buttonText->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(CharButton::ForwardToParent), NULL, this);
-  if(!(forceShow || FontRendersChar(m_char)))
+  if(!(forceShow || m_configuration->FontRendersChar(m_char)))
   {
     Hide();
   }
@@ -162,11 +162,11 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
   wxFont textFont = m_configuration->GetStyle(TS_DEFAULT, AFontSize(10.0)).GetFont();
   if(
     ((!mathFont.IsOk()) ||
-     FontRendersChar(m_char, mathFont)
+     m_configuration->FontRendersChar(m_char, mathFont)
       )
     ||
     ((!textFont.IsOk()) ||
-     FontRendersChar(m_char, textFont)
+     m_configuration->FontRendersChar(m_char, textFont)
       ))
     {
       SetToolTip(m_description);
@@ -177,115 +177,4 @@ CharButton::CharButton(wxWindow *parent, wxWindow *worksheet, Configuration *con
       SetToolTip(m_description + wxT("\n") +
                  _("(Might not be displayed correctly in at least one of the worksheet fonts)"));
     }
-}
-
-bool CharButton::FontRendersChar(wxChar ch, const wxFont &font)
-{
-  return
-    FontDisplaysChar(ch, font) &&
-    CharVisiblyDifferent(ch, wxT('\1'), font) &&
-    CharVisiblyDifferent(ch, wxT('\uF299'), font) &&
-    CharVisiblyDifferent(ch, wxT('\uF000'), font);
-}
-
-bool CharButton::FontDisplaysChar(wxChar ch, const wxFont &font)
-{
-  int width = 200;
-  int height = 200;
-
-  // Prepare two identical device contexts that create identical bitmaps
-  wxBitmap characterBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
-                                      wxBITMAP_SCREEN_DEPTH
-    );
-  wxBitmap referenceBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
-                                      wxBITMAP_SCREEN_DEPTH
-    );
-  wxMemoryDC characterDC;
-  wxMemoryDC referenceDC;
-  characterDC.SetFont(font);
-  referenceDC.SetFont(font);
-  characterDC.SelectObject(characterBitmap);
-  referenceDC.SelectObject(referenceBitmap);
-  characterDC.SetBrush(*wxWHITE_BRUSH);
-  referenceDC.SetBrush(*wxWHITE_BRUSH);
-  characterDC.DrawRectangle(0,0,200,200);
-  referenceDC.DrawRectangle(0,0,200,200);
-  characterDC.SetPen(*wxBLACK_PEN);
-  referenceDC.SetPen(*wxBLACK_PEN);
-
-  // Now draw the character our button shows into one of these bitmaps and see
-  // if that changed any aspect of the bitmap
-  characterDC.DrawText(wxString(ch),
-                       100,
-                       100);
-  wxImage characterImage = characterBitmap.ConvertToImage(); 
-  wxImage referenceImage = referenceBitmap.ConvertToImage(); 
-  for(int x=0; x < width; x++)
-    for(int y=0; y < height; y++)
-    {
-      if(characterImage.GetRed(x,y) != referenceImage.GetRed(x,y))
-        return true;
-      if(characterImage.GetGreen(x,y) != referenceImage.GetGreen(x,y))
-        return true;
-      if(characterImage.GetBlue(x,y) != referenceImage.GetBlue(x,y))
-        return true;
-    }
-  wxLogMessage(
-    wxString::Format(
-      wxT("Char '%s' seems not to be displayed."),
-      wxString(ch).c_str()));
-
-  // characterImage.SaveFile(wxString(m_char)+".png");
-  
-  return false;
-}
-
-bool CharButton::CharVisiblyDifferent(wxChar ch, wxChar otherChar, const wxFont &font)
-{
-  int width = 200;
-  int height = 200;
-
-  // Prepare two identical device contexts that create identical bitmaps
-  wxBitmap characterBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
-                                      wxBITMAP_SCREEN_DEPTH
-    );
-  wxBitmap referenceBitmap = wxBitmap(wxSize(width,height) * wxWindow::GetContentScaleFactor(),
-                                      wxBITMAP_SCREEN_DEPTH
-    );
-  wxMemoryDC characterDC;
-  wxMemoryDC referenceDC;
-  characterDC.SetFont(font);
-  referenceDC.SetFont(font);
-  characterDC.SelectObject(characterBitmap);
-  referenceDC.SelectObject(referenceBitmap);
-  characterDC.SetBrush(*wxWHITE_BRUSH);
-  referenceDC.SetBrush(*wxWHITE_BRUSH);
-  characterDC.DrawRectangle(0,0,200,200);
-  referenceDC.DrawRectangle(0,0,200,200);
-  characterDC.SetPen(*wxBLACK_PEN);
-  referenceDC.SetPen(*wxBLACK_PEN);
-  characterDC.DrawText(wxString(ch),
-                       100,
-                       100);
-  referenceDC.DrawText(wxString(otherChar),
-                       100,
-                       100);
-  wxImage characterImage = characterBitmap.ConvertToImage(); 
-  wxImage referenceImage = referenceBitmap.ConvertToImage(); 
-  for(int x=0; x < width; x++)
-    for(int y=0; y < height; y++)
-    {
-      if(characterImage.GetRed(x,y) != referenceImage.GetRed(x,y))
-        return true;
-      if(characterImage.GetGreen(x,y) != referenceImage.GetGreen(x,y))
-        return true;
-      if(characterImage.GetBlue(x,y) != referenceImage.GetBlue(x,y))
-        return true;
-    }
-  wxLogMessage(
-    wxString::Format(
-      wxT("Char '%s' looks identical to '%s'."),
-      wxString(ch).c_str(),
-      wxString(otherChar).c_str()));
-  return false;
 }
