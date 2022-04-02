@@ -1231,6 +1231,10 @@ void Configuration::WriteSettings(const wxString &file)
     config->Flush();
     delete config;
   }
+  for(auto i:m_renderableChars)
+    config->Write(wxT("renderability/good/")+i.first, i.second);
+  for(auto i:m_nonRenderableChars)
+    config->Write(wxT("renderability/bad/")+i.first, i.second);
 }
 
 wxFontWeight Configuration::IsBold(long st) const
