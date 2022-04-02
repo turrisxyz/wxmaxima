@@ -1314,11 +1314,25 @@ bool Configuration::InUpdateRegion(wxRect const rect) const
 
 bool Configuration::FontRendersChar(wxChar ch, const wxFont &font)
 {
-  return
+  wxString fontName = font.GetNativeFontInfoDesc();
+  fontName.Replace("/","_");
+  if(m_renderableChars[fontName].Contains(ch))
+    return true;
+  if(m_nonRenderableChars[fontName].Contains(ch))
+    return false;
+  
+  bool retval = 
     FontDisplaysChar(ch, font) &&
     CharVisiblyDifferent(ch, wxT('\1'), font) &&
     CharVisiblyDifferent(ch, wxT('\uF299'), font) &&
     CharVisiblyDifferent(ch, wxT('\uF000'), font);
+
+  if(retval)
+    m_renderableChars[fontName] += wxString(ch);
+  else
+    m_nonRenderableChars[fontName] += wxString(ch);
+    
+  return retval;
 }
 
 bool Configuration::FontDisplaysChar(wxChar ch, const wxFont &font)
