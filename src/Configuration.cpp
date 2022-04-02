@@ -123,6 +123,10 @@ wxSize Configuration::GetPPI() const
 
 void Configuration::ResetAllToDefaults(InitOpt options)
 {
+  for(auto i:m_renderableChars)
+    m_renderableChars[i.first] = wxEmptyString;
+  for(auto i:m_nonRenderableChars)
+    m_nonRenderableChars[i.first] = wxEmptyString;
   m_showAllDigits = false;
   m_lineBreaksInLongNums = false;
   m_autoSaveMinutes = 3;
@@ -504,6 +508,43 @@ bool Configuration::MaximaFound(wxString location)
 void Configuration::ReadConfig()
 {
   wxConfigBase *config = wxConfig::Get();
+
+  wxString str;
+  long dummy;
+  config->SetPath("/renderability/good");
+  wxLogMessage(_("Reading the glyph renderability cache"));
+  bool bCont = config->GetFirstEntry(str, dummy);
+  while (bCont)
+  {
+    wxString chars;
+    config->Read(str, &chars);
+    wxLogMessage(
+      wxString::Format(
+        _("Font %s should render the glyphs \"%s\" correctly."),
+        str.c_str(),
+        chars.c_str()
+        )
+      );
+    m_renderableChars[str] = chars;
+    bCont = config->GetNextEntry(str, dummy);
+  }
+  config->SetPath("/renderability/bad");
+  bCont = config->GetFirstEntry(str, dummy);
+  while (bCont)
+  {
+    wxString chars;
+    config->Read(str, &chars);
+    wxLogMessage(
+      wxString::Format(
+        _("Font %s cannot render the glyphs \"%s\"."),
+        str.c_str(),
+        chars.c_str()
+        )
+      );
+    m_nonRenderableChars[str] = chars;
+    bCont = config->GetNextEntry(str, dummy);
+  }
+  config->SetPath("/");
 
   {
     // If this preference cannot be loaded we don't want an error message about it
