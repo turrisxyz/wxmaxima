@@ -527,14 +527,10 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
   m_configuration->SetContext(dcm);
   // Create a graphics context that supports antialiasing, but on MSW
   // only supports fonts that come in the Right Format.
-  wxGCDC antiAliassingDC(dcm);
 #endif
   
   // Don't fill the text background with the background color
   m_configuration->GetDC()->SetMapMode(wxMM_TEXT);
-
-  if(antiAliassingDC.IsOk())
-    m_configuration->SetAntialiassingDC(antiAliassingDC);
 
   // Now iterate over all single parts of the region we need to redraw and redraw
   // the worksheet
@@ -698,7 +694,6 @@ void Worksheet::OnPaint(wxPaintEvent &WXUNUSED(event))
 
     
     m_configuration->SetContext(m_dc);
-    m_configuration->UnsetAntialiassingDC();
     m_lastTop = top;
     m_lastBottom = bottom;
 

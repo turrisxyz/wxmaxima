@@ -1145,8 +1145,10 @@ void Cell::SetPen(double lineWidth) const
     );
   dc->SetPen(pen);
     
-  if(configuration->GetAntialiassingDC() != dc)
-    configuration->GetAntialiassingDC()->SetPen(pen);
+  configuration->GetGC()->SetPen(
+    wxGraphicsPenInfo(GetForegroundColor()).
+    Width(lineWidth * configuration->GetDefaultLineWidth()).
+    Style(wxPENSTYLE_SOLID));
 }
 
 void Cell::SetBrush() const

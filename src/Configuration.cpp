@@ -83,7 +83,6 @@ Configuration::Configuration(wxDC *dc, InitOpt options) :
   m_forceUpdate = false;
   m_outdated = false;
   m_lineWidth_em = 88;
-  m_antialiassingDC = NULL;
   m_workSheet = NULL;
   SetBackgroundBrush(*wxWHITE_BRUSH);
   ResetAllToDefaults(options);
@@ -215,7 +214,6 @@ void Configuration::ResetAllToDefaults(InitOpt options)
   }
   m_indent = -1;
   m_autoSubscript = 1;
-  m_antiAliasLines = true;
   m_showCodeCells = true;
   m_greekSidebar_ShowLatinLookalikes = false;
   m_greekSidebar_Show_mu = false;
@@ -708,7 +706,6 @@ void Configuration::ReadConfig()
   config->Read(wxT("useUnicodeMaths"), &m_useUnicodeMaths);
   config->Read(wxT("mathJaxURL"), &m_mathJaxURL);
   config->Read(wxT("autosubscript"), &m_autoSubscript);
-  config->Read(wxT("antiAliasLines"), &m_antiAliasLines);
   config->Read(wxT("indentMaths"), &m_indentMaths);
   config->Read(wxT("abortOnError"),&m_abortOnError);
   config->Read("defaultPort",&m_defaultPort);
@@ -1534,7 +1531,6 @@ void Configuration::WriteStyles(wxConfigBase *config)
   config->Write(wxT("mathJaxURL_UseUser"), m_mathJaxURL_UseUser);
   config->Write(wxT("enterEvaluates"), m_enterEvaluates);
   config->Write(wxT("mathJaxURL"), m_mathJaxURL);
-  config->Write(wxT("antiAliasLines"), m_antiAliasLines);
   config->Write(wxT("copyBitmap"), m_copyBitmap);
   config->Write(wxT("copyMathML"), m_copyMathML);
   config->Write(wxT("copyMathMLHTML"), m_copyMathMLHTML);

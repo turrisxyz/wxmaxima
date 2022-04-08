@@ -294,7 +294,6 @@ protected:
   wxCheckBox *m_restartOnReEvaluation;
   wxCheckBox *m_wrapLatexMath;
   wxCheckBox *m_usesvg;
-  wxCheckBox *m_antialiasLines;
   wxSpinCtrl *m_defaultFramerate;
   wxSpinCtrl *m_defaultPlotWidth;
   wxSpinCtrl *m_defaultPlotHeight;

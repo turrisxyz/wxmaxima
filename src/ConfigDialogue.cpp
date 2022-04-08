@@ -369,8 +369,6 @@ void ConfigDialogue::SetCheckboxValues()
           _("MathJAX creates scalable High-Quality representations of 2D Maths that can be used for Drag-And-Drop and provides accessibility options. The disadvantage of MathJAX is that it needs JavaScript and a little bit of time in order to typeset equations.\nMathML is much faster than MathJaX, if it is supported by the browser. But many MathML implementations tend to lack necessary features.\nBitmaps tend to need more band width than the other two options. They lack support for advanced features like drag-and-drop or accessibility. Also they have problems aligning and scaling with the rest of the text and might use fonts that don't match the rest of the document."));
   m_usesvg->SetToolTip(
           _("PNG images can be read by old wxMaxima versions - but aren't really scalable."));
-  m_antialiasLines->SetToolTip(
-          _("Try to antialias lines (which allows to move them by a fraction of a pixel, but reduces their sharpness)."));
   m_matchParens->SetToolTip(
           _("Automatically insert a closing parenthesis the moment the user enters an opening one."));
   m_showMatchingParens->SetToolTip(
@@ -440,7 +438,6 @@ void ConfigDialogue::SetCheckboxValues()
 
   m_additionalParameters->SetValue(configuration->MaximaParameters());
   m_usesvg->SetValue(configuration->UseSVG());
-  m_antialiasLines->SetValue(configuration->AntiAliasLines());
 
   m_TeXExponentsAfterSubscript->SetValue(configuration->TeXExponentsAfterSubscript());
   m_usePartialForDiff->SetValue(configuration->UsePartialForDiff());
@@ -671,8 +668,6 @@ wxWindow *ConfigDialogue::CreateWorksheetPanel()
   m_keepPercentWithSpecials = new wxCheckBox(displaySizer->GetStaticBox(), -1,
                                              _("Keep percent sign with special symbols: %e, %i, etc."));
   displaySizer->Add(m_keepPercentWithSpecials, wxSizerFlags());
-  m_antialiasLines = new wxCheckBox(displaySizer->GetStaticBox(), -1, _("Antialias lines."));
-  displaySizer->Add(m_antialiasLines, wxSizerFlags());
 
   m_showMatchingParens = new wxCheckBox(displaySizer->GetStaticBox(), -1, _("Highlight the matching parenthesis"));
   displaySizer->Add(m_showMatchingParens, wxSizerFlags());
@@ -1775,7 +1770,6 @@ void ConfigDialogue::WriteSettings()
   configuration->SetLabelChoice((Configuration::showLabels) m_showUserDefinedLabels->GetSelection());
   configuration->DefaultPort(m_defaultPort->GetValue());
   configuration->UseSVG(m_usesvg->GetValue());
-  configuration->AntiAliasLines(m_antialiasLines->GetValue());
   configuration->DefaultFramerate(m_defaultFramerate->GetValue());
   configuration->MaxGnuplotMegabytes(m_maxGnuplotMegabytes->GetValue());
   configuration->AutosaveMinutes(m_autosaveMinutes->GetValue());

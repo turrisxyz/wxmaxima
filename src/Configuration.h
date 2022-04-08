@@ -26,6 +26,7 @@
 #include <wx/wx.h>
 #include <wx/config.h>
 #include <wx/display.h>
+#include <wx/graphics.h>
 #include <wx/fontenum.h>
 #include <wx/hashmap.h>
 #include "LoggingMessageDialog.h"
@@ -155,7 +156,7 @@ public:
   void SetContext(wxDC &dc)
   {
     m_dc = &dc;
-    m_antialiassingDC = NULL;
+    m_gc.reset();
   }
   void UnsetContext() {m_dc = NULL;}
 
@@ -164,11 +165,6 @@ public:
   void FixedFontInTextControls(bool fixed){m_fixedFontTC = fixed;}
   wxBrush GetBackgroundBrush() const {return m_BackgroundBrush;}
   wxBrush GetTooltipBrush() const {return m_tooltipBrush;}
-  void SetAntialiassingDC(wxDC &antialiassingDC)
-    {m_antialiassingDC = &antialiassingDC;}
-
-  void UnsetAntialiassingDC()
-    {m_antialiassingDC = NULL;}
 
   ~Configuration();
 
@@ -247,12 +243,14 @@ public:
   { return m_dc; }
 
   //! Get a drawing context suitable for size calculations
-  wxDC *GetAntialiassingDC()
+   wxGraphicsContext *GetGC()
     {
-      if ((m_antialiassingDC != NULL) && m_antiAliasLines)
-        return m_antialiassingDC;
-      else
-        return m_dc;
+      if(!m_gc)
+      {
+        wxGraphicsContext *gc = wxGraphicsContext::Create(m_dc);
+        m_gc = std::unique_ptr<wxGraphicsContext>(gc);
+      }
+      return m_gc.get();
     }
   
   AFontName GetFontName(TextStyle ts = TS_DEFAULT) const;
@@ -717,8 +715,6 @@ public:
   static wxString MathJaXURL_Auto() { return wxT("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js");}
   //! Returns the URL MathJaX can be found at.
   void MathJaXURL(wxString url){m_mathJaxURL = url;}
-  bool AntiAliasLines() const {return m_antiAliasLines;}
-  void AntiAliasLines(bool antiAlias){ m_antiAliasLines = antiAlias; }
 
   bool CopyBitmap() const {return m_copyBitmap;}
   void CopyBitmap(bool copyBitmap){ m_copyBitmap = copyBitmap; }
@@ -958,10 +954,9 @@ private:
   long m_labelWidth;
   long m_indent;
   bool m_latin2greek;
-  bool m_antiAliasLines;
   double m_zoomFactor;
   wxDC *m_dc;
-  wxDC *m_antialiassingDC;
+  std::unique_ptr<wxGraphicsContext> m_gc;
   wxString m_maximaShareDir;
   bool m_forceUpdate;
   bool m_clipToDrawRegion;
