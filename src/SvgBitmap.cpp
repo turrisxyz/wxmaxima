@@ -33,7 +33,8 @@
 #include "Image.h"
 #include "invalidImage.h"
 
-SvgBitmap::SvgBitmap(const unsigned char *data, size_t len, int width, int height, int scaleFactor)
+SvgBitmap::SvgBitmap(wxWindow *window, const unsigned char *data, size_t len, int width, int height, int scaleFactor):
+  m_window(window)
 {
   m_scaleFactor = scaleFactor;
   // Unzip the .svgz image
@@ -70,8 +71,11 @@ SvgBitmap::~SvgBitmap()
 const SvgBitmap &SvgBitmap::SetSize(int width, int height)
 {
   // Set the bitmap to the new size
+  #if defined __WXOSX__
+  wxBitmap::operator=(wxBitmap(width, height, 32, m_window->GetContentScaleFactor()));
+  #else
   wxBitmap::operator=(wxBitmap(width, height, 32));
-
+  #endif
   if (!m_svgImage)
   {
     wxBitmap::operator=(GetInvalidBitmap(width));
@@ -107,8 +111,8 @@ const SvgBitmap &SvgBitmap::SetSize(int width, int height)
   return *this;
 }
 
-SvgBitmap::SvgBitmap(const unsigned char *data, size_t len, wxSize siz, int scaleFactor):
-  SvgBitmap(data, len, siz.x, siz.y, scaleFactor)
+SvgBitmap::SvgBitmap(wxWindow *window, const unsigned char *data, size_t len, wxSize siz, int scaleFactor):
+  SvgBitmap(wxWindow *window, data, len, siz.x, siz.y, scaleFactor)
 {}
 
 SvgBitmap &SvgBitmap::operator=(SvgBitmap &&o)
@@ -123,7 +127,11 @@ wxBitmap SvgBitmap::GetInvalidBitmap(int targetSize)
   wxImage img = wxImage(invalidImage_xpm);
   img.Rescale(targetSize, targetSize, wxIMAGE_QUALITY_HIGH);
   wxBitmap retval;
+  #if defined __WXOSX__
+  retval = wxBitmap(img,wxBITMAP_SCREEN_DEPTH, m_window->GetContentScaleFactor());
+  #else
   retval = wxBitmap(img,wxBITMAP_SCREEN_DEPTH);
+  #endif
   return retval;
 }
 

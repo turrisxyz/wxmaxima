@@ -67,9 +67,9 @@ wxBitmap ToolBar::GetBitmap(wxString name, unsigned char *data, size_t len, wxSi
 
   #if defined __WXOSX__
     int targetSize = wxMax(m_ppi.x,75) * TOOLBAR_ICON_SCALE * GetContentScaleFactor();
-#else
+  #else
     int targetSize = wxMax(m_ppi.x,75) * TOOLBAR_ICON_SCALE;
-#endif
+  #endif
     int sizeA = 128 << 4;
     while(sizeA * 3 / 2 > targetSize && sizeA >= 32) {
       sizeA >>= 1;
