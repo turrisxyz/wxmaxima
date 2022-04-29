@@ -30,6 +30,8 @@
 #include <wx/zstream.h>
 #include <wx/txtstrm.h>
 #include <wx/rawbmp.h>
+#include <wx/window.h>
+#include <wx/wx.h>
 #include "Image.h"
 #include "invalidImage.h"
 
@@ -112,7 +114,7 @@ const SvgBitmap &SvgBitmap::SetSize(int width, int height)
 }
 
 SvgBitmap::SvgBitmap(wxWindow *window, const unsigned char *data, size_t len, wxSize siz, int scaleFactor):
-  SvgBitmap(wxWindow *window, data, len, siz.x, siz.y, scaleFactor)
+  SvgBitmap(window, data, len, siz.x, siz.y, scaleFactor)
 {}
 
 SvgBitmap &SvgBitmap::operator=(SvgBitmap &&o)

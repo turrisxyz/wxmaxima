@@ -91,7 +91,7 @@ wxBitmap ToolBar::GetBitmap(wxString name, unsigned char *data, size_t len, wxSi
   if(bmp.IsOk())
     img = bmp.ConvertToImage();
   if(!img.IsOk())
-    return SvgBitmap(data, len, siz, GetContentScaleFactor());
+    return SvgBitmap(this, data, len, siz, GetContentScaleFactor());
 
   img.Rescale(siz.x, siz.y, wxIMAGE_QUALITY_HIGH);
 #if defined __WXOSX__

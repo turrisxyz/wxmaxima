@@ -43,7 +43,7 @@ class SvgBitmap: public wxBitmap
 public:
 //! A constructor that loads the data into a wxBitmap
   SvgBitmap(wxWindow *window, const unsigned char *data, size_t len, int width = 640, int height = 480, int scaleFactor = 1);
-  SvgBitmap(wxWindow *windowm const unsigned char *data, size_t len, wxSize siz, int scaleFactor = 1);
+  SvgBitmap(wxWindow *window, const unsigned char *data, size_t len, wxSize siz, int scaleFactor = 1);
   ~SvgBitmap() override;
   SvgBitmap(SvgBitmap &&) = delete;
   SvgBitmap &operator=(SvgBitmap &&o);
@@ -74,7 +74,7 @@ private:
   //! The renderable svg image after we have read it in
   std::unique_ptr<NSVGimage, decltype(std::free)*> m_svgImage{nullptr, std::free};
   //! The window this bitmap will be drawn on
-  wxWindow m_window;
+  wxWindow *m_window;
 };
 
 #endif // SVGBITMAP_H
