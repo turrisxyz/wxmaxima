@@ -4117,6 +4117,28 @@ wxString EditorCell::GetSelectionString() const
     return wxEmptyString;
 }
 
+TextStyle EditorCell::GetSelectionStyle() const
+{
+  long pos = 0;
+  for (std::vector<StyledText>::const_iterator textSnippet = m_styledText.begin();
+       textSnippet != m_styledText.end(); ++textSnippet)
+  {
+    wxString text = textSnippet->GetText();
+    if(
+      (pos >= wxMin(m_selectionStart, m_selectionEnd)) &&
+      (pos+text.Length() <= wxMax(m_selectionStart, m_selectionEnd))
+      )
+    {
+      if (textSnippet->IsStyleSet())
+        return textSnippet->GetStyle();
+    }
+    if(pos>m_selectionEnd)
+      return TS_INVALID;
+      
+  }
+  return TS_INVALID;
+}
+
 void EditorCell::ClearSelection()
 {
   if (SelectionActive())
